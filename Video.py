@@ -5,7 +5,7 @@ class Video():
         self.id = vid
         self.originalFileName = originalFileName
         self.url = url
-        self.video_format = originalFileName.split('.')[-1]
+        self.video_format = url.split('.')[-1]
 
     def printInfo(self):
         print("\n####################################################")
