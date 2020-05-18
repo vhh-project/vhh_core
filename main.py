@@ -60,7 +60,7 @@ class MainController(object):
                 video_instance.download(self.__rest_api_instance)
 
         # run sbd
-        #self.__sbd_instance.run(video_instance_list=video_instance_list)
+        self.__sbd_instance.run(video_instance_list=video_instance_list)
 
         # run stc
 
