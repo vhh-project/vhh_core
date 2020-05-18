@@ -1,0 +1,48 @@
+
+Development:
+  DEBUG_FLAG: 1             # 1 ... activate 0 ... deactivate
+
+PreProcessing:
+  RESIZE_DIM: 128, 128      # resize dimension -> height, width
+  CONVERT2GRAY: 0           # 0 or 1   --> not working yet
+  CROP: 1                   # 0 or 1
+  DOWNSCALE: 1              # 0 or 1
+  HISTOGRAM_EQU: 'none'     # "clahe" or "classic" or "none"
+
+SbdCore:
+  CANDIDATE_SELECTION: 0    # 1 ... activate 0 ... deactivate
+
+  SAVE_RAW_RESULTS: 1       # 1 ... yes 0 ... no
+  PATH_RAW_RESULTS: "/data/share/maxrecall_vhh_mmsi/videos/results/sbd/raw_results/"
+  PREFIX_RAW_RESULTS: "results_raw_"
+  POSTFIX_RAW_RESULTS: "csv"
+
+  SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
+  PATH_FINAL_RESULTS: "/data/share/maxrecall_vhh_mmsi/videos/results/sbd/final_results/"
+  PREFIX_FINAL_RESULTS: "results_"
+  POSTFIX_FINAL_RESULTS: "csv"
+
+  PATH_VIDEOS: "/data/share/maxrecall_vhh_mmsi/videos/downloaded/"
+  THRESHOLD_MODE: 'adaptive'    # adaptive OR fixed
+  THRESHOLD: 0.8                 # value [0-1]
+  ALPHA: 8.0                     # value > 1 only for adaptive mode
+  WINDOW_SIZE: 100               # only for adaptive mode
+  BACKBONE_CNN: "squeezenet"    # vgg16 OR squeezenet
+  SIMILARITY_METRIC: "cosine"
+
+CandidateSelection:
+  PATH_PRETRAINED_MODEL: "/caa/Homes01/dhelm/working/pycharm_sbd_clipshot/ClipShots_basline/pretrained/Alexnet-final.pth"
+
+PostProcessing:
+  c: 2
+  d: 5
+
+Visualization:
+  c: 2
+  d: 5
+
+Evaluation:
+  SAVE_EVAL_RESULTS: 1
+  PATH_RAW_RESULTS: "/caa/Homes01/dhelm/working/pycharm_vhh_sbd/Demo/results_raw/"
+  PATH_EVAL_RESULTS: "/caa/Homes01/dhelm/working/pycharm_vhh_sbd/Develop/Evaluation/"
+  PATH_GT_ANNOTATIONS: "/caa/Projects02/vhh/private/database_nobackup/VHH_datasets/annotations/ShotBoundaryDetection/imediacities/sbd_imc_annotations_20191231.csv"

@@ -1,0 +1,40 @@
+
+
+Development:
+  DEBUG_FLAG: 0             # 1 ... activate 0 ... deactivate
+
+PreProcessing:
+  RESIZE_DIM: 128, 128      # resize dimension -> height, width
+  CONVERT2GRAY: 0           # 0 or 1   --> not working yet
+  CROP: 1                   # 0 or 1
+  DOWNSCALE: 1              # 0 or 1
+  HISTOGRAM_EQU: 'none'     # "clahe" or "classic" or "none"
+
+SbdCore:
+  SAVE_RAW_RESULTS: 1       # 1 ... yes 0 ... no
+  PATH_RAW_RESULTS: "/caa/Homes01/dhelm/working/pycharm_vhh_sbd/Demo/results_raw/"
+  PREFIX_RAW_RESULTS: "results_raw_"
+  POSTFIX_RAW_RESULTS: "csv"
+
+  SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
+  PATH_FINAL_RESULTS: "/caa/Homes01/dhelm/working/pycharm_vhh_sbd/Demo/"
+  PREFIX_FINAL_RESULTS: "results_"
+  POSTFIX_FINAL_RESULTS: "csv"
+
+  #PATH_VIDEOS: "/caa/Projects02/vhh/private/dzafirova/sbd_efilms_db_20190621/videos_converted/"
+  PATH_VIDEOS: "/caa/Projects02/vhh/private/database_nobackup/IMediaCities_datasets/IMC_database/videos/"
+  THRESHOLD: 0.8
+  BACKBONE_CNN: "squeeze"
+  SIMILARITY_METRIC: "cosine"
+
+PostProcessing:
+  c: 2
+  d: 5
+
+Visualization:
+  c: 2
+  d: 5
+
+Evaluation:
+  SAVE_EVAL_RESULTS: 1
+  PATH_EVAL_RESULTS: "/caa/Homes01/dhelm/working/pycharm_vhh_sbd/Develop/"
