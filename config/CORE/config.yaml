@@ -1,0 +1,24 @@
+
+
+Development:
+  DEBUG_FLAG: 0             # 1 ... activate 0 ... deactivate
+
+Security:
+  PEM_PATH: "/home/dhelm/VHH_Develop/certificates/cacert.pem"  # certificate file for vhh-mmsi api access
+
+ApiEndpoints:
+  ROOT_URL: "https://api.vhh-stg.max-recall.com/api/shotservice/"   # root url for API endpoints
+
+VhhCore:
+  VIDEO_DOWNLOAD_PATH: "/data/share/maxrecall_vhh_mmsi/videos/downloaded/"   # directory to store all downloaded videos
+  CLEANUP_FLAG: 0   # 0 ... deactivate cleanup function OR 1 ... activate cleanup method -> delete all downloaded videos + annotation results locally
+
+PluginConfigs:
+  SBD_CONFIG_FILE: "/home/dhelm/VHH_Develop/pycharm_vhh_core/config/SBD/config_single_video.yaml"
+  STC_CONFIG_FILE: "/home/dhelm/VHH_Develop/pycharm_vhh_core/config/STC/config_single_video.yaml"
+  CMC_CONFIG_FILE: "None"
+
+
+
+
+

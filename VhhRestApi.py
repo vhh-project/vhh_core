@@ -38,7 +38,7 @@ class VhhRestApi():
         # print(res)
         return response
 
-    def getListofVideosFromMaxRecall(self):
+    def getListofVideos(self):
         print("load list of videos ... ")
 
         print("send request: " + str(self.API_VIDEO_SEARCH_ENDPOINT))
@@ -62,26 +62,37 @@ class VhhRestApi():
 
             video_instance = Video(vid=vid,
                                    originalFileName=originalFileName,
-                                   url=url)
+                                   url=url,
+                                   download_path=self.video_download_path)
             video_instance_list.append(video_instance)
 
         return video_instance_list
 
     def downloadVideo(self, url, file_name, video_format):
         print("start download process ... ")
-        video_file = requests.get(url, verify=self.pem_path)
-        open(self.video_download_path + "/" + file_name + "." + str(video_format), 'wb').write(video_file.content)
-        print("successfully downloaded ... ")
+        ret = False
 
-    def getAutomaticSbdResults(self, vid):
+        try:
+            video_file = requests.get(url, verify=self.pem_path)
+            open(self.video_download_path + "/" + file_name + "." + str(video_format), 'wb').write(video_file.content)
+            print("successfully downloaded ... ")
+            ret = True
+        except():
+            print("Download process failed!")
+            ret = False
+
+        return ret
+
+    def getAutomaticResults(self, vid):
         print("get sbd results from maxrecall ... ")
         url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
         response = self.getRequest(url)
         res_json = response.json()
         print(res_json)
+        return res_json
 
-    def postAutomaticSbdResults(self, vid, results_np):
-        print("save sbd results to maxrecall ... ")
+    def postAutomaticResults(self, vid, results_np):
+        print("save all automatic generated results to maxrecall ... ")
         url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + "/" + str(vid) + "/shots/auto"
 
         data_block = results_np[1:, :]
@@ -90,12 +101,14 @@ class VhhRestApi():
         for i in range(0, len(data_block)):
             inpoint = int(data_block[i][2]) + 1
             outpoint = int(data_block[i][3]) + 1
+            shot_type = data_block[i][4]
+            camera_movement = data_block[i][5]
 
             data_dict = {
                 "inPoint": inpoint,
                 "outPoint": outpoint,
-                "shotType": "MS",
-                "cameraMovement": "PAN"
+                "shotType": shot_type,
+                "cameraMovement": camera_movement
             }
 
             data_dict_l.append(data_dict)
@@ -104,3 +117,5 @@ class VhhRestApi():
         payload = json.dumps(data_dict_l)
         response = self.postRequest(url, payload)
         print(response.content)
+
+        print("sbd results successfully sent to maxrecall ... ")
