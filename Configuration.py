@@ -41,6 +41,7 @@ class Configuration:
         self.stc_config_file = "None"
         self.cmc_config_file = "None"
         self.cleanup_flag = False
+        self.results_root_dir = "NONE"
 
     def loadConfig(self):
         """
@@ -65,6 +66,7 @@ class Configuration:
         # vhh_core_config section
         self.video_download_path = vhh_core_config['VIDEO_DOWNLOAD_PATH']
         self.cleanup_flag = int(vhh_core_config['CLEANUP_FLAG'])
+        self.results_root_dir = vhh_core_config['RESULTS_ROOT_DIR']
 
         # plugin_config section
         self.sbd_config_file = str(plugin_config['SBD_CONFIG_FILE'])

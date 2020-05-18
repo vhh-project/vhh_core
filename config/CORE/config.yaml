@@ -12,6 +12,7 @@ ApiEndpoints:
 VhhCore:
   VIDEO_DOWNLOAD_PATH: "/data/share/maxrecall_vhh_mmsi/videos/downloaded/"   # directory to store all downloaded videos
   CLEANUP_FLAG: 0   # 0 ... deactivate cleanup function OR 1 ... activate cleanup method -> delete all downloaded videos + annotation results locally
+  RESULTS_ROOT_DIR: "/data/share/maxrecall_vhh_mmsi/videos/results/"
 
 PluginConfigs:
   SBD_CONFIG_FILE: "/home/dhelm/VHH_Develop/pycharm_vhh_core/config/SBD/config_single_video.yaml"

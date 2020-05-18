@@ -1,6 +1,7 @@
 from Sbd import Sbd
-from sbd.utils import *
-from stc.STC import STC
+from Stc import Stc
+#from sbd.utils import *
+#from stc.STC import STC
 from VhhRestApi import VhhRestApi
 from Configuration import Configuration
 import numpy as np
@@ -21,7 +22,7 @@ print("------------------------------------------")
 
 class MainController(object):
     def __init__(self):
-        printCustom("Create instance of MainController", STDOUT_TYPE.INFO)
+        print("Create instance of MainController")
 
         # load CORE configuration
         config_file = "/home/dhelm/VHH_Develop/pycharm_vhh_core/config/CORE/config.yaml"
@@ -38,13 +39,13 @@ class MainController(object):
 
         # initialize class members
         self.__sbd_instance = Sbd(config=self.__configuration_instance)
-        self.__stc_instance = None
+        self.__stc_instance = Stc(config=self.__configuration_instance)
         self.__cmc_instance = None
 
         self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance)
 
     def run(self):
-        printCustom("Start automtatic annotation process ... ", STDOUT_TYPE.INFO)
+        print("Start automtatic annotation process ... ")
 
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
@@ -60,20 +61,72 @@ class MainController(object):
                 video_instance.download(self.__rest_api_instance)
 
         # run sbd
-        self.__sbd_instance.run(video_instance_list=video_instance_list)
+        #self.__sbd_instance.run(video_instance_list=video_instance_list)
 
         # run stc
+        #self.__stc_instance.run()
 
         # run cmc
 
         # merge all results
+        results_np = self.merge_results()
+        print(results_np)
 
-        # post automatic annotations mmsi
 
-        printCustom("Successfully finished!", STDOUT_TYPE.INFO)
 
+        # post all results
+        vids = np.unique(results_np[:, :1])
+        for vid in vids:
+            indices = np.where(vid == results_np[:, :1])[0]
+            vid_results_np = results_np[indices]
+            print(results_np[indices])
+
+            header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
+            header_np = np.expand_dims(np.array(header), axis=0)
+            vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
+
+            self.__rest_api_instance.postAutomaticResults(vid=int(vid), results_np=vid_results_np)
+
+        print("Successfully finished!")
+
+    def merge_results(self):
+        # merge and prepare results
+
+        stc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "stc")
+        stc_results_path = os.path.join(stc_results_path, "final_results")
+
+        cmc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "cmc")
+        cmc_results_path = os.path.join(cmc_results_path, "final_results")
+
+        result_file_list = os.listdir(stc_results_path)
+        print(result_file_list)
+
+        entries = []
+
+        for results_file in result_file_list:
+            fp = open(stc_results_path + "/" + results_file)
+            lines = fp.readlines()
+            fp.close()
+
+            for line in lines[1:]:
+                line = line.replace('\n', '')
+                line_split = line.split(';')
+                entries.append([line_split[0].split('.')[0],
+                                line_split[1],
+                                line_split[2],
+                                line_split[3],
+                                line_split[4],
+                                "NA"])
+
+        #header_np = np.expand_dims(np.array(header), axis=0)
+        entries_np = np.array(entries)
+        #entries_np = np.concatenate((header_np, entries_np), axis=0)
+        return entries_np
+
+
+    '''
     def run_stc_process(self, sbd_results_path, config_file):
-        printCustom("start stc process ... ", STDOUT_TYPE.INFO)
+        print("start stc process ... ")
 
         # initialize and run stc process
         stc_instance = STC(config_file)
@@ -96,7 +149,7 @@ class MainController(object):
                                             video_instance.originalFileName,
                                             video_instance.video_format)
         print("download process finished ... ")
-
+    '''
 
 def main():
     main_instance = MainController()

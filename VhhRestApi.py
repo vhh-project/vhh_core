@@ -100,6 +100,7 @@ class VhhRestApi(object):
 
         data_dict_l = []
         for i in range(0, len(data_block)):
+            print(data_block[i])
             inpoint = int(data_block[i][2]) + 1
             outpoint = int(data_block[i][3]) + 1
             shot_type = data_block[i][4]
@@ -115,8 +116,11 @@ class VhhRestApi(object):
             data_dict_l.append(data_dict)
         #print(json.dumps(data_dict_l))
 
-        payload = json.dumps(data_dict_l)
-        response = self.postRequest(url, payload)
+        #payload = json.dumps(data_dict_l)
+        #print(payload)
+
+        response = self.postRequest(url, data_dict_l)
         print(response.content)
+
 
         print("sbd results successfully sent to maxrecall ... ")
