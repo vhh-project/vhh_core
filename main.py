@@ -41,9 +41,7 @@ class MainController(object):
         self.__stc_instance = None
         self.__cmc_instance = None
 
-        self.__rest_api_instance = VhhRestApi(root_url=self.__root_url,
-                                              pem_path=self.__pem_path,
-                                              video_download_path=self.__video_download_path)
+        self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance)
 
     def run(self):
         printCustom("Start automtatic annotation process ... ", STDOUT_TYPE.INFO)

@@ -4,26 +4,26 @@ import requests
 from Video import Video
 
 
-class VhhRestApi():
-    def __init__(self,
-                 root_url="https://api.vhh-stg.max-recall.com/api/shotservice/",
-                 pem_path="/home/dhelm/VHH_Develop/certificates/cacert.pem",
-                 video_download_path="/data/share/maxrecall_vhh_mmsi/videos/downloaded/"):
-
+class VhhRestApi(object):
+    def __init__(self, config=None):
         print("create instance of VhhRestApi ...")
-        self.root_url = root_url
-        self.pem_path = pem_path
 
-        # download path
-        self.video_download_path = video_download_path
+        if (config == None):
+            print("You have to specify a valid configuration instance!")
+
+        # load configurations specified in core config file
+        self.__core_config = config
+        self.__pem_path = self.__core_config.pem_path
+        self.__root_url = self.__core_config.root_url
+        self.__video_download_path = self.__core_config.video_download_path
 
         # create urls
-        self.API_VIDEO_SEARCH_ENDPOINT = root_url + "/videos/search"
-        self.API_VIDEO_SHOTS_AUTO_ENDPOINT = self.root_url + "/videos/"  # 8/shots/auto
+        self.API_VIDEO_SEARCH_ENDPOINT = self.__root_url + "/videos/search"
+        self.API_VIDEO_SHOTS_AUTO_ENDPOINT = self.__root_url + "/videos/"  # 8/shots/auto
 
     def getRequest(self, url):
         print("send request: " + str(url))
-        response = requests.get(url, verify=self.pem_path)  # params=params,
+        response = requests.get(url, verify=self.__pem_path)  # params=params,
         print("receive response")
         # print(res)
         return response
@@ -33,7 +33,7 @@ class VhhRestApi():
         payload = json.dumps(data_dict)
 
         print("send request: " + str(url))
-        response = requests.post(url=url, headers=headers, data=payload, verify=self.pem_path)  # , header=headers
+        response = requests.post(url=url, headers=headers, data=payload, verify=self.__pem_path)  # , header=headers
         print("receive response")
         # print(res)
         return response
@@ -42,7 +42,7 @@ class VhhRestApi():
         print("load list of videos ... ")
 
         print("send request: " + str(self.API_VIDEO_SEARCH_ENDPOINT))
-        res = requests.get(self.API_VIDEO_SEARCH_ENDPOINT, verify=self.pem_path)  # params=params,
+        res = requests.get(self.API_VIDEO_SEARCH_ENDPOINT, verify=self.__pem_path)  # params=params,
         print("receive response")
         print(res)
 
@@ -60,10 +60,11 @@ class VhhRestApi():
             originalFileName = entry['originalFileName']
             url = entry['url']
 
-            video_instance = Video(vid=vid,
-                                   originalFileName=originalFileName,
-                                   url=url,
-                                   download_path=self.video_download_path)
+            video_instance = Video(self.__core_config)
+            video_instance.create_video(vid=vid,
+                                        originalFileName=originalFileName,
+                                        url=url,
+                                        download_path=self.__video_download_path)
             video_instance_list.append(video_instance)
 
         return video_instance_list
@@ -73,8 +74,8 @@ class VhhRestApi():
         ret = False
 
         try:
-            video_file = requests.get(url, verify=self.pem_path)
-            open(self.video_download_path + "/" + file_name + "." + str(video_format), 'wb').write(video_file.content)
+            video_file = requests.get(url, verify=self.__pem_path)
+            open(self.__video_download_path + "/" + file_name + "." + str(video_format), 'wb').write(video_file.content)
             print("successfully downloaded ... ")
             ret = True
         except():

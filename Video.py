@@ -1,7 +1,23 @@
 import os
+import yaml
 
 class Video(object):
-    def __init__(self, vid, originalFileName, url, download_path):
+    def __init__(self, config=None):
+        print("create instance of Video")
+
+        if (config == None):
+            print("You have to specify a valid configuration instance!")
+
+        self.__core_config = config
+
+        self.__id = -1
+        self.__originalFileName = "None"
+        self.__url = "None"
+        self.__video_format = "None"
+        self.__file_name = "None"
+        self.__download_path = "None"
+
+    def create_video(self, vid, originalFileName, url, download_path):
         #print("create instance of Video");
         self.__id = vid
         self.__originalFileName = originalFileName
@@ -50,8 +66,30 @@ class Video(object):
             os.remove(file_path)
 
         print("Delete sbd results if available ...")
+        fp = open(self.__core_config.sbd_config_file, 'r')
+        sbd_config = yaml.load(fp, Loader=yaml.BaseLoader)
+        sbd_results_dir = sbd_config['SbdCore']['PATH_FINAL_RESULTS']
+        fp.close()
+
+        search_str = str(self.__id) + ".csv"
+        result_file_list = os.listdir(sbd_results_dir)
+        if (search_str in result_file_list):
+            print("delete sbd results ... ")
+            file_path = os.path.join(sbd_results_dir, search_str)
+            os.remove(file_path)
 
         print("Delete stc results if available  ...")
+        fp = open(self.__core_config.stc_config_file, 'r')
+        stc_config = yaml.load(fp, Loader=yaml.BaseLoader)
+        stc_results_dir = stc_config['StcCore']['PATH_FINAL_RESULTS']
+        fp.close()
+
+        search_str = str(self.__id) + ".csv"
+        result_file_list = os.listdir(stc_results_dir)
+        if (search_str in result_file_list):
+            print("delete stc results ... ")
+            file_path = os.path.join(stc_results_dir, search_str)
+            os.remove(file_path)
 
         print("Delete cmc results if available  ...")
 
