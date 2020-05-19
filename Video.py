@@ -1,8 +1,18 @@
 import os
 import yaml
 
+
 class Video(object):
+    """
+    This class represents a video object.
+    """
+
     def __init__(self, config=None):
+        """
+        Constructor
+
+        :param config: parameter must hold the core configuration object (Class-type Configuration)
+        """
         print("create instance of Video")
 
         if (config == None):
@@ -18,6 +28,14 @@ class Video(object):
         self.download_path = "None"
 
     def create_video(self, vid, originalFileName, url, download_path):
+        """
+        This method is used to fill all properties of a video.
+
+        :param vid: This parameter must hold a valid video id.
+        :param originalFileName: This parameter must hold the original filename of a video
+        :param url: This parameter must hold the download url of the video.
+        :param download_path: This parameter must hold the download path in the local storage.
+        """
         #print("create instance of Video");
         self.id = vid
         self.originalFileName = originalFileName
@@ -27,6 +45,12 @@ class Video(object):
         self.download_path = download_path
 
     def download(self, rest_api_instance=None):
+        """
+        This method is used to download the video into the local storage path.
+
+        :param rest_api_instance: This parameter must hold a valid VhhRestApi object.
+        :return: This method returns the download status (true ... successfully downloaded OR false ... download failed).
+        """
         if (rest_api_instance == None):
             print("You have to specify a valid object of class type VhhRestApi to execute the download process!")
             exit()
@@ -37,6 +61,11 @@ class Video(object):
         return ret
 
     def is_downloaded(self):
+        """
+        This method is used to check if a video is already downloaded.
+
+        :return: This method returns a boolean flag (true ... video already downloaded OR false ... video does not exist).
+        """
         print("Check if video is already available in specified download path: " + str(self.download_path))
         ret = False
 
@@ -52,6 +81,10 @@ class Video(object):
         return ret
 
     def cleanup(self):
+        """
+        This method is used to cleanup all data related to the corresponding video ID. It deletes the generated results
+        of the sbd, stc and cmc plugin as well as the downloaded video file.
+        """
         print("start cleanup process ... ")
 
         print("Delete video if available in video_download path ...")
@@ -96,6 +129,10 @@ class Video(object):
         print("cleanup process successfully finished!")
 
     def printInfo(self):
+        """
+        This method summarizes all properties of this object and print it to the console.
+        """
+
         print("\n####################################################")
         print("id: " + str(self.id))
         print("originalFileName(without extension): " + str(self.originalFileName))

@@ -1,0 +1,6 @@
+numpy
+requests
+PyYAML
+Sphinx
+git+https://github.com/dahe-cvl/vhh_stc#egg=vhh_stc
+git+https://github.com/dahe-cvl/vhh_sbd#egg=vhh_sbd

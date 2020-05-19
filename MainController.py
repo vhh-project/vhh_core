@@ -1,27 +1,20 @@
 from Sbd import Sbd
 from Stc import Stc
-#from sbd.utils import *
-#from stc.STC import STC
 from VhhRestApi import VhhRestApi
 from Configuration import Configuration
 import numpy as np
 import os
 
-'''
-printCustom("Welcome to the sbd framework!", STDOUT_TYPE.INFO);
-printCustom("Setup environment variables ... ", STDOUT_TYPE.INFO)
-print("------------------------------------------")
-print("LD_LIBRARY_PATH: ", str(os.environ['LD_LIBRARY_PATH']))
-print("CUDA_HOME: ", str(os.environ['CUDA_HOME']))
-print("PATH: ", str(os.environ['PATH']))
-print("CUDA_VISIBLE_DEVICES: ", str(os.environ['CUDA_VISIBLE_DEVICES']))
-print("PYTHONPATH: ", str(os.environ['PYTHONPATH']))
-print("------------------------------------------")
-'''
-
 
 class MainController(object):
+    """
+    This class represents the Main part of this application and includes all interfaces and methods to use the automatic annotation plugins.
+    """
+
     def __init__(self):
+        """
+        Constructor
+        """
         print("Create instance of MainController")
 
         # load CORE configuration
@@ -45,7 +38,11 @@ class MainController(object):
         self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance)
 
     def run(self):
-        print("Start automtatic annotation process ... ")
+        """
+        This method is used to start the automatic annotation process.
+        """
+
+        print("Start automatic annotation process ... ")
 
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
@@ -70,16 +67,12 @@ class MainController(object):
 
         # merge all results
         results_np = self.merge_results()
-        print(results_np)
-
-
 
         # post all results
         vids = np.unique(results_np[:, :1])
         for vid in vids:
             indices = np.where(vid == results_np[:, :1])[0]
             vid_results_np = results_np[indices]
-            print(results_np[indices])
 
             header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
             header_np = np.expand_dims(np.array(header), axis=0)
@@ -90,6 +83,11 @@ class MainController(object):
         print("Successfully finished!")
 
     def merge_results(self):
+        """
+        This method is used to merge and prepare the results of each individual plugin (sbd, stc, cmc) to send it to the the Vhh-MMSI database.
+
+        :return: This method returns a numpy array holding all results (including a valid header).
+        """
         # merge and prepare results
 
         stc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "stc")
@@ -99,10 +97,7 @@ class MainController(object):
         cmc_results_path = os.path.join(cmc_results_path, "final_results")
 
         result_file_list = os.listdir(stc_results_path)
-        print(result_file_list)
-
         entries = []
-
         for results_file in result_file_list:
             fp = open(stc_results_path + "/" + results_file)
             lines = fp.readlines()
@@ -117,10 +112,7 @@ class MainController(object):
                                 line_split[3],
                                 line_split[4],
                                 "NA"])
-
-        #header_np = np.expand_dims(np.array(header), axis=0)
         entries_np = np.array(entries)
-        #entries_np = np.concatenate((header_np, entries_np), axis=0)
         return entries_np
 
 
@@ -150,11 +142,6 @@ class MainController(object):
                                             video_instance.video_format)
         print("download process finished ... ")
     '''
-
-def main():
-    main_instance = MainController()
-    main_instance.run()
-
 
     '''
     # load configuration
@@ -256,6 +243,3 @@ def main():
         # get all results
         rest_api_instance.getAutomaticResults(vid=10)
     '''
-
-if __name__ == '__main__':
-    main()

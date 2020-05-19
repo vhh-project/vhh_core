@@ -1,12 +1,21 @@
 from stc.STC import STC
 from stc.utils import *
-from Configuration import Configuration
 import os
 import yaml
 
 
 class Stc(object):
+    """
+    This class includes the interfaces and methods to use the plugin package STC.
+    """
+
     def __init__(self, config=None):
+        """
+        Constructor
+
+        :param config: parameter must hold the core configuration object (Class-type Configuration)
+        """
+
         printCustom("Create instance of sbd", STDOUT_TYPE.INFO)
 
         if (config == None):
@@ -27,6 +36,10 @@ class Stc(object):
         fp.close()
 
     def run(self):
+        """
+        This method is used to run the shot type classification task.
+        """
+
         printCustom("start stc process ... ", STDOUT_TYPE.INFO)
 
         results_file_list = os.listdir(self.__sbd_results_dir)

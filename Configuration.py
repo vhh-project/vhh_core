@@ -1,4 +1,3 @@
-from stc.utils import *
 import yaml
 
 
@@ -8,13 +7,14 @@ class Configuration:
     The instance of the class is holding all parameters during runtime.
 
     .. note::
-       e.g. ./config/config_vhh_test.yaml
+       e.g. ./config/CORE/config.yaml
 
         the yaml file is separated in multiple sections
         config['Development']
-        config['PreProcessing']
-        config['StcCore']
-        config['Evaluation']
+        config['Security']
+        config['VhhCore']
+        config['ApiEndpoints']
+        config['PluginConfigs']
 
         whereas each section should hold related and meaningful parameters.
     """
@@ -26,10 +26,10 @@ class Configuration:
         :param config_file: [required] path to configuration file (e.g. PATH_TO/config.yaml)
                                        must be with extension ".yaml"
         """
-        printCustom("create instance of configuration ... ", STDOUT_TYPE.INFO)
+        print("create instance of configuration ... ")
 
         if(config_file.split('.')[-1] != "yaml"):
-            printCustom("Configuration file must have the extension .yaml!", STDOUT_TYPE.ERROR)
+            print("Configuration file must have the extension .yaml!")
 
         self.config_file = config_file
 

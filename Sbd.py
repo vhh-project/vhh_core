@@ -1,11 +1,19 @@
 from sbd.SBD import SBD
 from sbd.utils import *
-from Configuration import Configuration
 import os
 
 
 class Sbd(object):
+    """
+    This class includes the interfaces and methods to use the plugin package SBD.
+    """
+
     def __init__(self, config=None):
+        """
+        Constructor
+
+        :param config: parameter must hold the core configuration object (Class-type Configuration)
+        """
         printCustom("Create instance of sbd", STDOUT_TYPE.INFO)
 
         if (config == None):
@@ -20,6 +28,11 @@ class Sbd(object):
         self.__sbd_instance = SBD(self.__sbd_config_file)
 
     def run(self, video_instance_list=None):
+        """
+        This method is used to run the shot boundary detection task
+
+        :param video_instance_list: parameter must hold a list of video objects (Class-type: Video)
+        """
         printCustom("start sbd process ... ", STDOUT_TYPE.INFO)
 
         if(video_instance_list == None):
