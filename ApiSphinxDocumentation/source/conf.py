@@ -14,6 +14,9 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../../'))
 
+# custom directory for extensions
+#sys.path.append(os.path.abspath('sphinxext'))
+
 
 # -- Project information -----------------------------------------------------
 
@@ -34,9 +37,15 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.coverage',
               'sphinx.ext.viewcode',
-              'rst2pdf.pdfbuilder'
+              'rst2pdf.pdfbuilder',
+              'sphinxcontrib.autoyaml',
               ]
+
 pdf_documents = [('index', u'rst2pdf', u'Sample rst2pdf doc', u'Your Name')]
+
+latex_elements = {
+  'extraclassoptions': 'openany,oneside'
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
