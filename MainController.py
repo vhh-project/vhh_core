@@ -1,5 +1,6 @@
 from Sbd import Sbd
 from Stc import Stc
+from Cmc import Cmc
 from VhhRestApi import VhhRestApi
 from Configuration import Configuration
 import numpy as np
@@ -33,7 +34,7 @@ class MainController(object):
         # initialize class members
         self.__sbd_instance = Sbd(config=self.__configuration_instance)
         self.__stc_instance = Stc(config=self.__configuration_instance)
-        self.__cmc_instance = None
+        self.__cmc_instance = Cmc(config=self.__configuration_instance)
 
         self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance)
 
@@ -64,6 +65,7 @@ class MainController(object):
         #self.__stc_instance.run()
 
         # run cmc
+        self.__cmc_instance.run()
 
         # merge all results
         results_np = self.merge_results()
@@ -96,10 +98,15 @@ class MainController(object):
         cmc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "cmc")
         cmc_results_path = os.path.join(cmc_results_path, "final_results")
 
-        result_file_list = os.listdir(stc_results_path)
+        stc_result_file_list = os.listdir(stc_results_path)
+        stc_result_file_list = [os.path.join(stc_results_path, x) for x in stc_result_file_list]
+        cmc_result_file_list = os.listdir(cmc_results_path)
+        cmc_result_file_list = [os.path.join(cmc_results_path, x) for x in cmc_result_file_list]
+        all_results_file_list = stc_result_file_list + cmc_result_file_list
+
         entries = []
-        for results_file in result_file_list:
-            fp = open(stc_results_path + "/" + results_file)
+        for results_file in stc_result_file_list:
+            fp = open(results_file)
             lines = fp.readlines()
             fp.close()
 
@@ -110,9 +117,26 @@ class MainController(object):
                                 line_split[1],
                                 line_split[2],
                                 line_split[3],
-                                line_split[4],
-                                "NA"])
-        entries_np = np.array(entries)
+                                line_split[4]])
+        stc_entries_np = np.array(entries)
+
+        entries = []
+        for results_file in cmc_result_file_list:
+            fp = open(results_file)
+            lines = fp.readlines()
+            fp.close()
+
+            for line in lines[1:]:
+                line = line.replace('\n', '')
+                line_split = line.split(';')
+                entries.append([line_split[0].split('.')[0],
+                                line_split[1],
+                                line_split[2],
+                                line_split[3],
+                                line_split[4]])
+        cmc_entries_np = np.array(entries)
+
+        entries_np = np.concatenate((stc_entries_np, cmc_entries_np[:, 4:]), axis=1)
         return entries_np
 
 

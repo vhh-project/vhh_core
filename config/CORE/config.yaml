@@ -37,7 +37,7 @@ PluginConfigs:
 
   ###
   # This parameter specifies the configuration path (.yaml) for the camera movement classification module
-  CMC_CONFIG_FILE: "None"
+  CMC_CONFIG_FILE: "/home/dhelm/VHH_Develop/pycharm_vhh_core/config/CMC/config_single_video.yaml"
 
 
 
