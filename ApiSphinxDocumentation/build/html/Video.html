@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Video class &#8212; VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="VhhRestApi class" href="VhhRestApi.html" />
+    <link rel="prev" title="Stc class" href="Stc.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="VhhRestApi.html" title="VhhRestApi class"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Stc.html" title="Stc class"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="video-class">
+<h1>Video class<a class="headerlink" href="#video-class" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="Video.Video">
+<em class="property">class </em><code class="sig-prename descclassname">Video.</code><code class="sig-name descname">Video</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Video.html#Video"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Video.Video" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class represents a video object.</p>
+<dl class="py method">
+<dt id="Video.Video.cleanup">
+<code class="sig-name descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Video.html#Video.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Video.Video.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is used to cleanup all data related to the corresponding video ID. It deletes the generated results
+of the sbd, stc and cmc plugin as well as the downloaded video file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Video.Video.create_video">
+<code class="sig-name descname">create_video</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vid</span></em>, <em class="sig-param"><span class="n">originalFileName</span></em>, <em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">download_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Video.html#Video.create_video"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Video.Video.create_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is used to fill all properties of a video.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vid</strong> – This parameter must hold a valid video id.</p></li>
+<li><p><strong>originalFileName</strong> – This parameter must hold the original filename of a video</p></li>
+<li><p><strong>url</strong> – This parameter must hold the download url of the video.</p></li>
+<li><p><strong>download_path</strong> – This parameter must hold the download path in the local storage.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Video.Video.download">
+<code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rest_api_instance</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Video.html#Video.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Video.Video.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is used to download the video into the local storage path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rest_api_instance</strong> – This parameter must hold a valid VhhRestApi object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>This method returns the download status (true … successfully downloaded OR false … download failed).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Video.Video.is_downloaded">
+<code class="sig-name descname">is_downloaded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Video.html#Video.is_downloaded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Video.Video.is_downloaded" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is used to check if a video is already downloaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>This method returns a boolean flag (true … video already downloaded OR false … video does not exist).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Video.Video.printInfo">
+<code class="sig-name descname">printInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Video.html#Video.printInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Video.Video.printInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method summarizes all properties of this object and print it to the console.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Stc.html"
+                        title="previous chapter">Stc class</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="VhhRestApi.html"
+                        title="next chapter">VhhRestApi class</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Video.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="VhhRestApi.html" title="VhhRestApi class"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Stc.html" title="Stc class"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Daniel Helm.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

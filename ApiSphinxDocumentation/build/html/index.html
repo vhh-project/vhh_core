@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Introduction &#8212; VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration class" href="Configuration.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Configuration.html" title="Configuration class"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Detecting cinematographic techniques such as Shot Boundary Detection (SBD), Shot Type Classification (STC) and Camera
+Movements Classification (CMC) is a fundamental task for automatic film archival. Therefore, a software framework is
+developed to process historical films related to the time of the liberation phase of Nazi concentration camps during
+the Second World War [<a class="reference external" href="https://www.vhh-project.eu/">Visual History of the Holocaust</a> <a class="footnote-reference brackets" href="#id1" id="id2">1</a> (VHH)]. This framework is able to detect and classify SBDs
+(<a class="reference external" href="https://github.com/dahe-cvl/vhh_sbd">vhh_sbd</a> <a class="footnote-reference brackets" href="#id5" id="id6">3</a>), STCs (<a class="reference external" href="https://github.com/dahe-cvl/vhh_stc">vhh_stc</a> <a class="footnote-reference brackets" href="#id8" id="id9">4</a>) and CMCs (<a class="reference external" href="https://github.com/dahe-cvl/vhh_cmc">vhh_cmc</a> <a class="footnote-reference brackets" href="#id11" id="id12">5</a>) by using deep learning-based as well as optical flow-based
+approaches [XX][XX][XX]. This documentation is separated into the following sections: In Section <em>System Overview</em> and
+<em>Process Pipeline</em> an overview of the code structure as well as the automatic annotation process pipeline is demonstrated.
+Furthermore, the package structure and the setup and usage description is visualized in Section <em>Package Structure</em> and
+<em>Setup Instructions</em>. Finally, this documentation closes with an API description of all classes, modules and their
+members in Section <em>API Description</em>.</p>
+</div>
+<div class="section" id="system-overview">
+<h1>System Overview<a class="headerlink" href="#system-overview" title="Permalink to this headline">¶</a></h1>
+<p>The software architecture is visualized in the below figure. The <a class="reference external" href="https://github.com/dahe-cvl/vhh_core">vhh_core</a> <a class="footnote-reference brackets" href="#id3" id="id4">2</a> is divided in multiple classes. The core
+class is called <em>MainController</em> and administers the external plugin modules for automatic shot analysis in historical
+films: <a class="reference external" href="https://github.com/dahe-cvl/vhh_sbd">vhh_sbd</a> <a class="footnote-reference brackets" href="#id5" id="id7">3</a> (SBD), <a class="reference external" href="https://github.com/dahe-cvl/vhh_stc">vhh_stc</a> <a class="footnote-reference brackets" href="#id8" id="id10">4</a> (STC) and <a class="reference external" href="https://github.com/dahe-cvl/vhh_cmc">vhh_cmc</a> <a class="footnote-reference brackets" href="#id11" id="id13">5</a> (CMC). Moreover, central functionality such as the communication
+with the VHH-MMSI system is handled in this class. The class <em>VhhRestApi</em> includes methods to communicate with the
+VHH-MMSI database via RestAPI endpoints. A various number of parameters defined and set in the <em>config_core.yaml</em>
+file is managed by the class <em>Configuration</em>. Furthermore, each shot analysis plugin can be configured with separate
+configuration files stored in the <em>./config</em> folder in this repositories.</p>
+<div class="figure align-center">
+<img alt="_images/software_architecture_core.png" src="_images/software_architecture_core.png" />
+</div>
+</div>
+<div class="section" id="process-pipeline">
+<h1>Process Pipeline<a class="headerlink" href="#process-pipeline" title="Permalink to this headline">¶</a></h1>
+<div class="figure align-center">
+<img alt="_images/process_pipeline_core.png" src="_images/process_pipeline_core.png" />
+</div>
+</div>
+<div class="section" id="package-overview">
+<h1>Package Overview<a class="headerlink" href="#package-overview" title="Permalink to this headline">¶</a></h1>
+<p>The following list gives an overview of the folder structure of this python repository:</p>
+<p><em>name of repository</em>: vhh_core</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>ApiSphinxDocumentation/</strong>: includes all files to generate the documentation as well as the created documentations (html, pdf). The results are stored in the build folder (e.g. xx/build/latex/vhh_core.pdf)</p></li>
+<li><p><strong>config/</strong>: This folder includes the required configuration file. For each plugin (sbd, stc, cmc, …) there is one subdirectory holding the corresponding configuration file.</p></li>
+<li><p><strong>Demo/</strong>: This folder includes a all scripts to run this application. Furthermore, scripts to setup the folder structure (video and results storage) as well as to setup the environment for running this application.</p></li>
+<li><p><strong>Develop/</strong>: This folder includes additional scripts used during developing phase of this application. (e.g. the document_builder script to generate the package documentation).</p></li>
+<li><p><strong>README.md</strong>: This file gives a brief description of this repository (e.g. link to this documentation)</p></li>
+<li><p><strong>requirements.txt</strong>: this file holds all python dependencies and is needed to install the package in your own virtual environment</p></li>
+<li><p><strong>setup.py</strong>: this script is needed to install the stc package in your own virtual environment</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="setup-instructions">
+<h1>Setup  instructions<a class="headerlink" href="#setup-instructions" title="Permalink to this headline">¶</a></h1>
+<p>This package includes a setup.py script and a requirements.txt file which are needed to install this package for custom applications.
+The following instructions have to be done to used this library in your own application:</p>
+<p><strong>Requirements:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Ubuntu 18.04 LTS</p></li>
+<li><p>CUDA 10.1 + cuDNN</p></li>
+<li><p>python version 3.6.x</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Create a virtual environment:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>create a folder to a specified path (e.g. /xxx/vhh_core/)</p></li>
+<li><p>python3 -m venv /xxx/vhh_core/</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Activate the environment:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>source /xxx/vhh_core/bin/activate</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Checkout vhh_core repository to a specified folder:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>git clone <a class="reference external" href="https://github.com/dahe-cvl/vhh_core">https://github.com/dahe-cvl/vhh_core</a></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Install the stc package and all dependencies:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>change to the root directory of the repository (includes setup.py)</p></li>
+<li><p>python setup.py install</p></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can check the success of the installation by using the commend <em>pip list</em>. This command should give you a list with all installed python packages and it should include <em>vhh_core</em></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently there is an issue in the <em>setup.py</em> script. Therefore the pytorch libraries have to be installed manually by running the following command:
+<em>pip install torch==1.5.0+cu101 torchvision==0.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html</em></p>
+</div>
+</div>
+<div class="section" id="parameter-description">
+<h1>Parameter Description<a class="headerlink" href="#parameter-description" title="Permalink to this headline">¶</a></h1>
+<p>Documenting single YAML file.</p>
+<p>DEBUG_FLAG<dd><p>This parameter is used to activate or deactivate the debug mode.</p>
+</dd>
+</p>
+<p>PEM_PATH<dd><p>This parameter specifies the path tp the certificate file needed to provide vhh-mmsi api access.</p>
+</dd>
+</p>
+<p>ROOT_URL<dd><p>This parameter specifies the root url for the RestApi endpoints.</p>
+</dd>
+</p>
+<p>VIDEO_DOWNLOAD_PATH<dd><p>This parameter specifies the video download path.</p>
+</dd>
+</p>
+<p>CLEANUP_FLAG<dd><p>This parameter is used to activate/deactivate the clean-up mode. The clean-up mode deletes all downloaded videos and the corresponding generated results.</p>
+</dd>
+</p>
+<p>RESULTS_ROOT_DIR<dd><p>This parameter specifies the results path for each individual plugin.</p>
+</dd>
+</p>
+<p>SBD_CONFIG_FILE<dd><p>This parameter specifies the configuration path (.yaml) for the shot boundary detection plugin module</p>
+</dd>
+</p>
+<p>STC_CONFIG_FILE<dd><p>This parameter specifies the configuration path (.yaml) for the shot type classification plugin module</p>
+</dd>
+</p>
+<p>CMC_CONFIG_FILE<dd><p>This parameter specifies the configuration path (.yaml) for the camera movement classification module</p>
+</dd>
+</p>
+</div>
+<div class="section" id="api-description">
+<h1>API Description<a class="headerlink" href="#api-description" title="Permalink to this headline">¶</a></h1>
+<p>This section gives an overview of all classes and modules in <em>vhh_core</em> as well as a brief configuration parameter description.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Configuration.html">Configuration class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Sbd.html">Sbd class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Stc.html">Stc class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Video.html">Video class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="VhhRestApi.html">VhhRestApi class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MainController.html">MainController class</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="references">
+<h1>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h1>
+<dl class="footnote brackets">
+<dt class="label" id="id1"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dd><p><a class="reference external" href="https://www.vhh-project.eu/">https://www.vhh-project.eu/</a></p>
+</dd>
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id4">2</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/dahe-cvl/vhh_core">https://github.com/dahe-cvl/vhh_core</a></p>
+</dd>
+<dt class="label" id="id5"><span class="brackets">3</span><span class="fn-backref">(<a href="#id6">1</a>,<a href="#id7">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://github.com/dahe-cvl/vhh_sbd">https://github.com/dahe-cvl/vhh_sbd</a></p>
+</dd>
+<dt class="label" id="id8"><span class="brackets">4</span><span class="fn-backref">(<a href="#id9">1</a>,<a href="#id10">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://github.com/dahe-cvl/vhh_stc">https://github.com/dahe-cvl/vhh_stc</a></p>
+</dd>
+<dt class="label" id="id11"><span class="brackets">5</span><span class="fn-backref">(<a href="#id12">1</a>,<a href="#id13">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://github.com/dahe-cvl/vhh_cmc">https://github.com/dahe-cvl/vhh_cmc</a></p>
+</dd>
+</dl>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a></li>
+<li><a class="reference internal" href="#system-overview">System Overview</a></li>
+<li><a class="reference internal" href="#process-pipeline">Process Pipeline</a></li>
+<li><a class="reference internal" href="#package-overview">Package Overview</a></li>
+<li><a class="reference internal" href="#setup-instructions">Setup  instructions</a></li>
+<li><a class="reference internal" href="#parameter-description">Parameter Description</a></li>
+<li><a class="reference internal" href="#api-description">API Description</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Configuration.html"
+                        title="next chapter">Configuration class</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Configuration.html" title="Configuration class"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Daniel Helm.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

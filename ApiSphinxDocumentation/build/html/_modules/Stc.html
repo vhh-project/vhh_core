@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Stc &#8212; VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Stc</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">stc.STC</span> <span class="k">import</span> <span class="n">STC</span>
+<span class="kn">from</span> <span class="nn">stc.utils</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="Stc"><a class="viewcode-back" href="../Stc.html#Stc.Stc">[docs]</a><span class="k">class</span> <span class="nc">Stc</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class includes the interfaces and methods to use the plugin package STC.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        :param config: parameter must hold the core configuration object (Class-type Configuration)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">printCustom</span><span class="p">(</span><span class="s2">&quot;Create instance of sbd&quot;</span><span class="p">,</span> <span class="n">STDOUT_TYPE</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">config</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">printCustom</span><span class="p">(</span><span class="s2">&quot;You have to specify a valid configuration instance!&quot;</span><span class="p">,</span> <span class="n">STDOUT_TYPE</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+
+        <span class="c1"># load configurations specified in core config file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stc_config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="o">.</span><span class="n">stc_config_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sbd_config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="o">.</span><span class="n">sbd_config_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__video_download_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="o">.</span><span class="n">video_download_path</span>
+
+        <span class="c1"># initialize sbd plugin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stc_instance</span> <span class="o">=</span> <span class="n">STC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__stc_config_file</span><span class="p">)</span>
+
+        <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="o">.</span><span class="n">sbd_config_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">sbd_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">BaseLoader</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sbd_results_dir</span> <span class="o">=</span> <span class="n">sbd_config</span><span class="p">[</span><span class="s1">&#39;SbdCore&#39;</span><span class="p">][</span><span class="s1">&#39;PATH_FINAL_RESULTS&#39;</span><span class="p">]</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Stc.run"><a class="viewcode-back" href="../Stc.html#Stc.Stc.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to run the shot type classification task.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">printCustom</span><span class="p">(</span><span class="s2">&quot;start stc process ... &quot;</span><span class="p">,</span> <span class="n">STDOUT_TYPE</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+        <span class="n">results_file_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sbd_results_dir</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">results_file_list</span><span class="p">:</span>
+            <span class="n">vid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">shots_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stc_instance</span><span class="o">.</span><span class="n">loadSbdResults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sbd_results_dir</span> <span class="o">+</span> <span class="n">file</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__stc_instance</span><span class="o">.</span><span class="n">runOnSingleVideo</span><span class="p">(</span><span class="n">shots_per_vid_np</span><span class="o">=</span><span class="n">shots_np</span><span class="p">,</span> <span class="n">max_recall_id</span><span class="o">=</span><span class="n">vid</span><span class="p">)</span>
+
+        <span class="n">printCustom</span><span class="p">(</span><span class="s2">&quot;stc process finished!&quot;</span><span class="p">,</span> <span class="n">STDOUT_TYPE</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Daniel Helm.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

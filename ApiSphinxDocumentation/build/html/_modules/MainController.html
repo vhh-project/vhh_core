@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MainController &#8212; VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for MainController</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">Sbd</span> <span class="k">import</span> <span class="n">Sbd</span>
+<span class="kn">from</span> <span class="nn">Stc</span> <span class="k">import</span> <span class="n">Stc</span>
+<span class="kn">from</span> <span class="nn">VhhRestApi</span> <span class="k">import</span> <span class="n">VhhRestApi</span>
+<span class="kn">from</span> <span class="nn">Configuration</span> <span class="k">import</span> <span class="n">Configuration</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<div class="viewcode-block" id="MainController"><a class="viewcode-back" href="../MainController.html#MainController.MainController">[docs]</a><span class="k">class</span> <span class="nc">MainController</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents the Main part of this application and includes all interfaces and methods to use the automatic annotation plugins.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Create instance of MainController&quot;</span><span class="p">)</span>
+
+        <span class="c1"># load CORE configuration</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="s2">&quot;/home/dhelm/VHH_Develop/pycharm_vhh_core/config/CORE/config.yaml&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="n">config_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">loadConfig</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__root_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">root_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pem_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">pem_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__video_download_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">video_download_path</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sbd_config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">sbd_config_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stc_config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">stc_config_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cmc_config_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">cmc_config_file</span>
+
+        <span class="c1"># initialize class members</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sbd_instance</span> <span class="o">=</span> <span class="n">Sbd</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stc_instance</span> <span class="o">=</span> <span class="n">Stc</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cmc_instance</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rest_api_instance</span> <span class="o">=</span> <span class="n">VhhRestApi</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MainController.run"><a class="viewcode-back" href="../MainController.html#MainController.MainController.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to start the automatic annotation process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start automatic annotation process ... &quot;</span><span class="p">)</span>
+
+        <span class="c1"># get list of videos in mmsi</span>
+        <span class="n">video_instance_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rest_api_instance</span><span class="o">.</span><span class="n">getListofVideos</span><span class="p">()</span>
+
+        <span class="c1"># cleanup video and results folder</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">cleanup_flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">video_instance</span> <span class="ow">in</span> <span class="n">video_instance_list</span><span class="p">:</span>
+                <span class="n">video_instance</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+
+        <span class="c1"># download videos if not available</span>
+        <span class="k">for</span> <span class="n">video_instance</span> <span class="ow">in</span> <span class="n">video_instance_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">video_instance</span><span class="o">.</span><span class="n">is_downloaded</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">video_instance</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rest_api_instance</span><span class="p">)</span>
+
+        <span class="c1"># run sbd</span>
+        <span class="c1">#self.__sbd_instance.run(video_instance_list=video_instance_list)</span>
+
+        <span class="c1"># run stc</span>
+        <span class="c1">#self.__stc_instance.run()</span>
+
+        <span class="c1"># run cmc</span>
+
+        <span class="c1"># merge all results</span>
+        <span class="n">results_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge_results</span><span class="p">()</span>
+
+        <span class="c1"># post all results</span>
+        <span class="n">vids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">results_np</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">vid</span> <span class="ow">in</span> <span class="n">vids</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">vid</span> <span class="o">==</span> <span class="n">results_np</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">vid_results_np</span> <span class="o">=</span> <span class="n">results_np</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+
+            <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;vid_name&quot;</span><span class="p">,</span> <span class="s2">&quot;shot_id&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;stc&quot;</span><span class="p">,</span> <span class="s2">&quot;cmc&quot;</span><span class="p">]</span>
+            <span class="n">header_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">header</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">vid_results_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">header_np</span><span class="p">,</span> <span class="n">vid_results_np</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__rest_api_instance</span><span class="o">.</span><span class="n">postAutomaticResults</span><span class="p">(</span><span class="n">vid</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">vid</span><span class="p">),</span> <span class="n">results_np</span><span class="o">=</span><span class="n">vid_results_np</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successfully finished!&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainController.merge_results"><a class="viewcode-back" href="../MainController.html#MainController.MainController.merge_results">[docs]</a>    <span class="k">def</span> <span class="nf">merge_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to merge and prepare the results of each individual plugin (sbd, stc, cmc) to send it to the the Vhh-MMSI database.</span>
+
+<span class="sd">        :return: This method returns a numpy array holding all results (including a valid header).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># merge and prepare results</span>
+
+        <span class="n">stc_results_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">results_root_dir</span><span class="p">,</span> <span class="s2">&quot;stc&quot;</span><span class="p">)</span>
+        <span class="n">stc_results_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stc_results_path</span><span class="p">,</span> <span class="s2">&quot;final_results&quot;</span><span class="p">)</span>
+
+        <span class="n">cmc_results_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__configuration_instance</span><span class="o">.</span><span class="n">results_root_dir</span><span class="p">,</span> <span class="s2">&quot;cmc&quot;</span><span class="p">)</span>
+        <span class="n">cmc_results_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmc_results_path</span><span class="p">,</span> <span class="s2">&quot;final_results&quot;</span><span class="p">)</span>
+
+        <span class="n">result_file_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">stc_results_path</span><span class="p">)</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">results_file</span> <span class="ow">in</span> <span class="n">result_file_list</span><span class="p">:</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">stc_results_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">results_file</span><span class="p">)</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+                <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">line_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                                <span class="n">line_split</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                <span class="n">line_split</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                <span class="n">line_split</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                                <span class="n">line_split</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                                <span class="s2">&quot;NA&quot;</span><span class="p">])</span>
+        <span class="n">entries_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">entries_np</span></div>
+
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    def run_stc_process(self, sbd_results_path, config_file):</span>
+<span class="sd">        print(&quot;start stc process ... &quot;)</span>
+
+<span class="sd">        # initialize and run stc process</span>
+<span class="sd">        stc_instance = STC(config_file)</span>
+
+<span class="sd">        results_file_list = os.listdir(sbd_results_path)</span>
+<span class="sd">        print(results_file_list)</span>
+
+<span class="sd">        for file in results_file_list:</span>
+<span class="sd">            vid = int(file.split(&#39;.&#39;)[0])</span>
+<span class="sd">            shots_np = stc_instance.loadSbdResults(sbd_results_path + file)</span>
+<span class="sd">            stc_instance.runOnSingleVideo(shots_per_vid_np=shots_np, max_recall_id=vid)</span>
+
+<span class="sd">        printCustom(&quot;stc process finished!&quot;, STDOUT_TYPE.INFO)</span>
+
+<span class="sd">    def run_download_process(self, rest_api_instance, video_instance_list):</span>
+<span class="sd">        print(&quot;start download process ... &quot;)</span>
+<span class="sd">        for video_instance in video_instance_list:</span>
+<span class="sd">            video_instance.printInfo()</span>
+<span class="sd">            rest_api_instance.downloadVideo(video_instance.url,</span>
+<span class="sd">                                            video_instance.originalFileName,</span>
+<span class="sd">                                            video_instance.video_format)</span>
+<span class="sd">        print(&quot;download process finished ... &quot;)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # load configuration</span>
+<span class="sd">    config_file = &quot;/home/dhelm/VHH_Develop/pycharm_vhh_core/config/CORE/config.yaml&quot;</span>
+<span class="sd">    configuration_instance = Configuration(config_file=config_file)</span>
+
+<span class="sd">    root_url = configuration_instance.root_url</span>
+<span class="sd">    pem_path = configuration_instance.pem_path</span>
+<span class="sd">    video_download_path = configuration_instance.video_download_path</span>
+<span class="sd">    sbd_config_file = configuration_instance.sbd_config_file</span>
+<span class="sd">    stc_config_file = configuration_instance.stc_config_file</span>
+<span class="sd">    cmc_config_file = configuration_instance.cmc_config_file</span>
+
+<span class="sd">    # create rest api instance</span>
+<span class="sd">    rest_api_instance = VhhRestApi(root_url=root_url, pem_path=pem_path, video_download_path=video_download_path)</span>
+
+<span class="sd">    if (configuration_instance.debug_flag == 0):</span>
+<span class="sd">        ACTIVATE_GET_VID_LIST_FLAG = True</span>
+<span class="sd">        ACTIVATE_DOWNLOAD_FLAG = True</span>
+<span class="sd">        ACTIVATE_SBD_FLAG = True</span>
+<span class="sd">        ACTIVATE_STC_FLAG = True</span>
+<span class="sd">        ACTIVATE_CMC_FLAG = False</span>
+<span class="sd">        ACTIVATE_GET_AUTO_RESULTS_FLAG = False</span>
+<span class="sd">        ACTIVATE_POST_AUTO_RESULTS_FLAG = True</span>
+<span class="sd">    else:</span>
+<span class="sd">        ACTIVATE_GET_VID_LIST_FLAG = False</span>
+<span class="sd">        ACTIVATE_DOWNLOAD_FLAG = False</span>
+<span class="sd">        ACTIVATE_SBD_FLAG = False</span>
+<span class="sd">        ACTIVATE_STC_FLAG = False</span>
+<span class="sd">        ACTIVATE_CMC_FLAG = False</span>
+<span class="sd">        ACTIVATE_GET_AUTO_RESULTS_FLAG = False</span>
+<span class="sd">        ACTIVATE_POST_AUTO_RESULTS_FLAG = False</span>
+
+
+
+<span class="sd">    # ##########################</span>
+<span class="sd">    # get film list with urls</span>
+<span class="sd">    video_instance_list = rest_api_instance.getListofVideos()</span>
+
+
+<span class="sd">    if (ACTIVATE_DOWNLOAD_FLAG == True):</span>
+<span class="sd">        # ##########################</span>
+<span class="sd">        # download all videos</span>
+<span class="sd">        run_download_process(rest_api_instance, video_instance_list)</span>
+
+<span class="sd">    if (ACTIVATE_SBD_FLAG == True):</span>
+<span class="sd">        # ##########################</span>
+<span class="sd">        # run sbd</span>
+
+<span class="sd">        for video_instance in video_instance_list:</span>
+<span class="sd">            video_instance.printInfo()</span>
+<span class="sd">            run_sbd_process(video_path=video_instance.download_path,</span>
+<span class="sd">                            file_name=video_instance.originalFileName + &quot;.&quot; + video_instance.video_format,</span>
+<span class="sd">                            vid=video_instance.id,</span>
+<span class="sd">                            config_file=sbd_config_file)</span>
+
+<span class="sd">    if (ACTIVATE_STC_FLAG == True):</span>
+<span class="sd">        # ##########################</span>
+<span class="sd">        # run stc</span>
+
+<span class="sd">        sbd_final_results_path = &quot;/data/share/maxrecall_vhh_mmsi/videos/results/sbd/final_results/&quot;</span>
+<span class="sd">        run_stc_process(sbd_results_path=sbd_final_results_path,</span>
+<span class="sd">                        config_file=stc_config_file</span>
+<span class="sd">                        )</span>
+
+<span class="sd">    if (ACTIVATE_CMC_FLAG == True):</span>
+<span class="sd">        # ##########################</span>
+<span class="sd">        # run cmc</span>
+<span class="sd">        print(&quot;NOT_IMPLEMENTED YET&quot;)</span>
+
+<span class="sd">    if (ACTIVATE_POST_AUTO_RESULTS_FLAG == True):</span>
+<span class="sd">        # ##########################</span>
+<span class="sd">        # post all results</span>
+
+<span class="sd">        # ##########################</span>
+<span class="sd">        # prepare results and send it to maxrecall</span>
+
+<span class="sd">        results_path = &quot;/data/share/maxrecall_vhh_mmsi/videos/results/stc/final_results/&quot;</span>
+<span class="sd">        result_file_list = os.listdir(results_path)</span>
+<span class="sd">        print(result_file_list)</span>
+
+<span class="sd">        fp = open(results_path + &quot;/&quot; + result_file_list[1])</span>
+<span class="sd">        lines = fp.readlines()</span>
+<span class="sd">        fp.close()</span>
+
+<span class="sd">        print(lines)</span>
+<span class="sd">        entries = []</span>
+<span class="sd">        for line in lines:</span>
+<span class="sd">            line = line.replace(&#39;\n&#39;, &#39;&#39;)</span>
+<span class="sd">            line_split = line.split(&#39;;&#39;)</span>
+<span class="sd">            entries.append([line_split[0], line_split[1], line_split[2], line_split[3], line_split[4]])</span>
+<span class="sd">        entries_np = np.array(entries)</span>
+<span class="sd">        print(entries_np)</span>
+
+<span class="sd">        rest_api_instance.postAutomaticResults(vid=10, results_np=entries_np)</span>
+
+<span class="sd">    if (ACTIVATE_GET_AUTO_RESULTS_FLAG == True):</span>
+<span class="sd">        # ##########################</span>
+<span class="sd">        # get all results</span>
+<span class="sd">        rest_api_instance.getAutomaticResults(vid=10)</span>
+<span class="sd">    &#39;&#39;&#39;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Daniel Helm.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

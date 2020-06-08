@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Video &#8212; VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Video</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="Video"><a class="viewcode-back" href="../Video.html#Video.Video">[docs]</a><span class="k">class</span> <span class="nc">Video</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a video object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        :param config: parameter must hold the core configuration object (Class-type Configuration)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;create instance of Video&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">config</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You have to specify a valid configuration instance!&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span> <span class="o">=</span> <span class="n">config</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">originalFileName</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_format</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_path</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+
+<div class="viewcode-block" id="Video.create_video"><a class="viewcode-back" href="../Video.html#Video.Video.create_video">[docs]</a>    <span class="k">def</span> <span class="nf">create_video</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">originalFileName</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">download_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to fill all properties of a video.</span>
+
+<span class="sd">        :param vid: This parameter must hold a valid video id.</span>
+<span class="sd">        :param originalFileName: This parameter must hold the original filename of a video</span>
+<span class="sd">        :param url: This parameter must hold the download url of the video.</span>
+<span class="sd">        :param download_path: This parameter must hold the download path in the local storage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(&quot;create instance of Video&quot;);</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">vid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">originalFileName</span> <span class="o">=</span> <span class="n">originalFileName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_format</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_path</span> <span class="o">=</span> <span class="n">download_path</span></div>
+
+<div class="viewcode-block" id="Video.download"><a class="viewcode-back" href="../Video.html#Video.Video.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rest_api_instance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to download the video into the local storage path.</span>
+
+<span class="sd">        :param rest_api_instance: This parameter must hold a valid VhhRestApi object.</span>
+<span class="sd">        :return: This method returns the download status (true ... successfully downloaded OR false ... download failed).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">rest_api_instance</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You have to specify a valid object of class type VhhRestApi to execute the download process!&quot;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">()</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">rest_api_instance</span><span class="o">.</span><span class="n">downloadVideo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                                              <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">video_format</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="Video.is_downloaded"><a class="viewcode-back" href="../Video.html#Video.Video.is_downloaded">[docs]</a>    <span class="k">def</span> <span class="nf">is_downloaded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to check if a video is already downloaded.</span>
+
+<span class="sd">        :return: This method returns a boolean flag (true ... video already downloaded OR false ... video does not exist).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Check if video is already available in specified download path: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">download_path</span><span class="p">))</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># get list of videos in download path</span>
+        <span class="n">video_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">download_path</span><span class="p">)</span>
+        <span class="n">search_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_format</span>
+
+        <span class="c1"># find video name in list</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">search_str</span> <span class="ow">in</span> <span class="n">video_list</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;video is already available ... &quot;</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="Video.cleanup"><a class="viewcode-back" href="../Video.html#Video.Video.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to cleanup all data related to the corresponding video ID. It deletes the generated results</span>
+<span class="sd">        of the sbd, stc and cmc plugin as well as the downloaded video file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start cleanup process ... &quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Delete video if available in video_download path ...&quot;</span><span class="p">)</span>
+        <span class="c1"># get list of videos in download path</span>
+        <span class="n">video_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">download_path</span><span class="p">)</span>
+        <span class="n">search_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_format</span>
+
+        <span class="c1"># find video name in list</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">search_str</span> <span class="ow">in</span> <span class="n">video_list</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;delete video ... &quot;</span><span class="p">)</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">download_path</span><span class="p">,</span> <span class="n">search_str</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Delete sbd results if available ...&quot;</span><span class="p">)</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="o">.</span><span class="n">sbd_config_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">sbd_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">BaseLoader</span><span class="p">)</span>
+        <span class="n">sbd_results_dir</span> <span class="o">=</span> <span class="n">sbd_config</span><span class="p">[</span><span class="s1">&#39;SbdCore&#39;</span><span class="p">][</span><span class="s1">&#39;PATH_FINAL_RESULTS&#39;</span><span class="p">]</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">search_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span>
+        <span class="n">result_file_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">sbd_results_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">search_str</span> <span class="ow">in</span> <span class="n">result_file_list</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;delete sbd results ... &quot;</span><span class="p">)</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sbd_results_dir</span><span class="p">,</span> <span class="n">search_str</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Delete stc results if available  ...&quot;</span><span class="p">)</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="o">.</span><span class="n">stc_config_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">stc_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">BaseLoader</span><span class="p">)</span>
+        <span class="n">stc_results_dir</span> <span class="o">=</span> <span class="n">stc_config</span><span class="p">[</span><span class="s1">&#39;StcCore&#39;</span><span class="p">][</span><span class="s1">&#39;PATH_FINAL_RESULTS&#39;</span><span class="p">]</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">search_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span>
+        <span class="n">result_file_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">stc_results_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">search_str</span> <span class="ow">in</span> <span class="n">result_file_list</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;delete stc results ... &quot;</span><span class="p">)</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stc_results_dir</span><span class="p">,</span> <span class="n">search_str</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Delete cmc results if available  ...&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cleanup process successfully finished!&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Video.printInfo"><a class="viewcode-back" href="../Video.html#Video.Video.printInfo">[docs]</a>    <span class="k">def</span> <span class="nf">printInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method summarizes all properties of this object and print it to the console.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">####################################################&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;id: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;originalFileName(without extension): &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">originalFileName</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;storage file name (with extension): &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;video_format: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_format</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;url: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;download_path: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">download_path</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;####################################################&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Daniel Helm.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

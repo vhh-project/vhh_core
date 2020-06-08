@@ -1,7 +1,12 @@
 # vhh_core
 VHH DL Framework Core Module
 
+## Package Description
 
+PDF format: [vhh_core_pdf](https://github.com/dahe-cvl/vhh_core/blob/master/ApiSphinxDocumentation/build/latex/vhhcorepackageautomaticvideoanalysisframeworkvhh_core.pdf)
+    
+HTML format (only usable if repository is available in local storage): [vhh_core_html](https://github.com/dahe-cvl/vhh_core/blob/master/ApiSphinxDocumentation/build/html/index.html)
+    
 requirements:
 
     1) install vhh related modules into virtual environment

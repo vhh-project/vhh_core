@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Configuration &#8212; VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Configuration</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="Configuration"><a class="viewcode-back" href="../Configuration.html#Configuration.Configuration">[docs]</a><span class="k">class</span> <span class="nc">Configuration</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is needed to read the configuration parameters specified in the configuration.yaml file.</span>
+<span class="sd">    The instance of the class is holding all parameters during runtime.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       e.g. ./config/CORE/config.yaml</span>
+
+<span class="sd">        the yaml file is separated in multiple sections</span>
+<span class="sd">        config[&#39;Development&#39;]</span>
+<span class="sd">        config[&#39;Security&#39;]</span>
+<span class="sd">        config[&#39;VhhCore&#39;]</span>
+<span class="sd">        config[&#39;ApiEndpoints&#39;]</span>
+<span class="sd">        config[&#39;PluginConfigs&#39;]</span>
+
+<span class="sd">        whereas each section should hold related and meaningful parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        :param config_file: [required] path to configuration file (e.g. PATH_TO/config.yaml)</span>
+<span class="sd">                                       must be with extension &quot;.yaml&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;create instance of configuration ... &quot;</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">config_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;yaml&quot;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Configuration file must have the extension .yaml!&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_flag</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pem_path</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_download_path</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sbd_config_file</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stc_config_file</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmc_config_file</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_flag</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_root_dir</span> <span class="o">=</span> <span class="s2">&quot;NONE&quot;</span>
+
+<div class="viewcode-block" id="Configuration.loadConfig"><a class="viewcode-back" href="../Configuration.html#Configuration.Configuration.loadConfig">[docs]</a>    <span class="k">def</span> <span class="nf">loadConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to load configurables from the specified configuration file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">BaseLoader</span><span class="p">)</span>
+
+        <span class="n">developer_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;Development&#39;</span><span class="p">]</span>
+        <span class="n">security_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;Security&#39;</span><span class="p">]</span>
+        <span class="n">vhh_core_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;VhhCore&#39;</span><span class="p">]</span>
+        <span class="n">api_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;ApiEndpoints&#39;</span><span class="p">]</span>
+        <span class="n">plugin_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;PluginConfigs&#39;</span><span class="p">]</span>
+
+        <span class="c1"># developer_config section</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_flag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">developer_config</span><span class="p">[</span><span class="s1">&#39;DEBUG_FLAG&#39;</span><span class="p">])</span>
+
+        <span class="c1"># security section</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pem_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">security_config</span><span class="p">[</span><span class="s1">&#39;PEM_PATH&#39;</span><span class="p">])</span>
+
+        <span class="c1"># vhh_core_config section</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_download_path</span> <span class="o">=</span> <span class="n">vhh_core_config</span><span class="p">[</span><span class="s1">&#39;VIDEO_DOWNLOAD_PATH&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_flag</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vhh_core_config</span><span class="p">[</span><span class="s1">&#39;CLEANUP_FLAG&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_root_dir</span> <span class="o">=</span> <span class="n">vhh_core_config</span><span class="p">[</span><span class="s1">&#39;RESULTS_ROOT_DIR&#39;</span><span class="p">]</span>
+
+        <span class="c1"># plugin_config section</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sbd_config_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">plugin_config</span><span class="p">[</span><span class="s1">&#39;SBD_CONFIG_FILE&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stc_config_file</span> <span class="o">=</span> <span class="n">plugin_config</span><span class="p">[</span><span class="s1">&#39;STC_CONFIG_FILE&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmc_config_file</span> <span class="o">=</span> <span class="n">plugin_config</span><span class="p">[</span><span class="s1">&#39;CMC_CONFIG_FILE&#39;</span><span class="p">]</span>
+
+        <span class="c1"># api_config section</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span> <span class="o">=</span> <span class="n">api_config</span><span class="p">[</span><span class="s1">&#39;ROOT_URL&#39;</span><span class="p">]</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Daniel Helm.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

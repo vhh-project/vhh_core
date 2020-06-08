@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>VhhRestApi &#8212; VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for VhhRestApi</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">Video</span> <span class="k">import</span> <span class="n">Video</span>
+
+
+<div class="viewcode-block" id="VhhRestApi"><a class="viewcode-back" href="../VhhRestApi.html#VhhRestApi.VhhRestApi">[docs]</a><span class="k">class</span> <span class="nc">VhhRestApi</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class includes the interfaces and methods to use the vhh restAPI interfaces provided by MaxRecall.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        :param config: parameter must hold the core configuration object (Class-type Configuration)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;create instance of VhhRestApi ...&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">config</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You have to specify a valid configuration instance!&quot;</span><span class="p">)</span>
+
+        <span class="c1"># load configurations specified in core config file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pem_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="o">.</span><span class="n">pem_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__root_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="o">.</span><span class="n">root_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__video_download_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="o">.</span><span class="n">video_download_path</span>
+
+        <span class="c1"># create urls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">API_VIDEO_SEARCH_ENDPOINT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__root_url</span> <span class="o">+</span> <span class="s2">&quot;/videos/search&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">API_VIDEO_SHOTS_AUTO_ENDPOINT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__root_url</span> <span class="o">+</span> <span class="s2">&quot;/videos/&quot;</span>  <span class="c1"># 8/shots/auto</span>
+
+<div class="viewcode-block" id="VhhRestApi.getRequest"><a class="viewcode-back" href="../VhhRestApi.html#VhhRestApi.VhhRestApi.getRequest">[docs]</a>    <span class="k">def</span> <span class="nf">getRequest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to send a get request to the Vhh-MMSI system.</span>
+
+<span class="sd">        :param url: this parameter must hold a valid restApi endpoint.</span>
+<span class="sd">        :return: This method returns the original response including header as well as payload.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;send request: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__pem_path</span><span class="p">)</span>  <span class="c1"># params=params,</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;receive response&quot;</span><span class="p">)</span>
+        <span class="c1"># print(res)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="VhhRestApi.postRequest"><a class="viewcode-back" href="../VhhRestApi.html#VhhRestApi.VhhRestApi.postRequest">[docs]</a>    <span class="k">def</span> <span class="nf">postRequest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">data_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to send a post request to the Vhh-MMSI system.</span>
+
+<span class="sd">        :param url: this parameter must hold a valid restApi endpoint.</span>
+<span class="sd">        :param data_dict: this parameter must hold a valid list of dictionaries with the specified fields (see RestApi documentation).</span>
+<span class="sd">        :return: This method returns the original response including header as well as payload</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Content-Type &quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data_dict</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;send request: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__pem_path</span><span class="p">)</span>  <span class="c1"># , header=headers</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;receive response&quot;</span><span class="p">)</span>
+        <span class="c1"># print(res)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="VhhRestApi.getListofVideos"><a class="viewcode-back" href="../VhhRestApi.html#VhhRestApi.VhhRestApi.getListofVideos">[docs]</a>    <span class="k">def</span> <span class="nf">getListofVideos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to get a list of all available videos in the VHH-MMSI system.</span>
+
+<span class="sd">        :return: This method returns a list of video objects (Class-type: Video) which holds all video specific meta-data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;load list of videos ... &quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;send request: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">API_VIDEO_SEARCH_ENDPOINT</span><span class="p">))</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">API_VIDEO_SEARCH_ENDPOINT</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__pem_path</span><span class="p">)</span>  <span class="c1"># params=params,</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;receive response&quot;</span><span class="p">)</span>
+
+        <span class="n">res_json</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="n">video_instance_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_json</span><span class="p">)):</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">res_json</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">vid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+            <span class="n">originalFileName</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;originalFileName&#39;</span><span class="p">]</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+
+            <span class="n">video_instance</span> <span class="o">=</span> <span class="n">Video</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__core_config</span><span class="p">)</span>
+            <span class="n">video_instance</span><span class="o">.</span><span class="n">create_video</span><span class="p">(</span><span class="n">vid</span><span class="o">=</span><span class="n">vid</span><span class="p">,</span>
+                                        <span class="n">originalFileName</span><span class="o">=</span><span class="n">originalFileName</span><span class="p">,</span>
+                                        <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                                        <span class="n">download_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__video_download_path</span><span class="p">)</span>
+            <span class="n">video_instance_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">video_instance</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">video_instance_list</span></div>
+
+<div class="viewcode-block" id="VhhRestApi.downloadVideo"><a class="viewcode-back" href="../VhhRestApi.html#VhhRestApi.VhhRestApi.downloadVideo">[docs]</a>    <span class="k">def</span> <span class="nf">downloadVideo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">video_format</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to download a video from the Vhh-MMSI system.</span>
+
+<span class="sd">        :param url: this parameter must hold a valid restApi endpoint.</span>
+<span class="sd">        :param file_name: This parameter represents the filename on the local storage.</span>
+<span class="sd">        :param video_format: This parameter must hold a valid video format extension (e.g. m4v)</span>
+<span class="sd">        :return: This method returns a boolean flag which includes the state of the download process (true ... sucessfully finished OR false ... downlaod failed)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start download process ... &quot;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">video_file</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__pem_path</span><span class="p">)</span>
+            <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__video_download_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">video_format</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">video_file</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;successfully downloaded ... &quot;</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Download process failed!&quot;</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="VhhRestApi.getAutomaticResults"><a class="viewcode-back" href="../VhhRestApi.html#VhhRestApi.VhhRestApi.getAutomaticResults">[docs]</a>    <span class="k">def</span> <span class="nf">getAutomaticResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to get all automatic generated results from the VhhMMSI system.</span>
+
+<span class="sd">        :param vid: This parameter must hold a valid video identifier.</span>
+<span class="sd">        :return: THis method returns the results (payload) as json format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;get sbd results from maxrecall ... &quot;</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">API_VIDEO_SHOTS_AUTO_ENDPOINT</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">vid</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/shots/auto&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRequest</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res_json</span></div>
+
+<div class="viewcode-block" id="VhhRestApi.postAutomaticResults"><a class="viewcode-back" href="../VhhRestApi.html#VhhRestApi.VhhRestApi.postAutomaticResults">[docs]</a>    <span class="k">def</span> <span class="nf">postAutomaticResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">results_np</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to post the automatic generated results to the VhhMMSI system.</span>
+
+<span class="sd">        :param vid: This parameter must hold a valid video identifier.</span>
+<span class="sd">        :param results_np: This parameter must hold a numpy array including the automatic generated results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;save all automatic generated results to maxrecall ... &quot;</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">API_VIDEO_SHOTS_AUTO_ENDPOINT</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">vid</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/shots/auto&quot;</span>
+
+        <span class="n">data_block</span> <span class="o">=</span> <span class="n">results_np</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span>
+
+        <span class="n">data_dict_l</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_block</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">data_block</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">inpoint</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_block</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">outpoint</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data_block</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">shot_type</span> <span class="o">=</span> <span class="n">data_block</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+            <span class="n">camera_movement</span> <span class="o">=</span> <span class="n">data_block</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span>
+
+            <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;inPoint&quot;</span><span class="p">:</span> <span class="n">inpoint</span><span class="p">,</span>
+                <span class="s2">&quot;outPoint&quot;</span><span class="p">:</span> <span class="n">outpoint</span><span class="p">,</span>
+                <span class="s2">&quot;shotType&quot;</span><span class="p">:</span> <span class="n">shot_type</span><span class="p">,</span>
+                <span class="s2">&quot;cameraMovement&quot;</span><span class="p">:</span> <span class="n">camera_movement</span>
+            <span class="p">}</span>
+
+            <span class="n">data_dict_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_dict</span><span class="p">)</span>
+        <span class="c1">#print(json.dumps(data_dict_l))</span>
+
+        <span class="c1">#payload = json.dumps(data_dict_l)</span>
+        <span class="c1">#print(payload)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postRequest</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data_dict_l</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sbd results successfully sent to maxrecall ... &quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">VHH Core Package: Automatic Video Analysis Framework (vhh_core) 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Daniel Helm.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>
