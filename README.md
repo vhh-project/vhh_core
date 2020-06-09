@@ -34,3 +34,44 @@ requirements:
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.1/lib64/
     export CUDA_HOME=/usr/local/cuda-10.1
     export PATH=$PATH:/usr/local/cuda-10.1/bin
+
+
+## Quick Setup
+
+**Requirements:**
+
+   * Ubuntu 18.04 LTS
+   * python version 3.6.x
+
+**Create a virtual environment:**
+
+   * create a folder to a specified path (e.g. /xxx/vhh_core/)
+   * python3 -m venv /xxx/vhh_core/
+
+**Activate the environment:**
+
+   * source /xxx/vhh_core/bin/activate
+
+**Checkout vhh_core repository to a specified folder:**
+
+   * git clone https://github.com/dahe-cvl/vhh_core
+
+**Install dependencies**
+
+    * cd /xxx/vhh_core/
+    * pip install -r requirements.txt
+
+**Setup environment variables:**
+
+   * source /data/dhelm/python_virtenv/vhh_core_env/bin/activate
+   * export CUDA_VISIBLE_DEVICES=1
+   * export PYTHONPATH=$PYTHONPATH:/XXX/vhh_core/:/XXX/vhh_core/Develop/:/XXX/vhh_core/Demo/
+
+**Run demo script**
+
+   * change to root directory of the repository
+   * python Demo/run_automatic_annotation_process.py
+
+## Docker Setup instructions
+
+NOT AVAILABLE YET
