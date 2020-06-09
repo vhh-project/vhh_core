@@ -67,8 +67,6 @@ The following list gives an overview of the folder structure of this python repo
    * **requirements.txt**: this file holds all python dependencies and is needed to install the package in your own virtual environment
    * **setup.py**: this script is needed to install the stc package in your own virtual environment
 
-
-
 Setup  instructions
 ===================
 
@@ -108,6 +106,10 @@ The following instructions have to be done to used this library in your own appl
    Currently there is an issue in the *setup.py* script. Therefore the pytorch libraries have to be installed manually by running the following command:
    *pip install torch==1.5.0+cu101 torchvision==0.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html*
 
+Setup  instructions
+===================
+
+asdfasdfasdf
 
 Parameter Description
 =====================
