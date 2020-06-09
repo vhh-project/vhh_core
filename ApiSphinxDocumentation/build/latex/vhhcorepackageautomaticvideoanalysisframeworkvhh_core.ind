@@ -1,0 +1,52 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter C
+  \item \spxentry{cleanup()}\spxextra{Video.Video method}, \hyperpage{8}
+  \item \spxentry{Configuration}\spxextra{class in Configuration}, \hyperpage{7}
+  \item \spxentry{create\_video()}\spxextra{Video.Video method}, \hyperpage{8}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{download()}\spxextra{Video.Video method}, \hyperpage{8}
+  \item \spxentry{downloadVideo()}\spxextra{VhhRestApi.VhhRestApi method}, \hyperpage{9}
+
+  \indexspace
+  \bigletter G
+  \item \spxentry{getAutomaticResults()}\spxextra{VhhRestApi.VhhRestApi method}, \hyperpage{9}
+  \item \spxentry{getListofVideos()}\spxextra{VhhRestApi.VhhRestApi method}, \hyperpage{9}
+  \item \spxentry{getRequest()}\spxextra{VhhRestApi.VhhRestApi method}, \hyperpage{9}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{is\_downloaded()}\spxextra{Video.Video method}, \hyperpage{8}
+
+  \indexspace
+  \bigletter L
+  \item \spxentry{loadConfig()}\spxextra{Configuration.Configuration method}, \hyperpage{7}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{postAutomaticResults()}\spxextra{VhhRestApi.VhhRestApi method}, \hyperpage{9}
+  \item \spxentry{postRequest()}\spxextra{VhhRestApi.VhhRestApi method}, \hyperpage{9}
+  \item \spxentry{printInfo()}\spxextra{Video.Video method}, \hyperpage{8}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{run()}\spxextra{Sbd.Sbd method}, \hyperpage{7}
+  \item \spxentry{run()}\spxextra{Stc.Stc method}, \hyperpage{8}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{Sbd}\spxextra{class in Sbd}, \hyperpage{7}
+  \item \spxentry{Stc}\spxextra{class in Stc}, \hyperpage{8}
+
+  \indexspace
+  \bigletter V
+  \item \spxentry{VhhRestApi}\spxextra{class in VhhRestApi}, \hyperpage{9}
+  \item \spxentry{Video}\spxextra{class in Video}, \hyperpage{8}
+
+\end{sphinxtheindex}
