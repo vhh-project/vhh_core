@@ -34,11 +34,12 @@ HTML format (only usable if repository is available in local storage): [vhh_core
 
     * cd /xxx/vhh_core/
     * pip install -r requirements.txt
+    * pip install torch==1.5.0+cu101 torchvision==0.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 
 **Setup environment variables:**
 
    * source /data/dhelm/python_virtenv/vhh_core_env/bin/activate
-   * export CUDA_VISIBLE_DEVICES=1
+   * export CUDA_VISIBLE_DEVICES=0
    * export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.1/lib64/
    * export CUDA_HOME=/usr/local/cuda-10.1
    * export PATH=$PATH:/usr/local/cuda-10.1/bin
