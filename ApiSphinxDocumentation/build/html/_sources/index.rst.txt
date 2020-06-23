@@ -67,8 +67,6 @@ The following list gives an overview of the folder structure of this python repo
    * **requirements.txt**: this file holds all python dependencies and is needed to install the package in your own virtual environment
    * **setup.py**: this script is needed to install the stc package in your own virtual environment
 
-
-
 Setup  instructions
 ===================
 
@@ -111,7 +109,6 @@ The following instructions have to be done to used this library in your own appl
 
 Parameter Description
 =====================
-Documenting single YAML file.
 
 .. autoyaml:: ../config/CORE/config.yaml
 

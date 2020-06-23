@@ -28,7 +28,7 @@ SbdCore:
 
   ###
   # This parameter is used to save raw results (e.g. debug visualizations).
-  SAVE_RAW_RESULTS: 0       # 1 ... yes 0 ... no
+  SAVE_RAW_RESULTS: 1       # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the raw results.
   PATH_RAW_RESULTS: "/data/share/maxrecall_vhh_mmsi/videos/results/sbd/raw_results/"
@@ -57,7 +57,7 @@ SbdCore:
   PATH_VIDEOS: "/data/share/maxrecall_vhh_mmsi/videos/downloaded/"
   ###
   # This parameter is used to specify the threshold mode (adaptive OR fixed).
-  THRESHOLD_MODE: 'adaptive'    # adaptive OR fixed
+  THRESHOLD_MODE: 'fixed'    # adaptive OR fixed
   ###
   # This parameter is used to specify the threshold (only in fixed threshold mode - [0-1]).
   THRESHOLD: 0.8                 # value [0-1]
@@ -85,10 +85,10 @@ Evaluation:
   SAVE_EVAL_RESULTS: 0
   ###
   # This parameter is used the raw results path.
-  PATH_RAW_RESULTS: "/data/share/maxrecall_vhh_mmsi/videos/results/cmc/raw_results/"
+  PATH_RAW_RESULTS: "/data/share/maxrecall_vhh_mmsi/videos/results/sbd/raw_results/"
   ###
   # This parameter is used to specify the path to store the evaluation results path.
-  PATH_EVAL_RESULTS: "/data/share/maxrecall_vhh_mmsi/videos/results/cmc/develop/"
+  PATH_EVAL_RESULTS: "/data/share/maxrecall_vhh_mmsi/videos/results/sbd/develop/"
   ###
   # This parameter is used to groundtruth annotations used for evaluation.
   PATH_GT_ANNOTATIONS: "/caa/Projects02/vhh/private/database_nobackup/VHH_datasets/annotations/ShotBoundaryDetection/imediacities/sbd_imc_annotations_20191231.csv"

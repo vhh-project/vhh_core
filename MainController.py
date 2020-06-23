@@ -47,6 +47,7 @@ class MainController(object):
 
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
+        #video_instance_list = video_instance_list[1:]
 
         # cleanup video and results folder
         if (self.__configuration_instance.cleanup_flag == 1):
@@ -71,16 +72,16 @@ class MainController(object):
         results_np = self.merge_results()
 
         # post all results
-        vids = np.unique(results_np[:, :1])
+        vids = np.unique(results_np[:, 1:2])
         for vid in vids:
-            indices = np.where(vid == results_np[:, :1])[0]
+            indices = np.where(vid == results_np[:, 1:2])[0]
             vid_results_np = results_np[indices]
 
-            header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
+            header = ["shot_id", "vid_name", "start", "end", "stc", "cmc"]
             header_np = np.expand_dims(np.array(header), axis=0)
             vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
 
-            self.__rest_api_instance.postAutomaticResults(vid=int(vid), results_np=vid_results_np)
+            self.__rest_api_instance.postAutomaticResults(vid=int(vid.split('.')[0]), results_np=vid_results_np)
 
         print("Successfully finished!")
 
@@ -91,6 +92,8 @@ class MainController(object):
         :return: This method returns a numpy array holding all results (including a valid header).
         """
         # merge and prepare results
+        sbd_results_path = os.path.join(self.__configuration_instance.results_root_dir, "sbd")
+        sbd_results_path = os.path.join(sbd_results_path, "final_results")
 
         stc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "stc")
         stc_results_path = os.path.join(stc_results_path, "final_results")
@@ -98,11 +101,31 @@ class MainController(object):
         cmc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "cmc")
         cmc_results_path = os.path.join(cmc_results_path, "final_results")
 
+        sbd_result_file_list = os.listdir(sbd_results_path)
+        sbd_result_file_list = [os.path.join(sbd_results_path, x) for x in sbd_result_file_list]
         stc_result_file_list = os.listdir(stc_results_path)
         stc_result_file_list = [os.path.join(stc_results_path, x) for x in stc_result_file_list]
         cmc_result_file_list = os.listdir(cmc_results_path)
         cmc_result_file_list = [os.path.join(cmc_results_path, x) for x in cmc_result_file_list]
-        all_results_file_list = stc_result_file_list + cmc_result_file_list
+
+        print(sbd_result_file_list)
+        print(stc_result_file_list)
+        print(cmc_result_file_list)
+
+        entries = []
+        for results_file in sbd_result_file_list:
+            fp = open(results_file)
+            lines = fp.readlines()
+            fp.close()
+
+            for line in lines[1:]:
+                line = line.replace('\n', '')
+                line_split = line.split(';')
+                entries.append([line_split[0].split('.')[0],
+                                line_split[1],
+                                line_split[2],
+                                line_split[3]])
+        sbd_entries_np = np.array(entries)
 
         entries = []
         for results_file in stc_result_file_list:
@@ -136,7 +159,15 @@ class MainController(object):
                                 line_split[4]])
         cmc_entries_np = np.array(entries)
 
-        entries_np = np.concatenate((stc_entries_np, cmc_entries_np[:, 4:]), axis=1)
+        if(len(stc_entries_np) > 0 and len(cmc_entries_np) > 0):
+            entries_np = np.concatenate((sbd_entries_np, stc_entries_np[:, 4:]), axis=1)
+            entries_np = np.concatenate((entries_np, cmc_entries_np[:, 4:]), axis=1)
+        else:
+            dummy_entries_np = np.empty([len(sbd_entries_np), 1]).astype('str')
+            dummy_entries_np[:] = "NA"
+            entries_np = np.concatenate((sbd_entries_np, dummy_entries_np), axis=1)
+            entries_np = np.concatenate((entries_np, dummy_entries_np), axis=1)
+
         return entries_np
 
 

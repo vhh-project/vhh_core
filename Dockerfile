@@ -7,6 +7,8 @@ COPY ./requirements.txt /requirements.txt
 
 WORKDIR /
 
+RUN pip3 install opencv-python
+RUN pip3 install torch==1.5.0+cu101 torchvision==0.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 RUN pip3 install -r requirements.txt
 
 COPY . /

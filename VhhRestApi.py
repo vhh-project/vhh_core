@@ -138,7 +138,6 @@ class VhhRestApi(object):
 
         print("save all automatic generated results to maxrecall ... ")
         url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + "/" + str(vid) + "/shots/auto"
-
         data_block = results_np[1:, :]
 
         data_dict_l = []
@@ -163,7 +162,7 @@ class VhhRestApi(object):
         #print(payload)
 
         response = self.postRequest(url, data_dict_l)
-        print(response.content)
+        #print(response.content)
 
 
         print("sbd results successfully sent to maxrecall ... ")
