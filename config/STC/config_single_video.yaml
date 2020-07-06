@@ -24,7 +24,7 @@ PreProcessing:
 StcCore:
   ###
   # This parameter is used to specify the class names.
-  CLASS_NAMES: ["ELS","LS","MS","CU"]
+  CLASS_NAMES: ["CU", "ELS", "LS", "MS"]
   ###
   # This parameter is used to specify the batch size.
   BATCH_SIZE: 64
