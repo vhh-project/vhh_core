@@ -81,12 +81,14 @@ class VhhRestApi(object):
             originalFileName = entry['originalFileName']
             url = entry['url']
 
-            video_instance = Video(self.__core_config)
-            video_instance.create_video(vid=vid,
-                                        originalFileName=originalFileName,
-                                        url=url,
-                                        download_path=self.__video_download_path)
-            video_instance_list.append(video_instance)
+            # filter frame_counter videos and amX videos
+            if not "video-framecounter" in originalFileName and not "eyeland" in originalFileName:
+                video_instance = Video(self.__core_config)
+                video_instance.create_video(vid=vid,
+                                            originalFileName=originalFileName,
+                                            url=url,
+                                            download_path=self.__video_download_path)
+                video_instance_list.append(video_instance)
 
         return video_instance_list
 

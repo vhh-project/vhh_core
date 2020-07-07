@@ -125,6 +125,17 @@ class Video(object):
             os.remove(file_path)
 
         print("Delete cmc results if available  ...")
+        fp = open(self.__core_config.cmc_config_file, 'r')
+        cmc_config = yaml.load(fp, Loader=yaml.BaseLoader)
+        cmc_results_dir = cmc_config['CmcCore']['PATH_FINAL_RESULTS']
+        fp.close()
+
+        search_str = str(self.id) + ".csv"
+        result_file_list = os.listdir(cmc_results_dir)
+        if (search_str in result_file_list):
+            print("delete cmc results ... ")
+            file_path = os.path.join(cmc_results_dir, search_str)
+            os.remove(file_path)
 
         print("cleanup process successfully finished!")
 
