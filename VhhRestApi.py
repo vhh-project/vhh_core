@@ -82,7 +82,7 @@ class VhhRestApi(object):
             url = entry['url']
 
             # filter frame_counter videos and amX videos
-            if not "video-framecounter" in originalFileName and not "eyeland" in originalFileName:
+            if not "video-framecounter" in originalFileName and not "eyeland" in originalFileName and not "am-" in originalFileName:
                 video_instance = Video(self.__core_config)
                 video_instance.create_video(vid=vid,
                                             originalFileName=originalFileName,
