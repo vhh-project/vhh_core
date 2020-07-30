@@ -69,7 +69,7 @@ class VhhRestApi(object):
         print("load list of videos ... ")
 
         print("send request: " + str(self.API_VIDEO_SEARCH_ENDPOINT))
-        res = requests.get(self.API_VIDEO_SEARCH_ENDPOINT, verify=self.__pem_path)  # params=params,
+        res = requests.get(self.API_VIDEO_SEARCH_ENDPOINT ) #, verify=self.__pem_path)  # params=params,
         print("receive response")
 
         res_json = res.json()
