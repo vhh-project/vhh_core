@@ -1,4 +1,4 @@
-from cmc.CMC import CMC
+from vhh_cmc.CMC import CMC
 import os
 import yaml
 

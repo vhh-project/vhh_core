@@ -1,5 +1,5 @@
-from sbd.SBD import SBD
-from sbd.utils import *
+from vhh_sbd.SBD import SBD
+from vhh_sbd.utils import *
 import os
 
 

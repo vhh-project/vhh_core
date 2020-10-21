@@ -4,10 +4,6 @@ PyYAML
 Sphinx
 sphinxcontrib-bibtex
 sphinxcontrib-autoyaml
-git+https://github.com/dahe-cvl/vhh_sbd@vhh_sbd_release_1_0_0
-git+https://github.com/dahe-cvl/vhh_stc@vhh_stc_release_1_0_0
-git+https://github.com/dahe-cvl/vhh_cmc@vhh_cmc_release_1_0_1
-
-#git+https://github.com/dahe-cvl/vhh_sbd#egg=vhh_sbd
-#git+https://github.com/dahe-cvl/vhh_stc#egg=vhh_stc
-#git+https://github.com/dahe-cvl/vhh_cmc#egg=vhh_cmc
+vhh-sbd
+vhh-stc
+vhh-cmc

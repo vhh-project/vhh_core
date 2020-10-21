@@ -1,5 +1,5 @@
-from stc.STC import STC
-from stc.utils import *
+from vhh_stc.STC import STC
+from vhh_stc.utils import *
 import os
 import yaml
 
