@@ -35,7 +35,7 @@ HTML format (only usable if repository is available in local storage): [vhh_core
     * cd /xxx/vhh_core/
     * pip install -r requirements.txt
     
-**Install PyTorch
+**Install PyTorch**
 
 Install a Version of PyTorch depending on your setup. Consult the [PyTorch website](https://pytorch.org/get-started/locally/) for detailed instructions.
 
