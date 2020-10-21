@@ -67,8 +67,12 @@ class Configuration:
         self.video_download_path = vhh_core_config['VIDEO_DOWNLOAD_PATH']
         self.cleanup_flag = int(vhh_core_config['CLEANUP_FLAG'])
         self.results_root_dir = vhh_core_config['RESULTS_ROOT_DIR']
+        self.results_format = vhh_core_config['RESULTS_FORMAT']
 
         # plugin_config section
+        self.use_sbd = (int(plugin_config['USE_SBD']) == 1)
+        self.use_stc = (int(plugin_config['USE_STC']) == 1)
+        self.use_cmc = (int(plugin_config['USE_CMC']) == 1)
         self.sbd_config_file = str(plugin_config['SBD_CONFIG_FILE'])
         self.stc_config_file = plugin_config['STC_CONFIG_FILE']
         self.cmc_config_file = plugin_config['CMC_CONFIG_FILE']

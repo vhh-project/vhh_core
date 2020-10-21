@@ -5,6 +5,8 @@ from VhhRestApi import VhhRestApi
 from Configuration import Configuration
 import numpy as np
 import os
+import csv
+import json
 
 
 class MainController(object):
@@ -19,7 +21,7 @@ class MainController(object):
         print("Create instance of MainController")
 
         # load CORE configuration
-        config_file = "/home/dhelm/VHH_Develop/pycharm_vhh_core/config/CORE/config.yaml"
+        config_file = "config/CORE/config.yaml"
         self.__configuration_instance = Configuration(config_file=config_file)
         self.__configuration_instance.loadConfig()
 
@@ -38,12 +40,16 @@ class MainController(object):
 
         self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance)
 
+        self.make_result_folders()
+
     def run(self):
         """
         This method is used to start the automatic annotation process.
         """
 
         print("Start automatic annotation process ... ")
+
+        exit()
 
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
@@ -59,29 +65,83 @@ class MainController(object):
             if (video_instance.is_downloaded() == False):
                 video_instance.download(self.__rest_api_instance)
 
+        #video_instance_list = [video_instance_list[0]]
+
+        # TODO: Flags
+
         # run sbd
-        self.__sbd_instance.run(video_instance_list=video_instance_list)
+        if self.__configuration_instance.use_sbd:
+            self.__sbd_instance.run(video_instance_list=video_instance_list)
 
         # run stc
-        self.__stc_instance.run()
+        if self.__configuration_instance.use_stc:
+            self.__stc_instance.run()
 
         # run cmc
-        self.__cmc_instance.run()
+        if self.__configuration_instance.use_cmc:
+            self.__cmc_instance.run()
 
         # merge all results
         results_np = self.merge_results()
+        header = ["shot_id", "vid_name", "start", "end", "stc", "cmc"]
 
-        # post all results
         vids = np.unique(results_np[:, 1:2])
-        for vid in vids:
-            indices = np.where(vid == results_np[:, 1:2])[0]
-            vid_results_np = results_np[indices]
 
-            header = ["shot_id", "vid_name", "start", "end", "stc", "cmc"]
-            header_np = np.expand_dims(np.array(header), axis=0)
-            vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
+        if self.__configuration_instance.results_format == "CSV_LOCAL":
 
-            self.__rest_api_instance.postAutomaticResults(vid=int(vid.split('.')[0]), results_np=vid_results_np)
+            # write Output to .csv file
+            csv_path = os.path.join(self.__configuration_instance.results_root_dir, "core", "results.csv")
+            print(f"Writing results to \"{csv_path}\"...")
+            with open(csv_path, 'w', newline='') as csv_file:
+                csv_writer = csv.writer(csv_file, delimiter=';')
+                csv_writer.writerow(header)
+                for row_idx in range(results_np.shape[0]):
+                    csv_writer.writerow(results_np[row_idx, :])
+
+        elif self.__configuration_instance.results_format == "JSON_LOCAL":
+            data = {}
+            data['analysis_results'] = []
+
+            # create dictionary as basis for JSON file
+            for vid in vids:
+                indices = np.where(vid == results_np[:, 1])[0]
+                vid_results_np = results_np[indices]
+
+                vid_results_dict = {}
+                vid_results_dict['vid_name'] = vid
+                vid_results_dict['shots'] = []
+
+                rows, cols = vid_results_np.shape
+                for row_idx in range(rows):
+                    result = {}
+                    for col in range(cols):
+                        if col is not 1:
+                            result[header[col]] = vid_results_np[row_idx, col]
+                    vid_results_dict['shots'].append(result)
+                data['analysis_results'].append(vid_results_dict)
+
+            # write JSON file
+            json_path = os.path.join(self.__configuration_instance.results_root_dir, "core", "results.json")
+            print(f"Writing results to \"{json_path}\"...")
+            with open(json_path, 'w', newline='') as json_file:
+                json.dump(data, json_file)
+
+
+        elif self.__configuration_instance.results_format == "JSON_REST":
+            print(f"Posting results using Rest API...")
+            # post all results
+            for vid in vids:
+                indices = np.where(vid == results_np[:, 1])[0]
+                vid_results_np = results_np[indices]
+
+                header_np = np.expand_dims(np.array(header), axis=0)
+                vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
+
+                self.__rest_api_instance.postAutomaticResults(vid=int(vid.split('.')[0]), results_np=vid_results_np)
+
+        else:
+            print("No results were written.")
+            print("If you wish to write any output, please set the RESULTS_FORMAT in the Config file.")
 
         print("Successfully finished!")
 
@@ -108,9 +168,9 @@ class MainController(object):
         cmc_result_file_list = os.listdir(cmc_results_path)
         cmc_result_file_list = [os.path.join(cmc_results_path, x) for x in cmc_result_file_list]
 
-        print(sbd_result_file_list)
-        print(stc_result_file_list)
-        print(cmc_result_file_list)
+        #print(sbd_result_file_list)
+        #print(stc_result_file_list)
+        #print(cmc_result_file_list)
 
         entries = []
         for results_file in sbd_result_file_list:
@@ -170,6 +230,22 @@ class MainController(object):
 
         return entries_np
 
+    def make_result_folders(self):
+
+        results_root_dir = self.__configuration_instance.results_root_dir
+        plugins = ["sbd", "stc", "cmc"]
+        results_sub_dirs = ["raw_results", "final_results", "develop"]
+
+        try: os.mkdir(results_root_dir)
+        except OSError: pass
+
+        for plugin in plugins:
+            for sub_dir in results_sub_dirs:
+                try: os.makedirs(os.path.join(results_root_dir, plugin, sub_dir))
+                except OSError: pass
+
+        try: os.mkdir(os.path.join(results_root_dir, "core"))
+        except OSError: pass
 
     '''
     def run_stc_process(self, sbd_results_path, config_file):

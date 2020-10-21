@@ -3,6 +3,7 @@ Development:
   ###
   # This parameter is used to activate or deactivate the debug mode.
   DEBUG_FLAG: 0             # 1 ... activate 0 ... deactivate
+  USE_GPU: 1
 
 PreProcessing:
   ###
@@ -31,7 +32,7 @@ SbdCore:
   SAVE_RAW_RESULTS: 1       # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the raw results.
-  PATH_RAW_RESULTS: "/data/share/maxrecall_vhh_mmsi/release/videos/results/sbd/raw_results/"
+  PATH_RAW_RESULTS: "results/sbd/raw_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_RAW_RESULTS: "results_raw_"
@@ -44,7 +45,7 @@ SbdCore:
   SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the final results.
-  PATH_FINAL_RESULTS: "/data/share/maxrecall_vhh_mmsi/release/videos/results/sbd/final_results/"
+  PATH_FINAL_RESULTS: "results/sbd/final_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_FINAL_RESULTS: "results_"
@@ -85,10 +86,10 @@ Evaluation:
   SAVE_EVAL_RESULTS: 0
   ###
   # This parameter is used the raw results path.
-  PATH_RAW_RESULTS: "/data/share/maxrecall_vhh_mmsi/release/videos/results/sbd/raw_results/"
+  PATH_RAW_RESULTS: "results/sbd/raw_results/"
   ###
   # This parameter is used to specify the path to store the evaluation results path.
-  PATH_EVAL_RESULTS: "/data/share/maxrecall_vhh_mmsi/release/videos/results/sbd/develop/"
+  PATH_EVAL_RESULTS: "results/sbd/develop/"
   ###
   # This parameter is used to groundtruth annotations used for evaluation.
   PATH_GT_ANNOTATIONS: "/caa/Projects02/vhh/private/database_nobackup/VHH_datasets/annotations/ShotBoundaryDetection/imediacities/sbd_imc_annotations_20191231.csv"

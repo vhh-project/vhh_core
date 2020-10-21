@@ -1,11 +1,3 @@
-Software:
-  ###
-  # This parameter is used to switch between release and develop software mode.
-  SW_DEV_MODE: &sw_mode "develop"   # *sw_mode
-  ###
-  # This parameter is used to specify the software version.
-  SW_VERSION: &sw_version "1.0.0"   # *sw_version
-
 Development:
   ###
   # This parameter is used to activate or deactivate the debug mode.
@@ -32,20 +24,35 @@ VhhCore:
 
   ###
   # This parameter specifies the results path for each individual plugin.
-  RESULTS_ROOT_DIR: "/data/share/maxrecall_vhh_mmsi/release/videos/results/"
+  # TODO: this needs to be adjusted (along with other configs?)
+  RESULTS_ROOT_DIR: "results/"
+  
+  ###
+  # This parameter specifies the format in which the results are written.
+  # CSV_LOCAL ... writes results to RESULTS_ROOT_DIR/core/results.csv
+  # JSON_LOCAL ... writes results to RESULTS_ROOT_DIR/core/results.json
+  # JSON_REST ... uses the Rest API to publish results as JSON files
+  # other ... do not write any results
+  RESULTS_FORMAT: "JSON_LOCAL"
 
 PluginConfigs:
   ###
+  # This parameter is used to activate or deactivate the SBD Plugin
+  USE_SBD: 1             # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the shot boundary detection plugin module
-  SBD_CONFIG_FILE: "/home/dhelm/VHH_Releases/vhh_core/config/SBD/config_single_video.yaml"
+  SBD_CONFIG_FILE: "config/SBD/config_single_video.yaml"
 
   ###
+  # This parameter is used to activate or deactivate the STC Plugin
+  USE_STC: 1             # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the shot type classification plugin module
-  STC_CONFIG_FILE: "/home/dhelm/VHH_Releases/vhh_core/config/STC/config_single_video.yaml"
+  STC_CONFIG_FILE: "config/STC/config_single_video.yaml"
 
   ###
+  # This parameter is used to activate or deactivate the CMC Plugin
+  USE_CMC: 1             # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the camera movement classification module
-  CMC_CONFIG_FILE: "/home/dhelm/VHH_Releases/vhh_core/config/CMC/config_single_video.yaml"
+  CMC_CONFIG_FILE: "config/CMC/config_single_video.yaml"
 
 
 

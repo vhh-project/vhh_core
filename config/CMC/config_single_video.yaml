@@ -9,6 +9,7 @@ Development:
   ###
   # This parameter is used to save a debug package (e.g. including some visualizations, ... - not available yet).
   SAVE_DEBUG_PKG: 0
+  PATH_DEBUG_RESULTS: ""
 
 PreProcessing:
   ###
@@ -28,6 +29,8 @@ OpticalFlow:
   ###
   # This parameter is used to specify a magnitude threshold to disinguish between no-movement and movement. (e.g. eval dataset: 2, 3, 5)
   MIN_MAGNITUDE_THRESHOLD: 1.0
+  # This parameter is used to specify a distance threshold for outlier detection of feature matches
+  DISTANCE_THRESHOLD: 0.75
   ###
   # This parameter is used to specify the number of consecutive frames which are needed to register a camera movement.
   SENSITIVITY: 10
@@ -61,7 +64,7 @@ CmcCore:
   SAVE_RAW_RESULTS: 0       # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the raw results.
-  PATH_RAW_RESULTS: "/data/share/maxrecall_vhh_mmsi/release/videos/results/cmc/raw_results/"
+  PATH_RAW_RESULTS: "results/cmc/raw_results/"
   NUMBER_OF_FRAMES_PER_SHOT: 5  # save x frames per shot
   ###
   # This parameter is used to specify the prefix for the results file.
@@ -75,7 +78,7 @@ CmcCore:
   SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the final results.
-  PATH_FINAL_RESULTS: "/data/share/maxrecall_vhh_mmsi/release/videos/results/cmc/final_results/"
+  PATH_FINAL_RESULTS: "results/cmc/final_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_FINAL_RESULTS: "results_"
@@ -93,10 +96,10 @@ Evaluation:
   SAVE_EVAL_RESULTS: 0
   ###
   # This parameter is used the raw results path.
-  PATH_RAW_RESULTS: "/data/share/maxrecall_vhh_mmsi/release/videos/results/cmc/raw_results/"
+  PATH_RAW_RESULTS: "results/cmc/raw_results/"
   ###
   # This parameter is used to specify the path to store the evaluation results path.
-  PATH_EVAL_RESULTS: "/data/share/maxrecall_vhh_mmsi/release/videos/results/cmc/develop/"
+  PATH_EVAL_RESULTS: "results/cmc/develop/"
   ###
   # This parameter is used to groundtruth annotations used for evaluation.
   PATH_GT_ANNOTATIONS: "/caa/Projects02/vhh/private/database_nobackup/VHH_datasets/annotations/ShotBoundaryDetection/imediacities/sbd_imc_annotations_20191231.csv"
