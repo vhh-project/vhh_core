@@ -55,7 +55,7 @@ class VhhRestApi(object):
         payload = json.dumps(data_dict)
 
         print("send request: " + str(url))
-        response = requests.post(url=url, headers=headers, data=payload, verify=self.__pem_path)  # , header=headers
+        response = requests.post(url=url, headers=headers, data=payload)#, verify=self.__pem_path)  # , header=headers
         print("receive response")
         # print(res)
         return response
