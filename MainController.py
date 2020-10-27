@@ -49,8 +49,6 @@ class MainController(object):
 
         print("Start automatic annotation process ... ")
 
-        exit()
-
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
         #video_instance_list = video_instance_list[1:]
