@@ -37,10 +37,10 @@ class VhhRestApi(object):
         :param url: this parameter must hold a valid restApi endpoint.
         :return: This method returns the original response including header as well as payload.
         """
-        print("send request: " + str(url))
-        response = requests.get(url, verify=self.__pem_path)  # params=params,
-        print("receive response")
-        # print(res)
+        print("send get request: " + str(url))
+        response = requests.get(url) #,verify=self.__pem_path)  # params=params,
+        print("receive get response")
+        print(response)
         return response
 
     def postRequest(self, url, data_dict):
@@ -51,13 +51,17 @@ class VhhRestApi(object):
         :param data_dict: this parameter must hold a valid list of dictionaries with the specified fields (see RestApi documentation).
         :return: This method returns the original response including header as well as payload
         """
-        headers = {"Content-Type ": "application/json"}
-        payload = json.dumps(data_dict)
+        #headers = {"Content-Type ": "application/json"}
+		
+        headers = {
+                    'accept': '*/*',
+                    'Content-Type': 'application/json',
+                  }
 
-        print("send request: " + str(url))
+        payload = json.dumps(data_dict)
+        print("send post request: " + str(url))
         response = requests.post(url=url, headers=headers, data=payload)#, verify=self.__pem_path)  # , header=headers
-        print("receive response")
-        # print(res)
+        print("receive post response")
         return response
 
     def getListofVideos(self):
@@ -105,7 +109,7 @@ class VhhRestApi(object):
         ret = False
 
         try:
-            video_file = requests.get(url, verify=self.__pem_path)
+            video_file = requests.get(url) #, verify=self.__pem_path)
             open(self.__video_download_path + "/" + file_name + "." + str(video_format), 'wb').write(video_file.content)
             print("successfully downloaded ... ")
             ret = True
@@ -158,13 +162,8 @@ class VhhRestApi(object):
             }
 
             data_dict_l.append(data_dict)
-        #print(json.dumps(data_dict_l))
-
-        #payload = json.dumps(data_dict_l)
-        #print(payload)
 
         response = self.postRequest(url, data_dict_l)
-        #print(response.content)
-
+        print(response)
 
         print("sbd results successfully sent to maxrecall ... ")

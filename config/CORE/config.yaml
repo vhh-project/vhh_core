@@ -6,6 +6,7 @@ Development:
 Security:
   ###
   # This parameter specifies the path tp the certificate file needed to provide vhh-mmsi api access.
+  # HINT: should not be needed at the moment
   PEM_PATH: "/home/dhelm/VHH_Releases/certificates/cacert.pem"  # certificate file for vhh-mmsi api access
 
 ApiEndpoints:
@@ -35,7 +36,7 @@ VhhCore:
   # JSON_LOCAL ... writes results to RESULTS_ROOT_DIR/core/results.json
   # JSON_REST ... uses the Rest API to publish results as JSON files
   # other ... do not write any results
-  RESULTS_FORMAT: "JSON_LOCAL"
+  RESULTS_FORMAT: "JSON_REST"
 
 PluginConfigs:
   ###

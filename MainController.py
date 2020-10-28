@@ -63,10 +63,6 @@ class MainController(object):
             if (video_instance.is_downloaded() == False):
                 video_instance.download(self.__rest_api_instance)
 
-        #video_instance_list = [video_instance_list[0]]
-
-        # TODO: Flags
-
         # run sbd
         if self.__configuration_instance.use_sbd:
             self.__sbd_instance.run(video_instance_list=video_instance_list)
