@@ -55,7 +55,7 @@ SbdCore:
 
   ###
   # This parameter is used to specify the path to the videos.
-  PATH_VIDEOS: "/data/share/maxrecall_vhh_mmsi/release/videos/downloaded/"
+  PATH_VIDEOS: "videos/"
   ###
   # This parameter is used to specify the threshold mode (adaptive OR fixed).
   THRESHOLD_MODE: 'fixed'    # adaptive OR fixed
@@ -78,7 +78,7 @@ SbdCore:
 CandidateSelection:
   ###
   # This parameter is used to specify the path to the pre-trained model.
-  PATH_PRETRAINED_MODEL: "/data/share/maxrecall_vhh_mmsi/release/videos/pre_trained_models/sbd/candidate_selection_model/pretrained/Alexnet-final.pth"
+  PATH_PRETRAINED_MODEL: "models/sbd/Alexnet-final.pth"
 
 Evaluation:
   ###

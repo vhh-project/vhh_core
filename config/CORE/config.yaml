@@ -16,7 +16,11 @@ ApiEndpoints:
 VhhCore:
   ###
   # This parameter specifies the video download path.
-  VIDEO_DOWNLOAD_PATH: "/data/share/maxrecall_vhh_mmsi/release/videos/downloaded/"   # directory to store all downloaded videos
+  VIDEO_DOWNLOAD_PATH: "videos/"   # directory to store all downloaded videos
+  
+  ###
+  # This parameter specifies the path to the pre-trained models.
+  PRETRAINED_MODEL_PATH: "models/"   # directory to store all downloaded videos
 
   ###
   # This parameter is used to activate/deactivate the clean-up mode. The clean-up mode deletes all downloaded videos and the corresponding generated results.
@@ -33,7 +37,7 @@ VhhCore:
   # JSON_LOCAL ... writes results to RESULTS_ROOT_DIR/core/results.json
   # JSON_REST ... uses the Rest API to publish results as JSON files
   # other ... do not write any results
-  RESULTS_FORMAT: "JSON_LOCAL"
+  RESULTS_FORMAT: "CSV_LOCAL"
 
 PluginConfigs:
   ###

@@ -37,6 +37,7 @@ class Configuration:
         self.pem_path = "None"
         self.root_url = "None"
         self.video_download_path = "None"
+        self.model_path = "None"
         self.sbd_config_file = "None"
         self.stc_config_file = "None"
         self.cmc_config_file = "None"
@@ -68,6 +69,7 @@ class Configuration:
         self.cleanup_flag = int(vhh_core_config['CLEANUP_FLAG'])
         self.results_root_dir = vhh_core_config['RESULTS_ROOT_DIR']
         self.results_format = vhh_core_config['RESULTS_FORMAT']
+        self.model_path = vhh_core_config['PRETRAINED_MODEL_PATH']
 
         # plugin_config section
         self.use_sbd = (int(plugin_config['USE_SBD']) == 1)

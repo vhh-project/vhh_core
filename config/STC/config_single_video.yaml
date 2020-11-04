@@ -58,13 +58,13 @@ StcCore:
 
   ###
   # This parameter is used to specify the path to the videos.
-  PATH_VIDEOS: "/data/share/maxrecall_vhh_mmsi/release/videos/downloaded/"
+  PATH_VIDEOS: "videos/"
   ###
   # This parameter is used to specify a decision threshold.
   THRESHOLD: 0.8                 # value [0-1]
   ###
   # This parameter is used to specify the path to the pre-trained model.
-  PATH_PRETRAINED_MODEL: "/data/share/maxrecall_vhh_mmsi/release/videos/pre_trained_models/stc/20200207_BasicCNN_db_v8_Vgg_ExpNum_001/"
+  PATH_PRETRAINED_MODEL: "models/stc/20200207_BasicCNN_db_v8_Vgg_ExpNum_001/"
 
 Evaluation:
   ###
