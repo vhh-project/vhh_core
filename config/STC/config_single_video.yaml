@@ -5,7 +5,7 @@ Development:
   DEBUG_FLAG: 0             # 1 ... activate 0 ... deactivate
   ###
   # This parameter is used to specify a SBD results file for debugging mode.
-  SBD_RESULTS_PATH: "/data/share/maxrecall_vhh_mmsi/release/videos/results/sbd/final_results/final_shots_video-counter-24fps.csv"
+  SBD_RESULTS_PATH: "/data/share/maxrecall_vhh_mmsi/videos/results/sbd/final_results/final_shots_video-counter-24fps.csv"
   ###
   # This parameter is used to save a debug package (e.g. including some visualizations, ... - not available yet).
   SAVE_DEBUG_PKG: 0
@@ -13,28 +13,27 @@ Development:
 PreProcessing:
   ###
   # This flag is used to to specify the resize dimension.
-  RESIZE_DIM: 128, 128      # resize dimension -> height, width
+  RESIZE_DIM: 256, 256      # resize dimension -> height, width
   ###
   # This parameter is used to to specify the mean values (RGB channels) used for the pre-trained model.
-  MEAN_VAL: [94.05657, 94.05657, 94.05657]  # mean values per color channel
+  MEAN_VAL: [0.34886327, 0.3442737, 0.34067717]  # mean values per color channel
   ###
   # This parameter is used to to specify the standard deviation values (RGB channels) used for the pre-trained model.
-  STD_DEV: [57.99793, 57.99793, 57.99793]   # standard deviation per color channel
+  STD_DEV: [ 0.25564876, 0.2566002, 0.25729373]   # standard deviation per color channel
 
 StcCore:
   ###
-  # This parameter is used to specify the class names.
-  CLASS_NAMES: ["CU", "ELS", "LS", "MS"]
+  # This parameter is used to specify the class names. ["ELS","LS","MS","CU"]
+  CLASS_NAMES: ["CU","ELS", "I", "LS", "MS", "NA"]
   ###
   # This parameter is used to specify the batch size.
   BATCH_SIZE: 64
-
   ###
   # This parameter is used to save raw results (e.g. debug visualizations).
   SAVE_RAW_RESULTS: 0       # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the raw results.
-  PATH_RAW_RESULTS: "results/stc/raw_results/"
+  PATH_RAW_RESULTS: "/data/share/cvl_vhh_software/release_v1_2_0/release_results/stc/raw_results/"
   NUMBER_OF_FRAMES_PER_SHOT: 5  # save x frames per shot
   ###
   # This parameter is used to specify the prefix for the results file.
@@ -42,20 +41,18 @@ StcCore:
   ###
   # This parameter is used to specify the postfix for the results file.
   POSTFIX_RAW_RESULTS: "csv"
-
   ###
   # This parameter is used to save final results (e.g. csv list).
   SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the final results.
-  PATH_FINAL_RESULTS: "results/stc/final_results/"
+  PATH_FINAL_RESULTS: "/data/share/cvl_vhh_software/release_v1_2_0/release_results/stc/final_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_FINAL_RESULTS: "results_"
   ###
   # This parameter is used to specify the postfix for the results file.
   POSTFIX_FINAL_RESULTS: "csv"
-
   ###
   # This parameter is used to specify the path to the videos.
   PATH_VIDEOS: "videos/"
@@ -72,10 +69,10 @@ Evaluation:
   SAVE_EVAL_RESULTS: 0
   ###
   # This parameter is used the raw results path.
-  PATH_RAW_RESULTS: "results/stc/raw_results/"
+  PATH_RAW_RESULTS: "/data/share/cvl_vhh_software/release_v1_2_0/release_results/stc/raw_results/"
   ###
   # This parameter is used to specify the path to store the evaluation results path.
-  PATH_EVAL_RESULTS: "results/stc/develop/"
+  PATH_EVAL_RESULTS: "/data/share/cvl_vhh_software/release_v1_2_0/release_results/stc/develop/"
   ###
   # This parameter is used to groundtruth annotations used for evaluation.
   PATH_GT_ANNOTATIONS: "/caa/Projects02/vhh/private/database_nobackup/VHH_datasets/annotations/ShotBoundaryDetection/imediacities/sbd_imc_annotations_20191231.csv"

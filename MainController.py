@@ -79,10 +79,11 @@ class MainController(object):
 
         # merge all results
         results_np = self.merge_results()
-        header = ["shot_id", "vid_name", "start", "end", "stc", "cmc"]
+        header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
 
-        vids = np.unique(results_np[:, 1:2])
-
+        vids = np.unique(results_np[:, :1])
+        print(vids)
+        
         if self.__configuration_instance.results_format == "CSV_LOCAL":
 
             # write Output to .csv file
@@ -100,7 +101,7 @@ class MainController(object):
 
             # create dictionary as basis for JSON file
             for vid in vids:
-                indices = np.where(vid == results_np[:, 1])[0]
+                indices = np.where(vid == results_np[:, 0])[0]
                 vid_results_np = results_np[indices]
 
                 vid_results_dict = {}
@@ -127,12 +128,12 @@ class MainController(object):
             print(f"Posting results using Rest API...")
             # post all results
             for vid in vids:
-                indices = np.where(vid == results_np[:, 1])[0]
+                indices = np.where(vid == results_np[:, 0])[0]
                 vid_results_np = results_np[indices]
 
                 header_np = np.expand_dims(np.array(header), axis=0)
                 vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
-
+                print(vid_results_np)
                 self.__rest_api_instance.postAutomaticResults(vid=int(vid.split('.')[0]), results_np=vid_results_np)
 
         else:
@@ -164,10 +165,6 @@ class MainController(object):
         cmc_result_file_list = os.listdir(cmc_results_path)
         cmc_result_file_list = [os.path.join(cmc_results_path, x) for x in cmc_result_file_list]
 
-        #print(sbd_result_file_list)
-        #print(stc_result_file_list)
-        #print(cmc_result_file_list)
-
         entries = []
         for results_file in sbd_result_file_list:
             fp = open(results_file)
@@ -182,6 +179,7 @@ class MainController(object):
                                 line_split[2],
                                 line_split[3]])
         sbd_entries_np = np.array(entries)
+        print(sbd_entries_np)
 
         entries = []
         for results_file in stc_result_file_list:
@@ -192,12 +190,17 @@ class MainController(object):
             for line in lines[1:]:
                 line = line.replace('\n', '')
                 line_split = line.split(';')
+
+                # TODO: just a temporary workaround
+                #if (line_split[4] == 'I'):
+                #    line_split[4] = 'NA'
                 entries.append([line_split[0].split('.')[0],
                                 line_split[1],
                                 line_split[2],
                                 line_split[3],
                                 line_split[4]])
         stc_entries_np = np.array(entries)
+        print(stc_entries_np)
 
         entries = []
         for results_file in cmc_result_file_list:
@@ -214,6 +217,8 @@ class MainController(object):
                                 line_split[3],
                                 line_split[4]])
         cmc_entries_np = np.array(entries)
+        print(cmc_entries_np)
+        
 
         if(len(stc_entries_np) > 0 and len(cmc_entries_np) > 0):
             entries_np = np.concatenate((sbd_entries_np, stc_entries_np[:, 4:]), axis=1)
@@ -223,7 +228,7 @@ class MainController(object):
             dummy_entries_np[:] = "NA"
             entries_np = np.concatenate((sbd_entries_np, dummy_entries_np), axis=1)
             entries_np = np.concatenate((entries_np, dummy_entries_np), axis=1)
-
+        print(entries_np)
         return entries_np
 
     def make_result_folders(self):
