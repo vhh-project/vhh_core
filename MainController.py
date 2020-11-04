@@ -51,8 +51,6 @@ class MainController(object):
 
         print("Start automatic annotation process ... ")
 
-        exit()
-
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
         #video_instance_list = video_instance_list[1:]
@@ -66,10 +64,6 @@ class MainController(object):
         for video_instance in video_instance_list:
             if (video_instance.is_downloaded() == False):
                 video_instance.download(self.__rest_api_instance)
-
-        #video_instance_list = [video_instance_list[0]]
-
-        # TODO: Flags
 
         # run sbd
         if self.__configuration_instance.use_sbd:
