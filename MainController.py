@@ -25,6 +25,10 @@ class MainController(object):
         self.__configuration_instance = Configuration(config_file=config_file)
         self.__configuration_instance.loadConfig()
 
+        if self.make_model_folders():
+            print("Model folders have been created! Place your models into the respective directories.")
+            exit()
+
         self.__root_url = self.__configuration_instance.root_url
         self.__pem_path = self.__configuration_instance.pem_path
         self.__video_download_path = self.__configuration_instance.video_download_path
@@ -41,7 +45,6 @@ class MainController(object):
         self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance)
 
         self.make_video_folder()
-        self.make_model_folders()
         self.make_result_folders()
 
     def run(self):
@@ -259,8 +262,10 @@ class MainController(object):
         plugins = ["sbd", "stc", "cmc"]
 
         try: os.mkdir(model_root_dir)
-        except OSError: pass
+        except OSError: return False
 
         for plugin in plugins:
             try: os.makedirs(os.path.join(model_root_dir, plugin))
-            except OSError: pass
+            except OSError: return False
+
+        return True

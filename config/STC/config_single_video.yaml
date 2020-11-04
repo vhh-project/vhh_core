@@ -61,7 +61,7 @@ StcCore:
   THRESHOLD: 0.8                 # value [0-1]
   ###
   # This parameter is used to specify the path to the pre-trained model.
-  PATH_PRETRAINED_MODEL: "models/stc/20200207_BasicCNN_db_v8_Vgg_ExpNum_001/"
+  PATH_PRETRAINED_MODEL: "./models/stc/20201026_stc_v4_vgg16_ExpNum_000/"
 
 Evaluation:
   ###
