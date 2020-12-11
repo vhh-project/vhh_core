@@ -57,16 +57,19 @@ SbdCore:
   PATH_VIDEOS: "videos/"
   ###
   # This parameter is used to specify the threshold mode (adaptive OR fixed).
-  THRESHOLD_MODE: 'fixed'    # adaptive OR fixed
+  THRESHOLD_MODE: 'adaptive'    # adaptive OR fixed
   ###
   # This parameter is used to specify the threshold (only in fixed threshold mode - [0-1]).
-  THRESHOLD: 0.75                 # value [0-1]
+  THRESHOLD: 0.8                 # value [0-1]  --> FIXED MODE
   ###
-  # This parameter is used to specify the adaptive threshold.
-  ALPHA: 2.0                     # value > 1
+  # This parameter is used to specify the threshold (only in adaptive threshold mode).
+  ALPHA: 0.4                     # value > 1   
+  ###
+  # This parameter is used to specify the threshold (only in adaptive threshold mode).
+  BETA: 0.5                  # value [0-1]
   ###
   # This parameter is used to specify the window size (frames history window - only for adaptive mode).
-  WINDOW_SIZE: 100               # only for adaptive mode
+  WINDOW_SIZE: 50               # only for adaptive mode
   ###
   # This parameter is used to specify the backbone cnn model ( vgg16 OR squeezenet).
   BACKBONE_CNN: "squeezenet"    # vgg16 OR squeezenet

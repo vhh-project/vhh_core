@@ -33,7 +33,7 @@ StcCore:
   SAVE_RAW_RESULTS: 0       # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the raw results.
-  PATH_RAW_RESULTS: "/data/share/cvl_vhh_software/release_v1_2_0/release_results/stc/raw_results/"
+  PATH_RAW_RESULTS: "results/stc/raw_results/"
   NUMBER_OF_FRAMES_PER_SHOT: 5  # save x frames per shot
   ###
   # This parameter is used to specify the prefix for the results file.
@@ -46,7 +46,7 @@ StcCore:
   SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the final results.
-  PATH_FINAL_RESULTS: "/data/share/cvl_vhh_software/release_v1_2_0/release_results/stc/final_results/"
+  PATH_FINAL_RESULTS: "results/stc/final_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_FINAL_RESULTS: "results_"
