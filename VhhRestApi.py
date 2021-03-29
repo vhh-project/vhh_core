@@ -84,6 +84,7 @@ class VhhRestApi(object):
             vid = int(entry['id'])
             originalFileName = entry['originalFileName']
             url = entry['url']
+            processed_flag = entry['processed']
 
             # filter frame_counter videos and amX videos
             if not "video-framecounter" in originalFileName and not "eyeland" in originalFileName and not "am-" in originalFileName:
@@ -91,7 +92,8 @@ class VhhRestApi(object):
                 video_instance.create_video(vid=vid,
                                             originalFileName=originalFileName,
                                             url=url,
-                                            download_path=self.__video_download_path)
+                                            download_path=self.__video_download_path,
+                                            processed_flag=processed_flag)
                 video_instance_list.append(video_instance)
 
         return video_instance_list

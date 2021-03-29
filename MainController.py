@@ -58,6 +58,18 @@ class MainController(object):
         video_instance_list = self.__rest_api_instance.getListofVideos()
         #video_instance_list = video_instance_list[1:]
 
+        # check video files if already processed and filter video_instance list
+        filtered_video_instance_list = []
+        for video_instance in video_instance_list:
+            video_instance.printInfo()
+            if( video_instance.is_processed() == False):
+                filtered_video_instance_list.append(video_instance)
+        video_instance_list = filtered_video_instance_list
+        
+        if(len(video_instance_list) == 0):
+            print("All videos are already processed!")
+            exit()   
+
         # cleanup video and results folder
         if (self.__configuration_instance.cleanup_flag == 1):
             for video_instance in video_instance_list:
@@ -66,7 +78,13 @@ class MainController(object):
         # download videos if not available
         for video_instance in video_instance_list:
             if (video_instance.is_downloaded() == False):
-                video_instance.download(self.__rest_api_instance)
+                ret = video_instance.download(self.__rest_api_instance)
+
+                # if for some reason it is not possible to download the video than skip it
+                print(ret)
+                if(ret == False):
+                    print("Not able to download this video! e.g. access restrictions or missing video file! --> skip")
+                    continue
 
         # run sbd
         if self.__configuration_instance.use_sbd:

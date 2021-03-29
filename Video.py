@@ -26,8 +26,9 @@ class Video(object):
         self.video_format = "None"
         self.file_name = "None"
         self.download_path = "None"
+        self.processed_flag = "None"
 
-    def create_video(self, vid, originalFileName, url, download_path):
+    def create_video(self, vid, originalFileName, url, download_path, processed_flag):
         """
         This method is used to fill all properties of a video.
 
@@ -43,6 +44,7 @@ class Video(object):
         self.video_format = url.split('.')[-1]
         self.file_name = url.split('/')[-1]
         self.download_path = download_path
+        self.processed_flag = processed_flag
 
     def download(self, rest_api_instance=None):
         """
@@ -79,6 +81,14 @@ class Video(object):
             ret = True
 
         return ret
+
+    def is_processed(self):
+        """
+        This method is used to check if a video was already processed by evaluating the processed_flag.
+
+        :return: This method returns a boolean flag (true ... video already processed OR false ... video was not processed in earlier runs).
+        """
+        return self.processed_flag
 
     def cleanup(self):
         """
@@ -151,4 +161,5 @@ class Video(object):
         print("video_format: " + str(self.video_format))
         print("url: " + str(self.url))
         print("download_path: " + str(self.download_path))
+        print("processed flag: " + str(self.processed_flag))
         print("####################################################")
