@@ -41,8 +41,14 @@ class Configuration:
         self.sbd_config_file = "None"
         self.stc_config_file = "None"
         self.cmc_config_file = "None"
+        self.odt_config_file = "None"
         self.cleanup_flag = False
         self.results_root_dir = "NONE"
+
+        self.use_sbd = 0
+        self.use_stc = 0
+        self.use_cmc = 0
+        self.use_odt = 0
 
     def loadConfig(self):
         """
@@ -75,9 +81,11 @@ class Configuration:
         self.use_sbd = (int(plugin_config['USE_SBD']) == 1)
         self.use_stc = (int(plugin_config['USE_STC']) == 1)
         self.use_cmc = (int(plugin_config['USE_CMC']) == 1)
+        self.use_odt = (int(plugin_config['USE_ODT']) == 1)
         self.sbd_config_file = str(plugin_config['SBD_CONFIG_FILE'])
         self.stc_config_file = plugin_config['STC_CONFIG_FILE']
         self.cmc_config_file = plugin_config['CMC_CONFIG_FILE']
+        self.odt_config_file = plugin_config['ODT_CONFIG_FILE']
 
         # api_config section
         self.root_url = api_config['ROOT_URL']

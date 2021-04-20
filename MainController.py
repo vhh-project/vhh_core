@@ -1,6 +1,7 @@
 from Sbd import Sbd
 from Stc import Stc
 from Cmc import Cmc
+from Odt import Odt
 from VhhRestApi import VhhRestApi
 from Configuration import Configuration
 import numpy as np
@@ -36,11 +37,13 @@ class MainController(object):
         self.__sbd_config_file = self.__configuration_instance.sbd_config_file
         self.__stc_config_file = self.__configuration_instance.stc_config_file
         self.__cmc_config_file = self.__configuration_instance.cmc_config_file
+        self.__odt_config_file = self.__configuration_instance.odt_config_file
 
         # initialize class members
         self.__sbd_instance = Sbd(config=self.__configuration_instance)
         self.__stc_instance = Stc(config=self.__configuration_instance)
         self.__cmc_instance = Cmc(config=self.__configuration_instance)
+        self.__odt_instance = Odt(config=self.__configuration_instance)
 
         self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance)
 
@@ -56,8 +59,9 @@ class MainController(object):
 
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
-        #video_instance_list = video_instance_list[1:]
+        #video_instance_list = video_instance_list[:1]
 
+        '''
         # check video files if already processed and filter video_instance list
         filtered_video_instance_list = []
         for video_instance in video_instance_list:
@@ -65,7 +69,9 @@ class MainController(object):
             if( video_instance.is_processed() == False):
                 filtered_video_instance_list.append(video_instance)
         video_instance_list = filtered_video_instance_list
-        
+        print(video_instance_list)
+        '''
+
         if(len(video_instance_list) == 0):
             print("All videos are already processed!")
             exit()   
@@ -97,6 +103,10 @@ class MainController(object):
         # run cmc
         if self.__configuration_instance.use_cmc:
             self.__cmc_instance.run()
+
+        # run odt
+        if self.__configuration_instance.use_odt:
+            self.__odt_instance.run()
 
         # merge all results
         results_np = self.merge_results()
@@ -255,7 +265,7 @@ class MainController(object):
     def make_result_folders(self):
 
         results_root_dir = self.__configuration_instance.results_root_dir
-        plugins = ["sbd", "stc", "cmc"]
+        plugins = ["sbd", "stc", "cmc", "od"]
         results_sub_dirs = ["raw_results", "final_results", "develop"]
 
         try: os.mkdir(results_root_dir)
