@@ -24,7 +24,7 @@ VhhCore:
 
   ###
   # This parameter is used to activate/deactivate the clean-up mode. The clean-up mode deletes all downloaded videos and the corresponding generated results.
-  CLEANUP_FLAG: 0   # 0 ... deactivate cleanup function OR 1 ... activate cleanup method -> delete all downloaded videos + annotation results locally
+  CLEANUP_FLAG: 1   # 0 ... deactivate cleanup function OR 1 ... activate cleanup method -> delete all downloaded videos + annotation results locally
 
   ###
   # This parameter specifies the results path for each individual plugin.
@@ -60,7 +60,7 @@ PluginConfigs:
 
   ###
   # This parameter is used to activate or deactivate the ODT Plugin
-  USE_ODT: 1             # 1 ... activate 0 ... deactivate
+  USE_ODT: 0             # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the object detection and tracking module
   ODT_CONFIG_FILE: "config/ODT/config_odt.yaml"
 
