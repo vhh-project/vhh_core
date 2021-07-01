@@ -30,6 +30,11 @@ VhhCore:
   # This parameter specifies the results path for each individual plugin.
   # TODO: this needs to be adjusted (along with other configs?)
   RESULTS_ROOT_DIR: "results/"
+
+  ###
+  # This parameter specifies the size of the processed videos within one cycle (e.g. size 2 means that 2 videos will be downloaded and processed. 
+  # if the results are generated, the next 2 videos will be downloaded and processed.).
+  BATCH_PROCESSING_SIZE: "results/"
   
   ###
   # This parameter specifies the format in which the results are written.

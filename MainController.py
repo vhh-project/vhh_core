@@ -90,7 +90,7 @@ class MainController(object):
 
         print("-------------------------------------------------------------------")
         print(" ------------------ BATCH PROCESSING -------------------------------")
-        batch_size = 2
+        batch_size = self.__configuration_instance.batch_size
 
         for i in range(0, len(video_instance_list), batch_size):
             start_pos = i
