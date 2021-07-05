@@ -56,11 +56,15 @@ class MainController(object):
         """
 
         print("Start automatic annotation process ... ")
-
+        
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
         #video_instance_list = video_instance_list[:12]
 
+        # cleanup coplete results and video folder
+        if (self.__configuration_instance.cleanup_flag == 1):
+            for video_instance in video_instance_list:
+                video_instance.cleanup()
 
         # check video files if already processed and filter video_instance list
         filtered_video_instance_list = []
@@ -71,10 +75,10 @@ class MainController(object):
                 filtered_video_instance_list.append(video_instance)
         video_instance_list = filtered_video_instance_list
         print(video_instance_list)
-        
+
         #print("*****************************")
-        del video_instance_list[0]
-        video_instance_list = video_instance_list[:12]
+        #del video_instance_list[0]
+        #video_instance_list = video_instance_list[12:]
         for i, video_instance in enumerate(video_instance_list):
             print(i)
             video_instance.printInfo()
@@ -86,7 +90,6 @@ class MainController(object):
         if(len(video_instance_list) == 0):
             print("All videos are already processed!")
             exit()   
-
 
         print("-------------------------------------------------------------------")
         print(" ------------------ BATCH PROCESSING -------------------------------")
@@ -183,25 +186,46 @@ class MainController(object):
                 print(f"Writing results to \"{json_path}\"...")
                 with open(json_path, 'w', newline='') as json_file:
                     json.dump(data, json_file)
-
             else:
                 print("No results were written.")
                 print("If you wish to write any output, please set the RESULTS_FORMAT in the Config file.")
-
+        ''''''
 
         '''
-        if self.__configuration_instance.results_format == "JSON_REST":
-            print(f"Posting results using Rest API...")
-            # post all results
-            for vid in vids:
-                indices = np.where(vid == results_np[:, 0])[0]
-                vid_results_np = results_np[indices]
+        # load all csv result files
+        print(f"Load all generated core results into a numpy array ...")
+        csv_core_results_path = os.path.join(self.__configuration_instance.results_root_dir, "core")
+        results_file_list = os.listdir(csv_core_results_path)
+        results_file_list.sort()
+        print(results_file_list)
+    
+        all_results_l = []
+        for file in results_file_list:
+            file_path = os.path.join(csv_core_results_path, file)
+            with open(file_path, 'r', newline='') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=';')
+                results_l = []
+                for row in csv_reader:
+                    results_l.append(row)
+                results_l = results_l[1:]
+                all_results_l.extend(results_l)
+        all_results_np = np.array(all_results_l[1:])
+        print(all_results_np.shape)
+        vids = np.unique(all_results_np[:, :1])
+        print(vids)
 
-                header_np = np.expand_dims(np.array(header), axis=0)
-                vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
-                print(vid_results_np)
-                self.__rest_api_instance.postAutomaticResults(vid=int(vid.split('.')[0]), results_np=vid_results_np)
+        print(f"Posting results using Rest API...")
+        header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
+        # post all results
+        for vid in vids:
+            indices = np.where(vid == all_results_np[:, 0])[0]
+            vid_results_np = all_results_np[indices]
+            header_np = np.expand_dims(np.array(header), axis=0)
+            vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
+            #print(vid_results_np)
+            self.__rest_api_instance.postAutomaticResults(vid=int(vid.split('.')[0]), results_np=vid_results_np)
         '''
+
         print("Successfully finished!")
 
     def merge_results(self):
