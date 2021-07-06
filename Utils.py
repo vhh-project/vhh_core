@@ -30,7 +30,7 @@ def store_csv(filepath, data):
     """
     keys = data[0].keys()
     with open(filepath, 'w', newline='')  as output_file:
-        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer = csv.DictWriter(output_file, keys, delimiter=';')
         dict_writer.writeheader()
         dict_writer.writerows(data)
 
