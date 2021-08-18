@@ -1,7 +1,7 @@
 from Sbd import Sbd
 from Stc import Stc
 from Cmc import Cmc
-#from Odt import Odt
+from Odt import Odt
 from VhhRestApi import VhhRestApi
 from Configuration import Configuration
 import numpy as np
@@ -37,13 +37,13 @@ class MainController(object):
         self.__sbd_config_file = self.__configuration_instance.sbd_config_file
         self.__stc_config_file = self.__configuration_instance.stc_config_file
         self.__cmc_config_file = self.__configuration_instance.cmc_config_file
-        #self.__odt_config_file = self.__configuration_instance.odt_config_file
+        self.__odt_config_file = self.__configuration_instance.odt_config_file
 
         # initialize class members
         self.__sbd_instance = Sbd(config=self.__configuration_instance)
         self.__stc_instance = Stc(config=self.__configuration_instance)
         self.__cmc_instance = Cmc(config=self.__configuration_instance)
-        #self.__odt_instance = Odt(config=self.__configuration_instance)
+        self.__odt_instance = Odt(config=self.__configuration_instance)
 
         self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance)
 
@@ -59,7 +59,7 @@ class MainController(object):
         
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
-        #video_instance_list = video_instance_list[:12]
+        #video_instance_list = video_instance_list[:1]
 
         # cleanup coplete results and video folder
         if (self.__configuration_instance.cleanup_flag == 1):
