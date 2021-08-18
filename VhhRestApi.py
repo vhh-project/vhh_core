@@ -133,7 +133,7 @@ class VhhRestApi(object):
         url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
         response = self.getRequest(url)
         res_json = response.json()
-        print(res_json)
+        #print(res_json)
         return res_json
 
     def postAutomaticResults(self, vid, results_np):
