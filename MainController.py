@@ -8,7 +8,8 @@ import numpy as np
 import os
 import csv
 import json
-
+import urllib
+import zipfile
 
 class MainController(object):
     """
@@ -27,8 +28,7 @@ class MainController(object):
         self.__configuration_instance.loadConfig()
 
         if self.make_model_folders():
-            print("Model folders have been created! Place your models into the respective directories.")
-            exit()
+            print("Models have been downloaded.")
 
         self.__root_url = self.__configuration_instance.root_url
         self.__pem_path = self.__configuration_instance.pem_path
@@ -340,15 +340,32 @@ class MainController(object):
         except OSError: pass
 
     def make_model_folders(self):
-
+        """
+        If the "models" folder does not exist, create the folder and download the models into it
+        """
         model_root_dir = self.__configuration_instance.model_path
-        plugins = ["sbd", "stc", "cmc"]
 
         try: os.mkdir(model_root_dir)
         except OSError: return False
+        print("Created models folder")
 
-        for plugin in plugins:
-            try: os.makedirs(os.path.join(model_root_dir, plugin))
-            except OSError: return False
+        url = 'https://zenodo.org/record/5704641/files/vhh_models.zip?download=1'
+        path = "models.zip"
+        store_in = "./models/"
+
+        print("Downloading models")
+        try:
+            urllib.request.urlretrieve(url, path)
+        except (urllib.error.URLError, IOError) as e:
+            print("Downloading failed:\n", e)
+            print("Deleting models folder")
+            os.rmdir(model_root_dir)
+
+        print("Unzipping models")
+        with zipfile.ZipFile(path, 'r') as zip_ref:
+            zip_ref.extractall(store_in)
+
+        print("Removing zipped models")
+        os.remove(path) 
 
         return True
