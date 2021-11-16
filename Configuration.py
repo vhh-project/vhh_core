@@ -44,6 +44,7 @@ class Configuration:
         self.odt_config_file = "None"
         self.cleanup_flag = False
         self.results_root_dir = "NONE"
+        self.batch_size = -1
 
         self.use_sbd = 0
         self.use_stc = 0
@@ -76,6 +77,7 @@ class Configuration:
         self.results_root_dir = vhh_core_config['RESULTS_ROOT_DIR']
         self.results_format = vhh_core_config['RESULTS_FORMAT']
         self.model_path = vhh_core_config['PRETRAINED_MODEL_PATH']
+        self.batch_size = int(vhh_core_config['BATCH_PROCESSING_SIZE'])
 
         # plugin_config section
         self.use_sbd = (int(plugin_config['USE_SBD']) == 1)
