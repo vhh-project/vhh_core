@@ -351,7 +351,6 @@ class MainController(object):
 
         url = 'https://zenodo.org/record/5704641/files/vhh_models.zip?download=1'
         path = "models.zip"
-        store_in = "./models/"
 
         print("Downloading models")
         try:
@@ -363,7 +362,7 @@ class MainController(object):
 
         print("Unzipping models")
         with zipfile.ZipFile(path, 'r') as zip_ref:
-            zip_ref.extractall(store_in)
+            zip_ref.extractall(model_root_dir)
 
         print("Removing zipped models")
         os.remove(path) 
