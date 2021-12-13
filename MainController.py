@@ -74,6 +74,7 @@ class MainController(object):
             if( video_instance.is_processed() == False):
                 filtered_video_instance_list.append(video_instance)
         video_instance_list = filtered_video_instance_list
+        # video_instance_list = video_instance_list[0:1]
         print(video_instance_list)
 
         #print("*****************************")
@@ -140,55 +141,73 @@ class MainController(object):
                 self.__odt_instance.run()
 
             # merge all results
-            results_np = self.merge_results()
-            print(results_np)
+            results_sba = self.merge_results_sba()
+            print(results_sba)
 
             header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
 
-            vids = np.unique(results_np[:, :1])
+            vids = np.unique(results_sba[:, :1])
             print(vids)
             
-            if self.__configuration_instance.results_format == "CSV_LOCAL":
+            path_core_results = os.path.join(self.__configuration_instance.results_root_dir, "core")
+            path_sba, path_oba = os.path.join(path_core_results, "SBA"), os.path.join(path_core_results, "OBA")
 
+            if self.__configuration_instance.results_format == "CSV_LOCAL":
                 # write Output to .csv file
-                csv_path = os.path.join(self.__configuration_instance.results_root_dir, "core", "results_" + str(i) + ".csv")
+                csv_path = os.path.join(path_sba, "results_" + str(i) + ".csv")
                 print(f"Writing results to \"{csv_path}\"...")
                 with open(csv_path, 'w', newline='') as csv_file:
                     csv_writer = csv.writer(csv_file, delimiter=';')
                     csv_writer.writerow(header)
-                    for row_idx in range(results_np.shape[0]):
-                        csv_writer.writerow(results_np[row_idx, :])
+                    for row_idx in range(results_sba.shape[0]):
+                        csv_writer.writerow(results_sba[row_idx, :])
 
-            elif self.__configuration_instance.results_format == "JSON_LOCAL":
+            elif self.__configuration_instance.results_format == "JSON_LOCAL" or self.__configuration_instance.results_format == "JSON_REST":
+                print(self.__configuration_instance.results_format)
                 data = {}
                 data['analysis_results'] = []
 
                 # create dictionary as basis for JSON file
                 for vid in vids:
-                    indices = np.where(vid == results_np[:, 0])[0]
-                    vid_results_np = results_np[indices]
+                    indices = np.where(vid == results_sba[:, 0])[0]
+                    vid_results_sba = results_sba[indices]
 
                     vid_results_dict = {}
                     vid_results_dict['vid_name'] = vid
                     vid_results_dict['shots'] = []
 
-                    rows, cols = vid_results_np.shape
+                    rows, cols = vid_results_sba.shape
                     for row_idx in range(rows):
                         result = {}
                         for col in range(cols):
-                            if col is not 1:
-                                result[header[col]] = vid_results_np[row_idx, col]
+                            if col != 1:
+                                result[header[col]] = vid_results_sba[row_idx, col]
                         vid_results_dict['shots'].append(result)
                     data['analysis_results'].append(vid_results_dict)
 
                 # write JSON file
-                json_path = os.path.join(self.__configuration_instance.results_root_dir, "core", "results_" + str(i) + "json")
+                json_path = os.path.join(path_sba, "results" + str(i) + ".json")
                 print(f"Writing results to \"{json_path}\"...")
                 with open(json_path, 'w', newline='') as json_file:
                     json.dump(data, json_file)
-            else:
-                print("No results were written.")
-                print("If you wish to write any output, please set the RESULTS_FORMAT in the Config file.")
+
+                # Deal with OD results
+                print("BEFORE OBA")
+                results_oba = self.format_results_oba()
+                for dict in results_oba:
+                    # write JSON file
+                    json_path = os.path.join(path_oba, str(dict["videoId"]) + ".json")
+                    print(f"Writing results to \"{json_path}\"...")
+                    with open(json_path, 'w', newline='') as json_file:
+                        json.dump(dict, json_file)
+                
+                if self.__configuration_instance.results_format == "JSON_REST":
+                    print("Uploading results")
+
+                    # OBA
+                    self.__rest_api_instance.postOBAResults(results_oba)
+                
+
         ''''''
 
         '''
@@ -228,11 +247,11 @@ class MainController(object):
 
         print("Successfully finished!")
 
-    def merge_results(self):
+    def merge_results_sba(self):
         """
-        This method is used to merge and prepare the results of each individual plugin (sbd, stc, cmc) to send it to the the Vhh-MMSI database.
+        This method is used to merge and prepare the results of shot based annotation data (sbd, stc, cmc) to send it to the the Vhh-MMSI database.
 
-        :return: This method returns a numpy array holding all results (including a valid header).
+        :return: This method returns a numpy array holding sbd, stc, cmc results (including a valid header).
         """
         # merge and prepare results
         sbd_results_path = os.path.join(self.__configuration_instance.results_root_dir, "sbd")
@@ -317,6 +336,55 @@ class MainController(object):
         print(entries_np)
         return entries_np
 
+    def format_results_oba(self):
+        """
+        This method is used to merge and prepare the results of object based annotation data (od) to send it to the the Vhh-MMSI database.
+
+        :return: This method returns a list of dictionaries, each containing the ODT result of one single video.
+        """
+        od_results_path = os.path.join(self.__configuration_instance.results_root_dir, "od")
+        od_results_path = os.path.join(od_results_path, "final_results")
+
+        od_result_file_list = [os.path.join(od_results_path, x) for x in os.listdir(od_results_path)]
+        video_dicts = []
+        for file_path  in od_result_file_list:      
+            with open(file_path, mode='r') as csv_file:
+                csv_reader = csv.DictReader(csv_file)
+
+                objects_dict = {}
+                videoId = None
+
+                for row in csv_reader:
+                    # Get videoId, this requires the moviename to have the form videoId.fileending e.g. "8213.m4v"
+                    if videoId is None:
+                        videoId = int(row["movie_name"].split(".")[0]) 
+
+                    bb = {"fid": int(row["fid"]), 
+                        "cbb": -1,
+                        "coc": -1,
+                        "x1": float(row["bb_x1"]), 
+                        "x2": float(row["bb_x2"]), 
+                        "y1": float(row["bb_y1"]), 
+                        "y2": float(row["bb_y2"])}
+
+                    # Store bounding box
+                    if row["oid"] in objects_dict:
+                        objects_dict[row["oid"]]["bbs"].append(bb)
+                    else:
+                        obj = {"bbs": [bb], 
+                            "className": row["class_name"],
+                            "id": int(row["oid"]),
+                            "inPoint": int(row["start"]),
+                            "outPoint": int(row["stop"]),
+                            "valueSource": "TBD"}
+                        objects_dict[row["oid"]] = obj
+
+                # Objects need to be stored in a list and not a dict
+                video_dict = {"videoId": videoId, "objects": list(objects_dict.values())}
+            video_dicts.append(video_dict)
+        return video_dicts
+
+
     def make_result_folders(self):
 
         results_root_dir = self.__configuration_instance.results_root_dir
@@ -333,6 +401,12 @@ class MainController(object):
 
         try: os.mkdir(os.path.join(results_root_dir, "core"))
         except OSError: pass
+
+        results_types = ["TBA", "OBA", "SBA"]
+        path = os.path.join(results_root_dir, "core")
+        for type in results_types:
+            try: os.mkdir(os.path.join(path, type))
+            except OSError: pass
 
     def make_video_folder(self):
         video_root_dir = self.__configuration_instance.video_download_path

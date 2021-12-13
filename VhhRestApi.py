@@ -115,7 +115,7 @@ class VhhRestApi(object):
             open(self.__video_download_path + "/" + file_name + "." + str(video_format), 'wb').write(video_file.content)
             print("successfully downloaded ... ")
             ret = True
-        except():
+        except:
             print("Download process failed!")
             ret = False
 
@@ -169,3 +169,17 @@ class VhhRestApi(object):
         print(response)
 
         print("sbd results successfully sent to maxrecall ... ")
+
+    def postOBAResults(self, data):
+        """
+        Posts the automatically generated OBA results (ODT) to the VhhMMSI system.
+
+        :data: list of dictionaries that have the keys videoId and objects 
+        """
+        for dict in data:
+            url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + "/videos/" + str(dict["videoId"]) + "/objects/auto"
+
+            # TODO: Change add 1 to inpoint, outpoint and FID
+            
+            response = self.postRequest(url, dict["objects"])
+            print(response)
