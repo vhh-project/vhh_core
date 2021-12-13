@@ -45,7 +45,7 @@ class MainController(object):
         self.__cmc_instance = Cmc(config=self.__configuration_instance)
         self.__odt_instance = Odt(config=self.__configuration_instance)
 
-        self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance)
+        self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance, main_controller=self)
 
         self.make_video_folder()
         self.make_result_folders()
@@ -59,36 +59,43 @@ class MainController(object):
         
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
-        #video_instance_list = video_instance_list[:1]
+        video_instance_list = video_instance_list[0:2]
 
         # cleanup coplete results and video folder
         if (self.__configuration_instance.cleanup_flag == 1):
             for video_instance in video_instance_list:
                 video_instance.cleanup()
 
-        # check video files if already processed and filter video_instance list
-        filtered_video_instance_list = []
-        for i, video_instance in enumerate(video_instance_list):
-            print(i)
-            video_instance.printInfo()
-            if( video_instance.is_processed() == False):
-                filtered_video_instance_list.append(video_instance)
-        video_instance_list = filtered_video_instance_list
-        # video_instance_list = video_instance_list[0:1]
-        print(video_instance_list)
+        #
+        # COLLECT VIDEOS
+        #
 
-        #print("*****************************")
+
+        videos_to_process = []
+
+        videos_per_process = {"shots": [], "objects": [], "overscan":[], "relations":[]}
+
+        for i, video_instance in enumerate(video_instance_list):
+            # For now we only care for shot and object detection
+            if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["objects"]):
+                videos_to_process.append(video_instance)
+            
+
+        print(videos_to_process)
+        print(videos_per_process)
+
+
         #del video_instance_list[0]
         #video_instance_list = video_instance_list[12:]
-        for i, video_instance in enumerate(video_instance_list):
-            print(i)
-            video_instance.printInfo()
+        # for i, video_instance in enumerate(video_instance_list):
+        #     print(i)
+        #     video_instance.printInfo()
 
         #print(len(video_instance_list))
         #exit()
         ''''''
 
-        if(len(video_instance_list) == 0):
+        if(len(videos_to_process) == 0):
             print("All videos are already processed!")
             exit()   
 
@@ -124,21 +131,34 @@ class MainController(object):
 
             print("start annotation process for given batch ...")
 
+            videos_to_process_shots = filter(lambda x: x.processed_flags["shots"] == False, batch_video_instance_list)
+            videos_to_download_shots = filter(lambda x: x.processed_flags["shots"] == True, batch_video_instance_list)
+
+
             # run sbd
             if self.__configuration_instance.use_sbd:
-                self.__sbd_instance.run(video_instance_list=batch_video_instance_list)
+                self.__sbd_instance.run(video_instance_list=videos_to_process_shots)
 
             # run stc
             if self.__configuration_instance.use_stc:
-                self.__stc_instance.run()
+                self.__stc_instance.run(video_instance_list=videos_to_process_shots)
 
-            # run cmc
+            # Download shot info (SBD, STC & CMC) for already processed videos
+            for video_instance in videos_to_download_shots:
+                self.__rest_api_instance.getShotResults(vid=video_instance.id)
+
+            # run cmc (only on videos with non processed shots)
             if self.__configuration_instance.use_cmc:
-                self.__cmc_instance.run()
+                self.__cmc_instance.run(video_instance_list=videos_to_process_shots)
+
+            videos_to_process_objects = filter(lambda x: x.processed_flags["objects"] == False, batch_video_instance_list)
+            videos_to_download_objects = filter(lambda x: x.processed_flags["objects"] == True, batch_video_instance_list)
 
             # run odt
             if self.__configuration_instance.use_odt:
-                self.__odt_instance.run()
+                self.__odt_instance.run(video_instance_list = videos_to_process_objects)
+
+            # TODO: Download object detection data for videos that are already processed
 
             # merge all results
             results_sba = self.merge_results_sba()
@@ -442,3 +462,13 @@ class MainController(object):
         os.remove(path) 
 
         return True
+
+    def get_result_directory(self, component):
+        if component == "SBD":
+            return self.__sbd_instance.get_results_directory()
+        elif component == "STC":
+            return self.__stc_instance.get_results_directory()
+        elif component == "CMC":
+            return self.__cmc_instance.get_results_directory()
+        else:
+            raise ValueError("Unknown component")

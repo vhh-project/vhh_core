@@ -28,7 +28,7 @@ class Video(object):
         self.download_path = "None"
         self.processed_flag = "None"
 
-    def create_video(self, vid, originalFileName, url, download_path, processed_flag):
+    def create_video(self, vid, originalFileName, url, download_path, processed_flag_shots, processed_flag_objects, processed_flag_relations, processed_flag_overscan):
         """
         This method is used to fill all properties of a video.
 
@@ -44,7 +44,11 @@ class Video(object):
         self.video_format = url.split('.')[-1]
         self.file_name = url.split('/')[-1]
         self.download_path = download_path
-        self.processed_flag = processed_flag
+        self.processed_flags = {
+            "shots": processed_flag_shots,
+            "objects": processed_flag_objects,
+            "relations": processed_flag_relations,
+            "overscan": processed_flag_overscan}
 
     def download(self, rest_api_instance=None):
         """
@@ -161,5 +165,6 @@ class Video(object):
         print("video_format: " + str(self.video_format))
         print("url: " + str(self.url))
         print("download_path: " + str(self.download_path))
-        print("processed flag: " + str(self.processed_flag))
+        print("processed flags:\n\tSHOTS: {0}\n\tObjects: {1}\n\tRelations: {2}\n\tOverscan: {3}".format(
+            self.processed_flags["shots"], self.processed_flags["objects"], self.processed_flags["relations"], self.processed_flags["overscan"]))
         print("####################################################")

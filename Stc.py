@@ -35,17 +35,24 @@ class Stc(object):
         self.__sbd_results_dir = sbd_config['SbdCore']['PATH_FINAL_RESULTS']
         fp.close()
 
-    def run(self):
+    def get_results_directory(self):
+        return self.__stc_instance.config_instance.path_final_results
+
+    def run(self, video_instance_list=None):
         """
         This method is used to run the shot type classification task.
+        
+        :param video_instance_list: parameter must hold a list of video objects (Class-type: Video)
         """
 
         printCustom("start stc process ... ", STDOUT_TYPE.INFO)
 
-        results_file_list = os.listdir(self.__sbd_results_dir)
-        for file in results_file_list:
-            vid = int(file.split('.')[0])
-            shots_np = self.__stc_instance.loadSbdResults(self.__sbd_results_dir + file)
+
+        for video_instance in video_instance_list:
+            video_instance.printInfo()
+            vid = video_instance.vid
+            sbd_results_file = os.path.join(self.__sbd_results_dir, vid + ".csv")           
+            shots_np = self.__stc_instance.loadSbdResults(sbd_results_file)
             self.__stc_instance.runOnSingleVideo(shots_per_vid_np=shots_np, max_recall_id=vid)
 
         printCustom("stc process finished!", STDOUT_TYPE.INFO)
