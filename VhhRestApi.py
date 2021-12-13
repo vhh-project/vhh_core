@@ -1,7 +1,7 @@
 import json
 import requests
 from Video import Video
-
+import urllib.parse
 
 class VhhRestApi(object):
     """
@@ -27,8 +27,8 @@ class VhhRestApi(object):
         self.__video_download_path = self.__core_config.video_download_path
 
         # create urls
-        self.API_VIDEO_SEARCH_ENDPOINT = self.__root_url + "/videos/search"
-        self.API_VIDEO_SHOTS_AUTO_ENDPOINT = self.__root_url + "/videos/"  # 8/shots/auto
+        self.API_VIDEO_SEARCH_ENDPOINT = urllib.parse.urljoin(self.__root_url, "/videos/search")
+        self.API_VIDEO_SHOTS_AUTO_ENDPOINT = urllib.parse.urljoin(self.__root_url, "/videos/")  # 8/shots/auto
 
     def getRequest(self, url):
         """
