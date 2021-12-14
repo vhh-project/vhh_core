@@ -112,44 +112,22 @@ class Video(object):
             file_path = os.path.join(self.download_path, search_str)
             os.remove(file_path)
 
-        print("Delete sbd results if available ...")
-        fp = open(self.__core_config.sbd_config_file, 'r')
-        sbd_config = yaml.load(fp, Loader=yaml.BaseLoader)
-        sbd_results_dir = sbd_config['SbdCore']['PATH_FINAL_RESULTS']
-        fp.close()
-
+        # Delte results from SBD, STC, CMC and ODT
         search_str = str(self.id) + ".csv"
-        result_file_list = os.listdir(sbd_results_dir)
-        if (search_str in result_file_list):
-            print("delete sbd results ... ")
-            file_path = os.path.join(sbd_results_dir, search_str)
-            os.remove(file_path)
 
-        print("Delete stc results if available  ...")
-        fp = open(self.__core_config.stc_config_file, 'r')
-        stc_config = yaml.load(fp, Loader=yaml.BaseLoader)
-        stc_results_dir = stc_config['StcCore']['PATH_FINAL_RESULTS']
-        fp.close()
+        for config_file_path, config_section in zip(
+            [self.__core_config.sbd_config_file, self.__core_config.stc_config_file, self.__core_config.cmc_config_file, self.__core_config.odt_config_file], 
+            ['SbdCore', 'StcCore', 'CmcCore', 'OdCore']):
 
-        search_str = str(self.id) + ".csv"
-        result_file_list = os.listdir(stc_results_dir)
-        if (search_str in result_file_list):
-            print("delete stc results ... ")
-            file_path = os.path.join(stc_results_dir, search_str)
-            os.remove(file_path)
+            print("Deleting result: ", config_section)
+            with open(config_file_path, 'r') as fp:
+                config = yaml.load(fp, Loader=yaml.BaseLoader)
+                results_dir = config[config_section]['PATH_FINAL_RESULTS']
 
-        print("Delete cmc results if available  ...")
-        fp = open(self.__core_config.cmc_config_file, 'r')
-        cmc_config = yaml.load(fp, Loader=yaml.BaseLoader)
-        cmc_results_dir = cmc_config['CmcCore']['PATH_FINAL_RESULTS']
-        fp.close()
-
-        search_str = str(self.id) + ".csv"
-        result_file_list = os.listdir(cmc_results_dir)
-        if (search_str in result_file_list):
-            print("delete cmc results ... ")
-            file_path = os.path.join(cmc_results_dir, search_str)
-            os.remove(file_path)
+                result_file_list = os.listdir(results_dir)
+                if (search_str in result_file_list):
+                    file_path = os.path.join(results_dir, search_str)
+                    os.remove(file_path)    
 
         print("cleanup process successfully finished!")
 

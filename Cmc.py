@@ -45,6 +45,7 @@ class Cmc(object):
         """
 
         print("start cmc process ... ")
+        print("CMC ON", video_instance_list)
 
         for video_instance in video_instance_list:
             vid = video_instance.id

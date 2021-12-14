@@ -46,11 +46,12 @@ class Stc(object):
         """
 
         printCustom("start stc process ... ", STDOUT_TYPE.INFO)
-
+        print("STC ON", video_instance_list)
 
         for video_instance in video_instance_list:
             video_instance.printInfo()
-            vid = video_instance.vid
+            vid = str(video_instance.id)
+            print("STC ", vid)
             sbd_results_file = os.path.join(self.__sbd_results_dir, vid + ".csv")           
             shots_np = self.__stc_instance.loadSbdResults(sbd_results_file)
             self.__stc_instance.runOnSingleVideo(shots_per_vid_np=shots_np, max_recall_id=vid)

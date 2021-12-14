@@ -156,7 +156,7 @@ class VhhRestApi(object):
                     fieldnames_stc = ["vid_name", "shot_id", "start", "end", "stc"]
                     fieldnames_cmc = ["vid_name", "shot_id", "start", "end", "cmc"]
 
-                    writer_sbd = csv.DictWriter(sbd_file, fieldnames=fieldnames_stc, delimiter=";")
+                    writer_sbd = csv.DictWriter(sbd_file, fieldnames=fieldnames_sbd, delimiter=";")
                     writer_stc = csv.DictWriter(stc_file, fieldnames=fieldnames_stc, delimiter=";")
                     writer_cmc = csv.DictWriter(cmc_file, fieldnames=fieldnames_cmc, delimiter=";")
 
@@ -168,9 +168,18 @@ class VhhRestApi(object):
                     shot_id_stc = 1
                     shot_id_cmc = 1
 
+                    new_shots = []
+                    # The JSON does not contain information about shots with NA camera movement, need to add it by finding shots for which no camera movement is given
+                    for shot in filter(lambda x: 'shotType' in x.keys(), res_json):
+                        if len(list(filter(lambda x: "cameraMovement" in x.keys() and x["inPoint"] == shot["inPoint"] and x["outPoint"] == shot["outPoint"], res_json))) == 0:
+                            new_shots.append({"inPoint": shot["inPoint"], "outPoint": shot["outPoint"], "cameraMovement": "NA"})
+
+                    res_json += new_shots  
+                    # Sort numbers, so the shot ids are correct
+                    res_json.sort(key=lambda shot: shot["inPoint"])
+
                     for shot in res_json:
                         if 'cameraMovement' in shot.keys():
-                            # TODO: Fix CMC file!
                             writer_cmc.writerow({'vid_name': vid_name, "shot_id": shot_id_cmc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "cmc": shot["cameraMovement"]})
                             shot_id_cmc += 1
                         else:

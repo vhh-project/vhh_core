@@ -37,12 +37,12 @@ class Sbd(object):
         :param video_instance_list: parameter must hold a list of video objects (Class-type: Video)
         """
         printCustom("start sbd process ... ", STDOUT_TYPE.INFO)
+        print("SBD ON", video_instance_list)
 
         for video_instance in video_instance_list:
             video_instance.printInfo()
-            video_filename = os.path.join(video_instance.download_path,
-                                          str(video_instance.id)) + "." + video_instance.video_format
-            #print(video_filename)
+            vid = str(video_instance.id)
+            video_filename = os.path.join(video_instance.download_path, vid + "." + video_instance.video_format) 
             self.__sbd_instance.runOnSingleVideo(video_filename=video_filename,
                                                  max_recall_id=video_instance.id)
 

@@ -59,7 +59,7 @@ class MainController(object):
         
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
-        video_instance_list = video_instance_list[0:2]
+        # video_instance_list = video_instance_list[0:2]
 
         # cleanup coplete results and video folder
         if (self.__configuration_instance.cleanup_flag == 1):
@@ -70,46 +70,29 @@ class MainController(object):
         # COLLECT VIDEOS
         #
 
-
         videos_to_process = []
-
-        videos_per_process = {"shots": [], "objects": [], "overscan":[], "relations":[]}
-
         for i, video_instance in enumerate(video_instance_list):
             # For now we only care for shot and object detection
-            if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["objects"]):
+            # if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["objects"]):
+
+            if (not video_instance.processed_flags["shots"]):
                 videos_to_process.append(video_instance)
             
-
-        print(videos_to_process)
-        print(videos_per_process)
-
-
-        #del video_instance_list[0]
-        #video_instance_list = video_instance_list[12:]
-        # for i, video_instance in enumerate(video_instance_list):
-        #     print(i)
-        #     video_instance.printInfo()
-
-        #print(len(video_instance_list))
-        #exit()
-        ''''''
-
         if(len(videos_to_process) == 0):
             print("All videos are already processed!")
             exit()   
+        else:
+            print("Found {0} videos to process".format(len(videos_to_process)))
 
         print("-------------------------------------------------------------------")
-        print(" ------------------ BATCH PROCESSING -------------------------------")
+        print("------------------ BATCH PROCESSING -------------------------------")
         batch_size = self.__configuration_instance.batch_size
 
-        for i in range(0, len(video_instance_list), batch_size):
+        for i in range(0, len(videos_to_process), batch_size):
             start_pos = i
             end_pos = i + batch_size
-            batch_video_instance_list = video_instance_list[start_pos:end_pos]
-            
-            print(f'start_pos: {start_pos}, end_pos: {end_pos}')
-            
+            batch_video_instance_list = videos_to_process[start_pos:end_pos]
+                        
             for video_instance in batch_video_instance_list:
                 video_instance.printInfo()
 
@@ -131,9 +114,8 @@ class MainController(object):
 
             print("start annotation process for given batch ...")
 
-            videos_to_process_shots = filter(lambda x: x.processed_flags["shots"] == False, batch_video_instance_list)
-            videos_to_download_shots = filter(lambda x: x.processed_flags["shots"] == True, batch_video_instance_list)
-
+            videos_to_process_shots = list(filter(lambda x: not x.processed_flags["shots"], batch_video_instance_list))
+            videos_to_download_shots = list(filter(lambda x: x.processed_flags["shots"], batch_video_instance_list))
 
             # run sbd
             if self.__configuration_instance.use_sbd:
@@ -151,8 +133,8 @@ class MainController(object):
             if self.__configuration_instance.use_cmc:
                 self.__cmc_instance.run(video_instance_list=videos_to_process_shots)
 
-            videos_to_process_objects = filter(lambda x: x.processed_flags["objects"] == False, batch_video_instance_list)
-            videos_to_download_objects = filter(lambda x: x.processed_flags["objects"] == True, batch_video_instance_list)
+            videos_to_process_objects = list(filter(lambda x: not x.processed_flags["objects"], batch_video_instance_list))
+            videos_to_download_objects = list(filter(lambda x: x.processed_flags["objects"], batch_video_instance_list))
 
             # run odt
             if self.__configuration_instance.use_odt:
@@ -219,7 +201,7 @@ class MainController(object):
                     json_path = os.path.join(path_oba, str(dict["videoId"]) + ".json")
                     print(f"Writing results to \"{json_path}\"...")
                     with open(json_path, 'w', newline='') as json_file:
-                        json.dump(dict, json_file)
+                        json.dump(dict['objects'], json_file)
                 
                 if self.__configuration_instance.results_format == "JSON_REST":
                     print("Uploading results")
