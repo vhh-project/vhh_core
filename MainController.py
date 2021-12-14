@@ -47,6 +47,9 @@ class MainController(object):
 
         self.__rest_api_instance = VhhRestApi(config=self.__configuration_instance, main_controller=self)
 
+        path_core_results = os.path.join(self.__configuration_instance.results_root_dir, "core")
+        self.__path_sba, self.__path_oba = os.path.join(path_core_results, "SBA"), os.path.join(path_core_results, "OBA")
+
         self.make_video_folder()
         self.make_result_folders()
 
@@ -101,7 +104,11 @@ class MainController(object):
                 for video_instance in video_instance_list:
                     video_instance.cleanup()
 
-            # download videos if not available
+            #
+            # DOWNLOAD VIDEOS
+            #
+
+            # download if not available
             for video_instance in batch_video_instance_list:
                 if (video_instance.is_downloaded() == False):
                     ret = video_instance.download(self.__rest_api_instance)
@@ -112,10 +119,14 @@ class MainController(object):
                         print("Not able to download this video! e.g. access restrictions or missing video file! --> skip")
                         continue
 
-            print("start annotation process for given batch ...")
 
             videos_to_process_shots = list(filter(lambda x: not x.processed_flags["shots"], batch_video_instance_list))
             videos_to_download_shots = list(filter(lambda x: x.processed_flags["shots"], batch_video_instance_list))
+
+            #
+            # RUN THE PIPELINE
+            #
+            print("Run pipeline on a batch")
 
             # run sbd
             if self.__configuration_instance.use_sbd:
@@ -142,119 +153,80 @@ class MainController(object):
 
             # TODO: Download object detection data for videos that are already processed
 
-            # merge all results
-            results_sba = self.merge_results_sba()
-            print(results_sba)
+            #
+            # GET RESULTS IN CORRECT FORMAT TO POST
+            #  
 
-            header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
+            results_sba = self.merge_results_SBA(batch_video_instance_list)
+            self.store_SBA_results(results_sba)
+                      
+            results_oba = self.format_results_OBA()
+            self.store_OBA_results(results_oba)
 
-            vids = np.unique(results_sba[:, :1])
-            print(vids)
             
-            path_core_results = os.path.join(self.__configuration_instance.results_root_dir, "core")
-            path_sba, path_oba = os.path.join(path_core_results, "SBA"), os.path.join(path_core_results, "OBA")
+            #
+            # SEND TO VHH MMSI
+            #
+            
+            
+            
+            
+            if self.__configuration_instance.results_format == "JSON_REST":
+                print("Uploading results")
 
-            if self.__configuration_instance.results_format == "CSV_LOCAL":
-                # write Output to .csv file
-                csv_path = os.path.join(path_sba, "results_" + str(i) + ".csv")
-                print(f"Writing results to \"{csv_path}\"...")
-                with open(csv_path, 'w', newline='') as csv_file:
-                    csv_writer = csv.writer(csv_file, delimiter=';')
-                    csv_writer.writerow(header)
-                    for row_idx in range(results_sba.shape[0]):
-                        csv_writer.writerow(results_sba[row_idx, :])
-
-            elif self.__configuration_instance.results_format == "JSON_LOCAL" or self.__configuration_instance.results_format == "JSON_REST":
-                print(self.__configuration_instance.results_format)
-                data = {}
-                data['analysis_results'] = []
-
-                # create dictionary as basis for JSON file
-                for vid in vids:
-                    indices = np.where(vid == results_sba[:, 0])[0]
-                    vid_results_sba = results_sba[indices]
-
-                    vid_results_dict = {}
-                    vid_results_dict['vid_name'] = vid
-                    vid_results_dict['shots'] = []
-
-                    rows, cols = vid_results_sba.shape
-                    for row_idx in range(rows):
-                        result = {}
-                        for col in range(cols):
-                            if col != 1:
-                                result[header[col]] = vid_results_sba[row_idx, col]
-                        vid_results_dict['shots'].append(result)
-                    data['analysis_results'].append(vid_results_dict)
-
-                # write JSON file
-                json_path = os.path.join(path_sba, "results" + str(i) + ".json")
-                print(f"Writing results to \"{json_path}\"...")
-                with open(json_path, 'w', newline='') as json_file:
-                    json.dump(data, json_file)
-
-                # Deal with OD results
-                print("BEFORE OBA")
-                results_oba = self.format_results_oba()
-                for dict in results_oba:
-                    # write JSON file
-                    json_path = os.path.join(path_oba, str(dict["videoId"]) + ".json")
-                    print(f"Writing results to \"{json_path}\"...")
-                    with open(json_path, 'w', newline='') as json_file:
-                        json.dump(dict['objects'], json_file)
+                # OBA
+                self.__rest_api_instance.postOBAResults(results_oba)
                 
-                if self.__configuration_instance.results_format == "JSON_REST":
-                    print("Uploading results")
-
-                    # OBA
-                    self.__rest_api_instance.postOBAResults(results_oba)
-                
-
-        ''''''
-
-        '''
-        # load all csv result files
-        print(f"Load all generated core results into a numpy array ...")
-        csv_core_results_path = os.path.join(self.__configuration_instance.results_root_dir, "core")
-        results_file_list = os.listdir(csv_core_results_path)
-        results_file_list.sort()
-        print(results_file_list)
-    
-        all_results_l = []
-        for file in results_file_list:
-            file_path = os.path.join(csv_core_results_path, file)
-            with open(file_path, 'r', newline='') as csv_file:
-                csv_reader = csv.reader(csv_file, delimiter=';')
-                results_l = []
-                for row in csv_reader:
-                    results_l.append(row)
-                results_l = results_l[1:]
-                all_results_l.extend(results_l)
-        all_results_np = np.array(all_results_l[1:])
-        print(all_results_np.shape)
-        vids = np.unique(all_results_np[:, :1])
-        print(vids)
-
-        print(f"Posting results using Rest API...")
-        header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
-        # post all results
-        for vid in vids:
-            indices = np.where(vid == all_results_np[:, 0])[0]
-            vid_results_np = all_results_np[indices]
-            header_np = np.expand_dims(np.array(header), axis=0)
-            vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
-            #print(vid_results_np)
-            self.__rest_api_instance.postAutomaticResults(vid=int(vid.split('.')[0]), results_np=vid_results_np)
-        '''
 
         print("Successfully finished!")
 
-    def merge_results_sba(self):
+    def store_OBA_results(self, results_oba):
+        """
+        Stores the OBA results in JSON files so they are ready to be sent to VHH-MMSI
+
+        :param results_oba: Output of merge_results_OBA
+        """
+        for dict in results_oba:
+            json_path = os.path.join(self.__path_oba, str(dict["videoId"]) + ".json")
+            with open(json_path, 'w', newline='') as json_file:
+                json.dump(dict['objects'], json_file)
+
+    def store_SBA_results(self, results_sba):
+        """
+        Stores the SBA results in JSON files so they are ready to be sent to VHH-MMSI
+
+        :param results_sba: Output of merge_results_sba
+        """
+
+        vids = np.unique(results_sba[:, :1])
+
+        for vid in vids:
+            indices = np.where(vid == results_sba[:, 0])[0]
+            vid_results_sba = results_sba[indices]
+            shots = []
+            rows, _ = vid_results_sba.shape
+
+            for row_idx in range(rows):
+                shot = {
+                    "inPoint": int(vid_results_sba[row_idx, 2])+1, 
+                    "outPoint": int(vid_results_sba[row_idx, 3])+1,
+                    "shotType": vid_results_sba[row_idx, 4],
+                    "cameraMovement": vid_results_sba[row_idx, 5]}
+                shots.append(shot)
+
+            # Write shots to JSON file
+            json_path = os.path.join(self.__path_sba, str(vid) + ".json")
+            with open(json_path, 'w', newline='') as json_file:
+                json.dump(shots, json_file)
+
+    def merge_results_SBA(self, relevant_videos):
         """
         This method is used to merge and prepare the results of shot based annotation data (sbd, stc, cmc) to send it to the the Vhh-MMSI database.
 
         :return: This method returns a numpy array holding sbd, stc, cmc results (including a valid header).
         """
+
+        relevant_files = [str(video.id) + ".csv" for video in relevant_videos]
         # merge and prepare results
         sbd_results_path = os.path.join(self.__configuration_instance.results_root_dir, "sbd")
         sbd_results_path = os.path.join(sbd_results_path, "final_results")
@@ -266,11 +238,11 @@ class MainController(object):
         cmc_results_path = os.path.join(cmc_results_path, "final_results")
 
         sbd_result_file_list = os.listdir(sbd_results_path)
-        sbd_result_file_list = [os.path.join(sbd_results_path, x) for x in sbd_result_file_list]
+        sbd_result_file_list = [os.path.join(sbd_results_path, x) for x in sbd_result_file_list if x in relevant_files]
         stc_result_file_list = os.listdir(stc_results_path)
-        stc_result_file_list = [os.path.join(stc_results_path, x) for x in stc_result_file_list]
+        stc_result_file_list = [os.path.join(stc_results_path, x) for x in stc_result_file_list if x in relevant_files]
         cmc_result_file_list = os.listdir(cmc_results_path)
-        cmc_result_file_list = [os.path.join(cmc_results_path, x) for x in cmc_result_file_list]
+        cmc_result_file_list = [os.path.join(cmc_results_path, x) for x in cmc_result_file_list if x in relevant_files]
 
         entries = []
         for results_file in sbd_result_file_list:
@@ -338,16 +310,18 @@ class MainController(object):
         print(entries_np)
         return entries_np
 
-    def format_results_oba(self):
+    def format_results_OBA(self, relevant_videos):
         """
         This method is used to merge and prepare the results of object based annotation data (od) to send it to the the Vhh-MMSI database.
 
         :return: This method returns a list of dictionaries, each containing the ODT result of one single video.
         """
+        relevant_files = [str(video.id) + ".csv" for video in relevant_videos]
+
         od_results_path = os.path.join(self.__configuration_instance.results_root_dir, "od")
         od_results_path = os.path.join(od_results_path, "final_results")
 
-        od_result_file_list = [os.path.join(od_results_path, x) for x in os.listdir(od_results_path)]
+        od_result_file_list = [os.path.join(od_results_path, x) for x in os.listdir(od_results_path) if x in relevant_files]
         video_dicts = []
         for file_path  in od_result_file_list:      
             with open(file_path, mode='r') as csv_file:
