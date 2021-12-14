@@ -158,26 +158,22 @@ class MainController(object):
             #  
 
             results_sba = self.merge_results_SBA(batch_video_instance_list)
-            self.store_SBA_results(results_sba)
+            sba_paths = self.store_SBA_results(results_sba)
                       
-            results_oba = self.format_results_OBA()
-            self.store_OBA_results(results_oba)
+            results_oba = self.format_results_OBA(batch_video_instance_list)
+            oba_paths = self.store_OBA_results(results_oba)
 
             
             #
             # SEND TO VHH MMSI
             #
             
-            
-            
-            
-            if self.__configuration_instance.results_format == "JSON_REST":
-                print("Uploading results")
-
-                # OBA
-                self.__rest_api_instance.postOBAResults(results_oba)
+            print("SENDING TO SERVER:", self.__configuration_instance.do_send_to_server)
+            if self.__configuration_instance.do_send_to_server:
+                self.__rest_api_instance.postSBAResults(sba_paths)
+                self.__rest_api_instance.postOBAResults(oba_paths)
+                pass
                 
-
         print("Successfully finished!")
 
     def store_OBA_results(self, results_oba):
@@ -186,10 +182,13 @@ class MainController(object):
 
         :param results_oba: Output of merge_results_OBA
         """
+        paths = []
         for dict in results_oba:
             json_path = os.path.join(self.__path_oba, str(dict["videoId"]) + ".json")
+            paths.append(json_path)
             with open(json_path, 'w', newline='') as json_file:
                 json.dump(dict['objects'], json_file)
+        return paths
 
     def store_SBA_results(self, results_sba):
         """
@@ -197,7 +196,7 @@ class MainController(object):
 
         :param results_sba: Output of merge_results_sba
         """
-
+        paths = []
         vids = np.unique(results_sba[:, :1])
 
         for vid in vids:
@@ -216,8 +215,10 @@ class MainController(object):
 
             # Write shots to JSON file
             json_path = os.path.join(self.__path_sba, str(vid) + ".json")
+            paths.append(json_path)
             with open(json_path, 'w', newline='') as json_file:
                 json.dump(shots, json_file)
+        return paths
 
     def merge_results_SBA(self, relevant_videos):
         """
@@ -335,7 +336,7 @@ class MainController(object):
                     if videoId is None:
                         videoId = int(row["movie_name"].split(".")[0]) 
 
-                    bb = {"fid": int(row["fid"]), 
+                    bb = {"fid": int(row["fid"]) + 1, 
                         "cbb": -1,
                         "coc": -1,
                         "x1": float(row["bb_x1"]), 
@@ -350,8 +351,8 @@ class MainController(object):
                         obj = {"bbs": [bb], 
                             "className": row["class_name"],
                             "id": int(row["oid"]),
-                            "inPoint": int(row["start"]),
-                            "outPoint": int(row["stop"]),
+                            "inPoint": int(row["start"]) + 1,
+                            "outPoint": int(row["stop"]) + 1,
                             "valueSource": "TBD"}
                         objects_dict[row["oid"]] = obj
 

@@ -53,9 +53,7 @@ class VhhRestApi(object):
         :param url: this parameter must hold a valid restApi endpoint.
         :param data_dict: this parameter must hold a valid list of dictionaries with the specified fields (see RestApi documentation).
         :return: This method returns the original response including header as well as payload
-        """
-        #headers = {"Content-Type ": "application/json"}
-		
+        """		
         headers = {
                     'accept': '*/*',
                     'Content-Type': 'application/json',
@@ -223,16 +221,31 @@ class VhhRestApi(object):
 
         print("sbd results successfully sent to maxrecall ... ")
 
-    def postOBAResults(self, data):
+    def postSBAResults(self, sba_paths):
+        """
+        Posts the automatically generated SBA results (SBD, STC, CMC) to the VhhMMSI system.
+
+        :data: list of paths to json files that contain the shot information
+        """
+        for path in sba_paths:
+            vid = os.path.split(path)[-1].split('.')[0]
+            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/shots/auto".format(vid))
+            with open(path) as file:
+                data = json.load(file)
+                response = self.postRequest(url, data)
+                print(url, ": ", response)
+
+    def postOBAResults(self, oba_paths):
         """
         Posts the automatically generated OBA results (ODT) to the VhhMMSI system.
 
-        :data: list of dictionaries that have the keys videoId and objects 
+        :data: list of paths to json files that contain the object information
         """
-        for dict in data:
-            url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + "/videos/" + str(dict["videoId"]) + "/objects/auto"
-
-            # TODO: Change add 1 to inpoint, outpoint and FID
-            
-            response = self.postRequest(url, dict["objects"])
-            print(response)
+        return
+        for path in oba_paths:
+            vid = os.path.split(path)[-1].split('.')[0]
+            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/objects/auto".format(vid))
+            with open(path) as file:
+                data = json.load(file)
+                # response = self.postRequest(url, data)
+                # print(url, ": ", response)

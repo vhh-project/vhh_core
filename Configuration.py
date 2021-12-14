@@ -75,7 +75,7 @@ class Configuration:
         self.video_download_path = vhh_core_config['VIDEO_DOWNLOAD_PATH']
         self.cleanup_flag = int(vhh_core_config['CLEANUP_FLAG'])
         self.results_root_dir = vhh_core_config['RESULTS_ROOT_DIR']
-        self.results_format = vhh_core_config['RESULTS_FORMAT']
+        self.do_send_to_server = int(vhh_core_config['SEND_TO_SERVER']) == 1
         self.model_path = vhh_core_config['PRETRAINED_MODEL_PATH']
         self.batch_size = int(vhh_core_config['BATCH_PROCESSING_SIZE'])
 
