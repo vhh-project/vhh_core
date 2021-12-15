@@ -56,120 +56,175 @@ class MainController(object):
         """
 
         print("Start automatic annotation process ... ")
-
+        
         # get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
         #video_instance_list = video_instance_list[:1]
 
-        '''
+        # cleanup coplete results and video folder
+        if (self.__configuration_instance.cleanup_flag == 1):
+            for video_instance in video_instance_list:
+                video_instance.cleanup()
+
         # check video files if already processed and filter video_instance list
         filtered_video_instance_list = []
-        for video_instance in video_instance_list:
+        for i, video_instance in enumerate(video_instance_list):
+            print(i)
             video_instance.printInfo()
             if( video_instance.is_processed() == False):
                 filtered_video_instance_list.append(video_instance)
         video_instance_list = filtered_video_instance_list
         print(video_instance_list)
-        '''
+
+        #print("*****************************")
+        #del video_instance_list[0]
+        #video_instance_list = video_instance_list[12:]
+        for i, video_instance in enumerate(video_instance_list):
+            print(i)
+            video_instance.printInfo()
+
+        #print(len(video_instance_list))
+        #exit()
+        ''''''
 
         if(len(video_instance_list) == 0):
             print("All videos are already processed!")
             exit()   
 
-        # cleanup video and results folder
-        if (self.__configuration_instance.cleanup_flag == 1):
-            for video_instance in video_instance_list:
-                video_instance.cleanup()
+        print("-------------------------------------------------------------------")
+        print(" ------------------ BATCH PROCESSING -------------------------------")
+        batch_size = self.__configuration_instance.batch_size
 
-        # download videos if not available
-        for video_instance in video_instance_list:
-            if (video_instance.is_downloaded() == False):
-                ret = video_instance.download(self.__rest_api_instance)
+        for i in range(0, len(video_instance_list), batch_size):
+            start_pos = i
+            end_pos = i + batch_size
+            batch_video_instance_list = video_instance_list[start_pos:end_pos]
+            
+            print(f'start_pos: {start_pos}, end_pos: {end_pos}')
+            
+            for video_instance in batch_video_instance_list:
+                video_instance.printInfo()
 
-                # if for some reason it is not possible to download the video than skip it
-                print(ret)
-                if(ret == False):
-                    print("Not able to download this video! e.g. access restrictions or missing video file! --> skip")
-                    continue
+            # cleanup video and results folder
+            if (self.__configuration_instance.cleanup_flag == 1):
+                for video_instance in video_instance_list:
+                    video_instance.cleanup()
 
-        # run sbd
-        if self.__configuration_instance.use_sbd:
-            self.__sbd_instance.run(video_instance_list=video_instance_list)
+            # download videos if not available
+            for video_instance in batch_video_instance_list:
+                if (video_instance.is_downloaded() == False):
+                    ret = video_instance.download(self.__rest_api_instance)
 
-        # run stc
-        if self.__configuration_instance.use_stc:
-            self.__stc_instance.run()
+                    # if for some reason it is not possible to download the video than skip it
+                    print(ret)
+                    if(ret == False):
+                        print("Not able to download this video! e.g. access restrictions or missing video file! --> skip")
+                        continue
 
-        # run cmc
-        if self.__configuration_instance.use_cmc:
-            self.__cmc_instance.run()
+            print("start annotation process for given batch ...")
 
-        # run odt
-        if self.__configuration_instance.use_odt:
-            self.__odt_instance.run()
+            # run sbd
+            if self.__configuration_instance.use_sbd:
+                self.__sbd_instance.run(video_instance_list=batch_video_instance_list)
 
-        # merge all results
-        results_np = self.merge_results()
-        header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
+            # run stc
+            if self.__configuration_instance.use_stc:
+                self.__stc_instance.run()
 
-        vids = np.unique(results_np[:, :1])
+            # run cmc
+            if self.__configuration_instance.use_cmc:
+                self.__cmc_instance.run()
+
+            # run odt
+            if self.__configuration_instance.use_odt:
+                self.__odt_instance.run()
+
+            # merge all results
+            results_np = self.merge_results()
+            print(results_np)
+
+            header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
+
+            vids = np.unique(results_np[:, :1])
+            print(vids)
+            
+            if self.__configuration_instance.results_format == "CSV_LOCAL":
+
+                # write Output to .csv file
+                csv_path = os.path.join(self.__configuration_instance.results_root_dir, "core", "results_" + str(i) + ".csv")
+                print(f"Writing results to \"{csv_path}\"...")
+                with open(csv_path, 'w', newline='') as csv_file:
+                    csv_writer = csv.writer(csv_file, delimiter=';')
+                    csv_writer.writerow(header)
+                    for row_idx in range(results_np.shape[0]):
+                        csv_writer.writerow(results_np[row_idx, :])
+
+            elif self.__configuration_instance.results_format == "JSON_LOCAL":
+                data = {}
+                data['analysis_results'] = []
+
+                # create dictionary as basis for JSON file
+                for vid in vids:
+                    indices = np.where(vid == results_np[:, 0])[0]
+                    vid_results_np = results_np[indices]
+
+                    vid_results_dict = {}
+                    vid_results_dict['vid_name'] = vid
+                    vid_results_dict['shots'] = []
+
+                    rows, cols = vid_results_np.shape
+                    for row_idx in range(rows):
+                        result = {}
+                        for col in range(cols):
+                            if col is not 1:
+                                result[header[col]] = vid_results_np[row_idx, col]
+                        vid_results_dict['shots'].append(result)
+                    data['analysis_results'].append(vid_results_dict)
+
+                # write JSON file
+                json_path = os.path.join(self.__configuration_instance.results_root_dir, "core", "results_" + str(i) + "json")
+                print(f"Writing results to \"{json_path}\"...")
+                with open(json_path, 'w', newline='') as json_file:
+                    json.dump(data, json_file)
+            else:
+                print("No results were written.")
+                print("If you wish to write any output, please set the RESULTS_FORMAT in the Config file.")
+        ''''''
+
+        '''
+        # load all csv result files
+        print(f"Load all generated core results into a numpy array ...")
+        csv_core_results_path = os.path.join(self.__configuration_instance.results_root_dir, "core")
+        results_file_list = os.listdir(csv_core_results_path)
+        results_file_list.sort()
+        print(results_file_list)
+    
+        all_results_l = []
+        for file in results_file_list:
+            file_path = os.path.join(csv_core_results_path, file)
+            with open(file_path, 'r', newline='') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=';')
+                results_l = []
+                for row in csv_reader:
+                    results_l.append(row)
+                results_l = results_l[1:]
+                all_results_l.extend(results_l)
+        all_results_np = np.array(all_results_l[1:])
+        print(all_results_np.shape)
+        vids = np.unique(all_results_np[:, :1])
         print(vids)
-        
-        if self.__configuration_instance.results_format == "CSV_LOCAL":
 
-            # write Output to .csv file
-            csv_path = os.path.join(self.__configuration_instance.results_root_dir, "core", "results.csv")
-            print(f"Writing results to \"{csv_path}\"...")
-            with open(csv_path, 'w', newline='') as csv_file:
-                csv_writer = csv.writer(csv_file, delimiter=';')
-                csv_writer.writerow(header)
-                for row_idx in range(results_np.shape[0]):
-                    csv_writer.writerow(results_np[row_idx, :])
-
-        elif self.__configuration_instance.results_format == "JSON_LOCAL":
-            data = {}
-            data['analysis_results'] = []
-
-            # create dictionary as basis for JSON file
-            for vid in vids:
-                indices = np.where(vid == results_np[:, 0])[0]
-                vid_results_np = results_np[indices]
-
-                vid_results_dict = {}
-                vid_results_dict['vid_name'] = vid
-                vid_results_dict['shots'] = []
-
-                rows, cols = vid_results_np.shape
-                for row_idx in range(rows):
-                    result = {}
-                    for col in range(cols):
-                        if col is not 1:
-                            result[header[col]] = vid_results_np[row_idx, col]
-                    vid_results_dict['shots'].append(result)
-                data['analysis_results'].append(vid_results_dict)
-
-            # write JSON file
-            json_path = os.path.join(self.__configuration_instance.results_root_dir, "core", "results.json")
-            print(f"Writing results to \"{json_path}\"...")
-            with open(json_path, 'w', newline='') as json_file:
-                json.dump(data, json_file)
-
-
-        elif self.__configuration_instance.results_format == "JSON_REST":
-            print(f"Posting results using Rest API...")
-            # post all results
-            for vid in vids:
-                indices = np.where(vid == results_np[:, 0])[0]
-                vid_results_np = results_np[indices]
-
-                header_np = np.expand_dims(np.array(header), axis=0)
-                vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
-                print(vid_results_np)
-                self.__rest_api_instance.postAutomaticResults(vid=int(vid.split('.')[0]), results_np=vid_results_np)
-
-        else:
-            print("No results were written.")
-            print("If you wish to write any output, please set the RESULTS_FORMAT in the Config file.")
+        print(f"Posting results using Rest API...")
+        header = ["vid_name", "shot_id", "start", "end", "stc", "cmc"]
+        # post all results
+        for vid in vids:
+            indices = np.where(vid == all_results_np[:, 0])[0]
+            vid_results_np = all_results_np[indices]
+            header_np = np.expand_dims(np.array(header), axis=0)
+            vid_results_np = np.concatenate((header_np, vid_results_np), axis=0)
+            #print(vid_results_np)
+            self.__rest_api_instance.postAutomaticResults(vid=int(vid.split('.')[0]), results_np=vid_results_np)
+        '''
 
         print("Successfully finished!")
 

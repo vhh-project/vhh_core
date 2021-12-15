@@ -1,0 +1,136 @@
+
+Development:
+  ###
+  # This parameter is used to activate or deactivate the debug mode.
+  DEBUG_FLAG: 0             # 1 ... activate 0 ... deactivate
+  ###
+  # This parameter is used to specify a SBD results file for debugging mode.
+  SBD_RESULTS_PATH: "/data/share/datasets/vhh_mmsi_test_db_v3/annotations/sbd/57.csv"
+  ###
+  # This parameter is used to save a debug package (e.g. including some visualizations, ... - not available yet).
+  SAVE_DEBUG_PKG: 0
+
+PreProcessing:
+  ###
+  # This flag is used to to specify the resize dimension.
+  RESIZE_DIM: 416, 416      # resize dimension -> height, width
+
+OdCore:
+  ###
+  # This parameter is used to specify the batch size.
+  BATCH_SIZE: 8
+
+  ###
+  # This parameter is used to save raw results (e.g. debug visualizations).
+  SAVE_RAW_RESULTS: 0       # 1 ... yes 0 ... no
+  ###
+  # This parameter is used to specify the path for saving the raw results.
+  PATH_RAW_RESULTS: "./results/od/raw_results/"
+  ###
+  # This parameter is used to specify the prefix for the results file.
+  PREFIX_RAW_RESULTS: "results_raw_"
+  ###
+  # This parameter is used to specify the postfix for the results file.
+  POSTFIX_RAW_RESULTS: "csv"
+
+  ###
+  # This parameter is used to save final results (e.g. csv list).
+  SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
+  ###
+  # This parameter is used to specify the path for saving the final results.
+  PATH_FINAL_RESULTS: "./results/od/final_results/"
+  ###
+  # This parameter is used to specify the prefix for the results file.
+  PREFIX_FINAL_RESULTS: "results_"
+  ###
+  # This parameter is used to specify the postfix for the results file.
+  POSTFIX_FINAL_RESULTS: "csv"
+
+  ###
+  # This parameter is used to specify the path to the videos.
+  PATH_VIDEOS: "./videos/"
+
+  ###
+  # This parameter is used to specify the path to the pre-trained model.
+  PATH_PRETRAINED_MODEL: "./models/odt/yolov3.weights"
+
+  ###
+  # yolov3 detector
+  MODEL_CONFIG_PATH: "./config/ODT/yolov3/yolov3.cfg"
+
+  ###
+  # yolov3 detector - confidence threshold
+  MODEL_CONF_THRES: 0.1
+
+  ###
+  # yolov3 detector - IOU confidence threshold (NOT USED)
+  MODEL_IOU_THRESH: 0.4
+
+  ###
+  # yolov3 detector - NMS confidence threshold
+  MODEL_NMS_THRESH: 0.3
+
+  ###
+  # yolov3 detector - holding list of trained class categories
+  MODEL_CLASS_NAMES_PATH: "./config/ODT/yolov3/coco.names"
+  ###
+  # yolov3 detector - holding list of trained class categories
+  MODEL_CLASS_SELECTION_PATH: "./config/ODT/yolov3/class.selection"
+
+  ###
+  # Parameters for DeepSort Tracker
+  USE_DEEPSORT: 1
+  ###
+  # Path to DeepSort Model Checkpoint
+  DEEPSORT_MODEL_PATH: "./deep_sort/deep/checkpoint/ckpt.t7"
+  ###
+  # Maximum Distance for Nearest Neighbour Cosine Metric. Must be a float >= 0
+  DS_MAX_DIST: 0.2
+  ###
+  # Minimum Confidence to accept an Object. Must be a float between 0 and 1.
+  DS_MIN_CONF: 0.3
+  ###
+  # Maximum overlap for Non-Maximum Suppression. Must be a float >= 0
+  DS_NMS_MAX_OVERLAP: 0.5
+  ###
+  # Maximum allowed IoU distance for tracking. Must be a float >= 0
+  DS_MAX_IOU_DIST: 0.7
+  ###
+  # Maximum number of missed misses before a track is deleted. Must be an integer >= 0
+  DS_MAX_AGE: 70
+  ###
+  # Number of frames that a track remains in initialization phase. Tracking starts if object has been detected x times. Must be an integer >= 0
+  DS_NUM_INIT: 3
+  ###
+  # Max number of frames to return at the same time from getFramesByShots_NEW
+  MAX_FRAMES: 2000
+  ###
+  # Enables the classifier
+  USE_CLASSIFIER: 1
+  ###
+  # Enable majority classification, a detected object will be given the classification which appears the most often 
+  # (this applies only to classification and not to object detection)
+  USE_CLASSIFIER_MAJORITY_VOTING: 1
+  ###
+  # Path to the model the classifier is supposed to use
+  PATH_TO_CLASSIFIER_MODEL: "./models/odt/wd_0.05_best_wide_resnet50_2.weights"
+  ###
+  # Architecture of the model the classifier is using
+  CLASSIFIER_MODEL_ARCHITECTURE: "wide_resnet50_2"
+  ###
+  # Classes to use for the classifier (this influences training, testing and inference)
+  CLASSES_FOR_CLASSIFIER: ["others", "soldier", "corpse", "person_with_kz_uniform"]
+
+Evaluation:
+  ###
+  # This parameter is used to save evaluation results (e.g. visualizations, ... ).
+  SAVE_EVAL_RESULTS: 0
+  ###
+  # This parameter is used the raw results path.
+  PATH_RAW_RESULTS: "/data/share/maxrecall_vhh_mmsi/videos/results/sbd/raw_results/"
+  ###
+  # This parameter is used to specify the path to store the evaluation results path.
+  PATH_EVAL_RESULTS: "/data/share/maxrecall_vhh_mmsi/videos/results/sbd/develop/"
+  ###
+  # This parameter is used to groundtruth annotations used for evaluation.
+  PATH_GT_ANNOTATIONS: "/caa/Projects02/vhh/private/database_nobackup/VHH_datasets/annotations/ShotBoundaryDetection/imediacities/sbd_imc_annotations_20191231.csv"

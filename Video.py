@@ -13,7 +13,7 @@ class Video(object):
 
         :param config: parameter must hold the core configuration object (Class-type Configuration)
         """
-        print("create instance of Video")
+        #print("create instance of Video")
 
         if (config == None):
             print("You have to specify a valid configuration instance!")
