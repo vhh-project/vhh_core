@@ -172,8 +172,7 @@ class MainController(object):
             if self.__configuration_instance.do_send_to_server:
                 self.__rest_api_instance.postSBAResults(sba_paths)
                 self.__rest_api_instance.postOBAResults(oba_paths)
-                pass
-                
+                            
         print("Successfully finished!")
 
     def store_OBA_results(self, results_oba):
@@ -353,7 +352,7 @@ class MainController(object):
                             "id": int(row["oid"]),
                             "inPoint": int(row["start"]) + 1,
                             "outPoint": int(row["stop"]) + 1,
-                            "valueSource": "TBD"}
+                            "valueSource": "TUW CV Object Detection (v0.1)"}
                         objects_dict[row["oid"]] = obj
 
                 # Objects need to be stored in a list and not a dict
