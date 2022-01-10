@@ -106,14 +106,22 @@ class VhhRestApi(object):
         """
         This method is used to get all automatic generated results from the VhhMMSI system.
         :param vid: This parameter must hold a valid video identifier.
-        :return: THis method returns the results (payload) as json format.
+        :return: This method returns the results (payload) as json format.
         """
-
-        print("get sbd results from maxrecall ... ")
         url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
         response = self.getRequest(url)
         res_json = response.json()
-        #print(res_json)
+        return res_json
+
+    def getManualResults(self, vid):
+        """
+        This method is used to get all manually generated results from the VhhMMSI system.
+        :param vid: This parameter must hold a valid video identifier.
+        :return: This method returns the results (payload) as json format.
+        """
+        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/tbas/shots/manual"
+        response = self.getRequest(url)
+        res_json = response.json()
         return res_json
 
     def downloadVideo(self, url, file_name, video_format):
@@ -138,7 +146,7 @@ class VhhRestApi(object):
         return ret
 
     def downloadSTCData(self, vid, download_dir):
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
+        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/tbas/shots/manual"
         response = self.getRequest(url)
         res_json = response.json()
 
