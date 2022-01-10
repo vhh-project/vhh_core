@@ -26,7 +26,7 @@ class Video(object):
         self.video_format = "None"
         self.file_name = "None"
         self.download_path = "None"
-        self.processed_flag = "None"
+        self.processed_flags = {}
 
     def create_video(self, vid, originalFileName, url, download_path, processed_flag_shots, processed_flag_objects, processed_flag_relations, processed_flag_overscan):
         """
@@ -50,7 +50,7 @@ class Video(object):
             "relations": processed_flag_relations,
             "overscan": processed_flag_overscan}
 
-    def download(self, rest_api_instance=None):
+    def download(self, rest_api_instance=None, filename = None):
         """
         This method is used to download the video into the local storage path.
 
@@ -61,8 +61,10 @@ class Video(object):
             print("You have to specify a valid object of class type VhhRestApi to execute the download process!")
             exit()
 
+        if filename is None:
+            filename = str(self.id)
         ret = rest_api_instance.downloadVideo(self.url,
-                                              str(self.id),
+                                              filename,
                                               self.video_format)
         return ret
 

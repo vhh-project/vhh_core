@@ -23,6 +23,10 @@ parser.add_argument('-n', '--not-annotated', dest='use_not_annotated', action='s
 parser.add_argument('-m', "-max_number", dest="max_number_of_downloads", nargs = '?', type=int, const=5, help =
 "The maximum number of videos to download, for example '-m 2'. Default value is 5. To download without a maximum number set this to -1. ")
 
+parser.add_argument('-s', '--starting_with', dest='starting_with', nargs='?', type=str, const = "", help = "Download all videos starting with this i.e. -s NARA will only download videos who's name starts with NARA")
+parser.add_argument('--full_name', dest='use_full_name', action='store_true', help = "If this parameter is used then videos will be stored as ID_(full_name).FILEENDING")
+
+
 # This is a required parameter
 required_args = parser.add_argument_group('required arguments')
 required_args.add_argument('-p', '--path', dest='path', help =
@@ -56,12 +60,18 @@ print("There exist {0} video in total".format(len(video_list)))
 # Collect the videos that fulfill the criteria (processed / non processed / ID)
 videos_selected = []
 for video in video_list:
+
+    # Only use videos that start with the required string
+    if not video.originalFileName.startswith(args.starting_with):
+        continue
+
     if args.use_annotated and video.processed_flag:
         videos_selected.append(video)
     elif args.use_not_annotated and not video.processed_flag:
         videos_selected.append(video)
     elif args.ids is not None and video.id in args.ids:
         videos_selected.append(video)
+     
 
 print("Found {0} videos that fit the criteria".format(len(videos_selected)))
 if len(video_list) == 0:
@@ -74,10 +84,14 @@ number_downloads = 0
 for video in videos_selected:
     if number_downloads == args.max_number_of_downloads:
         break
-    print("Video {0}".format(video.id))
+    print("Video {0} ({1})".format(video.id, video.originalFileName))
     if not video.is_downloaded():
         number_downloads += 1
-        video.download(RestAPI)
+
+        if args.use_full_name:
+            video.download(RestAPI, "{0}_({1})".format(video.id, video.originalFileName))
+        else:
+            video.download(RestAPI)
 
     
 print("Downloaded {0} videos".format(number_downloads))
