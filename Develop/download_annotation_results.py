@@ -77,52 +77,5 @@ print("Found {0} videos that fulfill the requirements".format(len(videos_id_list
 annotation_results = []
 
 # Get annotation results
-for id in videos_id_list:
-    res = RestAPI.getAutomaticResults(id)
-    annotation_results.append({'id':id, 'data':res})
-
-
-# Need the entire list of videos, so we can find the name of the video
-video_list = RestAPI.getListofVideos()
-for result in annotation_results:
-    video_format = [v.video_format for v in video_list if v.id == id][0]
-    result["filename"] = str(result["id"]) + "." + video_format
-
-# Add shot ids
-for result in annotation_results:
-    shot_id = 1
-    filename = result["filename"]
-    for i, row in enumerate(result["data"]):
-        result["data"][i] = {"filename": filename,  "shot_id": shot_id, "start": row['inPoint'] - 1, "end": row["outPoint"] - 1, "stc": row["shotType"], "cmc": row["cameraMovement"]}
-        shot_id += 1
-
-annotation_results_single_file = []
-for result in annotation_results:
-    id = result["id"]
-    filename = result["filename"]
-    for row in result["data"]:
-        annotation_results_single_file.append({"filename": filename, "vid_name": id, "shot_id": row["shot_id"], "start": row['start'], "end": row["end"], "stc": row["stc"], "cmc": row["cmc"]})
-
-# Store results in a single big file
-if args.store_one_file:
-    file_name_without_extension = os.path.join(args.path, output_filename)
-    if args.store_as_csv:
-        file_path = Utils.make_filepath_unique(file_name_without_extension, '.csv')
-        Utils.store_csv(file_path, annotation_results_single_file)
-    if args.store_as_json:
-        file_path = Utils.make_filepath_unique(file_name_without_extension, '.json')
-        Utils.store_json(file_path, annotation_results_single_file)
-
-
-# Store results in a file per id
-if args.store_separate_files:
-    for result in annotation_results:
-        id = result["id"]
-        data = result["data"]
-        file_name_without_extension = os.path.join(args.path,  str(id))
-        if args.store_as_csv:
-            file_path = Utils.make_filepath_unique(file_name_without_extension, '.csv')
-            Utils.store_csv(file_path, data)
-        if args.store_as_json:
-            file_path = Utils.make_filepath_unique(file_name_without_extension, '.json')
-            Utils.store_json(file_path, data)
+for vid in videos_id_list:
+    RestAPI.downloadSTCData(vid, args.path)

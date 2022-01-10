@@ -53,6 +53,15 @@ class MainController(object):
         self.make_video_folder()
         self.make_result_folders()
 
+    def get_rest_api(self):
+        """
+        Allows access to the REST API
+        """
+        return self.__rest_api_instance
+
+    def get_config(self):
+        return self.__configuration_instance
+
     def run(self):
         """
         This method is used to start the automatic annotation process.

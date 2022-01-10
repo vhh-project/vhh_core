@@ -102,6 +102,20 @@ class VhhRestApi(object):
 
         return video_instance_list
 
+    def getAutomaticResults(self, vid):
+        """
+        This method is used to get all automatic generated results from the VhhMMSI system.
+        :param vid: This parameter must hold a valid video identifier.
+        :return: THis method returns the results (payload) as json format.
+        """
+
+        print("get sbd results from maxrecall ... ")
+        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
+        response = self.getRequest(url)
+        res_json = response.json()
+        #print(res_json)
+        return res_json
+
     def downloadVideo(self, url, file_name, video_format):
         """
         This method is used to download a video from the Vhh-MMSI system.
@@ -111,19 +125,51 @@ class VhhRestApi(object):
         :param video_format: This parameter must hold a valid video format extension (e.g. m4v)
         :return: This method returns a boolean flag which includes the state of the download process (true ... sucessfully finished OR false ... downlaod failed)
         """
-        print("start download process ... ")
         ret = False
 
         try:
             video_file = requests.get(url) #, verify=self.__pem_path)
             open(self.__video_download_path + "/" + file_name + "." + str(video_format), 'wb').write(video_file.content)
-            print("successfully downloaded ... ")
             ret = True
         except:
             print("Download process failed!")
             ret = False
 
         return ret
+
+    def downloadSTCData(self, vid, download_dir):
+        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
+        response = self.getRequest(url)
+        res_json = response.json()
+
+        file_name = str(vid) + ".csv"
+        path = os.path.join(download_dir, file_name)
+
+        with open(path, 'w') as file:
+            fieldnames_stc = ["vid_name", "shot_id", "start", "end", "stc"]
+            writer_stc = csv.DictWriter(file, fieldnames=fieldnames_stc, delimiter=";")
+            writer_stc.writeheader()
+
+            vid_name = str(vid) + ".m4v"
+            shot_id_stc = 1
+
+            new_shots = []
+            # The JSON does not contain information about shots with NA camera movement, need to add it by finding shots for which no camera movement is given
+            for shot in filter(lambda x: 'shotType' in x.keys(), res_json):
+                if len(list(filter(lambda x: "cameraMovement" in x.keys() and x["inPoint"] == shot["inPoint"] and x["outPoint"] == shot["outPoint"], res_json))) == 0:
+                    new_shots.append({"inPoint": shot["inPoint"], "outPoint": shot["outPoint"], "cameraMovement": "NA"})
+
+            res_json += new_shots  
+            # Sort numbers, so the shot ids are correct
+            res_json.sort(key=lambda shot: shot["inPoint"])
+
+            for shot in res_json:
+                if not 'cameraMovement' in shot.keys():
+                    writer_stc.writerow({'vid_name': vid_name, "shot_id": shot_id_stc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "stc": shot["shotType"]})
+                    shot_id_stc += 1
+    
+        return
+
 
     def getShotResults(self, vid):
         """
@@ -241,11 +287,10 @@ class VhhRestApi(object):
 
         :data: list of paths to json files that contain the object information
         """
-        return
         for path in oba_paths:
             vid = os.path.split(path)[-1].split('.')[0]
             url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/objects/auto".format(vid))
             with open(path) as file:
                 data = json.load(file)
-                # response = self.postRequest(url, data)
-                # print(url, ": ", response)
+                response = self.postRequest(url, data)
+                print(url, ": ", response)
