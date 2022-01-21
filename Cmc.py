@@ -34,17 +34,23 @@ class Cmc(object):
         self.__sbd_results_dir = sbd_config['SbdCore']['PATH_FINAL_RESULTS']
         fp.close()
 
-    def run(self):
+    def get_results_directory(self):
+        return self.__cmc_instance.config_instance.path_final_results 
+
+    def run(self, video_instance_list=None):
         """
         This method is used to run the camera movements classification task.
+        
+        :param video_instance_list: parameter must hold a list of video objects (Class-type: Video)
         """
 
         print("start cmc process ... ")
+        print("CMC ON", video_instance_list)
 
-        results_file_list = os.listdir(self.__sbd_results_dir)
-        for file in results_file_list:
-            vid = int(file.split('.')[0])
-            shots_np = self.__cmc_instance.loadSbdResults(self.__sbd_results_dir + file)
+        for video_instance in video_instance_list:
+            vid = video_instance.id
+            sbd_results_file = os.path.join(self.__sbd_results_dir, str(vid) + ".csv")           
+            shots_np = self.__cmc_instance.loadSbdResults(sbd_results_file)
             self.__cmc_instance.runOnSingleVideo(shots_per_vid_np=shots_np, max_recall_id=vid)
 
         print("cmc process finished!")

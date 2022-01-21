@@ -11,12 +11,12 @@ Security:
 ApiEndpoints:
   ###
   # This parameter specifies the root url for the RestApi endpoints.
-  ROOT_URL: "https://api.vhh-mmsi.eu/api/shotservice/"   # root url for API endpoints
+  ROOT_URL: "https://api.vhh-mmsi.eu/api/tbaservice/"   # root url for API endpoints
 
 VhhCore:
   ###
   # This parameter specifies the video download path.
-  VIDEO_DOWNLOAD_PATH: "videos/"   # directory to store all downloaded videos
+  VIDEO_DOWNLOAD_PATH: "/data/share/fjogl/vhh_core_workspace/videos"   # directory to store all downloaded videos
   
   ###
   # This parameter specifies the path to the pre-trained models.
@@ -29,7 +29,7 @@ VhhCore:
   ###
   # This parameter specifies the results path for each individual plugin.
   # TODO: this needs to be adjusted (along with other configs?)
-  RESULTS_ROOT_DIR: "results/"
+  RESULTS_ROOT_DIR: "/data/share/fjogl/vhh_core_workspace/results/"
 
   ###
   # This parameter specifies the size of the processed videos within one cycle (e.g. size 2 means that 2 videos will be downloaded and processed. 
@@ -37,29 +37,27 @@ VhhCore:
   BATCH_PROCESSING_SIZE: 2
   
   ###
-  # This parameter specifies the format in which the results are written.
-  # CSV_LOCAL ... writes results to RESULTS_ROOT_DIR/core/results.csv
-  # JSON_LOCAL ... writes results to RESULTS_ROOT_DIR/core/results.json
-  # JSON_REST ... uses the Rest API to publish results as JSON files
-  # other ... do not write any results
-  RESULTS_FORMAT: "CSV_LOCAL"
+  # This parameter specifies whether the results will be sent to the VHH MMSI server
+  #   0 ... do NOT send to server
+  #   1 ... send to server
+  SEND_TO_SERVER: 1
 
 PluginConfigs:
   ###
   # This parameter is used to activate or deactivate the SBD Plugin
-  USE_SBD: 0             # 1 ... activate 0 ... deactivate
+  USE_SBD: 1             # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the shot boundary detection plugin module
   SBD_CONFIG_FILE: "config/SBD/config_sbd.yaml"
 
   ###
   # This parameter is used to activate or deactivate the STC Plugin
-  USE_STC: 0             # 1 ... activate 0 ... deactivate
+  USE_STC: 1             # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the shot type classification plugin module
   STC_CONFIG_FILE: "config/STC/config_stc.yaml"
 
   ###
   # This parameter is used to activate or deactivate the CMC Plugin
-  USE_CMC: 0             # 1 ... activate 0 ... deactivate
+  USE_CMC: 1             # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the camera movement classification module
   CMC_CONFIG_FILE: "config/CMC/config_cmc.yaml"
 

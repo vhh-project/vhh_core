@@ -27,6 +27,9 @@ class Sbd(object):
         # initialize sbd plugin
         self.__sbd_instance = SBD(self.__sbd_config_file)
 
+    def get_results_directory(self):
+        return self.__sbd_instance.config_instance.path_final_results
+
     def run(self, video_instance_list=None):
         """
         This method is used to run the shot boundary detection task
@@ -34,17 +37,12 @@ class Sbd(object):
         :param video_instance_list: parameter must hold a list of video objects (Class-type: Video)
         """
         printCustom("start sbd process ... ", STDOUT_TYPE.INFO)
-
-        if(video_instance_list == None):
-            printCustom("You have to specify a valid non-empty list of video objects (class-type: Video)",
-                        STDOUT_TYPE.ERROR)
-            exit()
+        print("SBD ON", video_instance_list)
 
         for video_instance in video_instance_list:
             video_instance.printInfo()
-            video_filename = os.path.join(video_instance.download_path,
-                                          str(video_instance.id)) + "." + video_instance.video_format
-            #print(video_filename)
+            vid = str(video_instance.id)
+            video_filename = os.path.join(video_instance.download_path, vid + "." + video_instance.video_format) 
             self.__sbd_instance.runOnSingleVideo(video_filename=video_filename,
                                                  max_recall_id=video_instance.id)
 

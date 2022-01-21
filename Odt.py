@@ -34,17 +34,19 @@ class Odt(object):
         self.__sbd_results_dir = sbd_config['SbdCore']['PATH_FINAL_RESULTS']
         fp.close()
 
-    def run(self):
+    def run(self, video_instance_list=None):
         """
         This method is used to run the object detection and tracking task.
+        
+        :param video_instance_list: parameter must hold a list of video objects (Class-type: Video)
         """
 
         print("start odt process ... ")
 
-        results_file_list = os.listdir(self.__sbd_results_dir)
-        for file in results_file_list:
-            vid = int(file.split('.')[0])
-            shots_np = self.__od_instance.loadSbdResults(self.__sbd_results_dir + file)
+        for video_instance in video_instance_list:
+            vid = video_instance.id
+            sbd_results_file = os.path.join(self.__sbd_results_dir, str(vid) + ".csv")           
+            shots_np = self.__od_instance.loadSbdResults(sbd_results_file)
             self.__od_instance.runOnSingleVideo(shots_per_vid_np=shots_np, max_recall_id=vid)
-
+       
         print("odt process finished!")
