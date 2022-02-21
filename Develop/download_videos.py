@@ -23,7 +23,7 @@ parser.add_argument('-n', '--not-annotated', dest='use_not_annotated', action='s
 parser.add_argument('-m', "-max_number", dest="max_number_of_downloads", nargs = '?', type=int, const=5, help =
 "The maximum number of videos to download, for example '-m 2'. Default value is 5. To download without a maximum number set this to -1. ")
 
-parser.add_argument('-s', '--starting_with', dest='starting_with', nargs='?', type=str, const = "", help = "Download all videos starting with this i.e. -s NARA will only download videos who's name starts with NARA")
+parser.add_argument('-s', '--starting_with', dest='starting_with', nargs='?', type=str, default = "", help = "Download all videos starting with this i.e. -s NARA will only download videos who's name starts with NARA")
 parser.add_argument('--full_name', dest='use_full_name', action='store_true', help = "If this parameter is used then videos will be stored as ID_(full_name).FILEENDING")
 
 
@@ -65,9 +65,9 @@ for video in video_list:
     if not video.originalFileName.startswith(args.starting_with):
         continue
 
-    if args.use_annotated and video.processed_flag:
+    if args.use_annotated and video.processed_flags["shots"]:
         videos_selected.append(video)
-    elif args.use_not_annotated and not video.processed_flag:
+    elif args.use_not_annotated and not video.processed_flags["shots"]:
         videos_selected.append(video)
     elif args.ids is not None and video.id in args.ids:
         videos_selected.append(video)
