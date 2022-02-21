@@ -101,27 +101,22 @@ class Video(object):
         This method is used to cleanup all data related to the corresponding video ID. It deletes the generated results
         of the sbd, stc and cmc plugin as well as the downloaded video file.
         """
-        print("start cleanup process ... ")
-
-        print("Delete video if available in video_download path ...")
         # get list of videos in download path
         video_list = os.listdir(self.download_path)
         search_str = str(self.id) + "." + self.video_format
 
         # find video name in list
         if (search_str in video_list):
-            print("delete video ... ")
             file_path = os.path.join(self.download_path, search_str)
             os.remove(file_path)
 
-        # Delte results from SBD, STC, CMC and ODT
+        # Delete results from SBD, STC, CMC and ODT
         search_str = str(self.id) + ".csv"
 
         for config_file_path, config_section in zip(
             [self.__core_config.sbd_config_file, self.__core_config.stc_config_file, self.__core_config.cmc_config_file, self.__core_config.odt_config_file], 
             ['SbdCore', 'StcCore', 'CmcCore', 'OdCore']):
 
-            print("Deleting result: ", config_section)
             with open(config_file_path, 'r') as fp:
                 config = yaml.load(fp, Loader=yaml.BaseLoader)
                 results_dir = config[config_section]['PATH_FINAL_RESULTS']
@@ -130,8 +125,6 @@ class Video(object):
                 if (search_str in result_file_list):
                     file_path = os.path.join(results_dir, search_str)
                     os.remove(file_path)    
-
-        print("cleanup process successfully finished!")
 
     def printInfo(self):
         """
