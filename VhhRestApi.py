@@ -319,3 +319,20 @@ class VhhRestApi(object):
                 data = json.load(file)
                 response = self.postRequest(url, data)
                 print(url, ": ", response)
+
+    def postOSDresults(self, osd_list):
+        """
+        Posts overscan detections to VhhMMSI
+
+        :osd_list: a list contatining a dictionary for each film
+                    The dictionary contains the VID, and the overscan coordinates (left, right, top, bottom) normalized to to the intervall [0, 1]
+        """
+        for dict in osd_list:
+            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/overscan/auto".format(dict["vid"]))
+            response = self.postRequest(url, {
+                "left": dict["left"],
+                "right": dict["right"],
+                "top": dict["top"],
+                "bottom": dict["bottom"]
+            })
+            print(url, ": ", response)
