@@ -95,6 +95,8 @@ class MainController(object):
         else:
             print("Found {0} videos to process".format(len(videos_to_process)))
 
+        #exit()
+
         print("-------------------------------------------------------------------")
         print("------------------ BATCH PROCESSING -------------------------------")
         batch_size = self.__configuration_instance.batch_size
