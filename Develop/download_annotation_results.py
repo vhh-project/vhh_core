@@ -23,8 +23,6 @@ parser.add_argument('-i', '--id', nargs='+', dest = "ids", type=int, help =
 parser.add_argument('-a', '--all', dest='download_all', action='store_true', help = "If this parameter is used then download all annotated videos.")
 parser.add_argument('-c', '--csv', dest='store_as_csv', action='store_true', help = "If this parameter is used then the results will be stores as CSV.")
 parser.add_argument('-j', '--json', dest='store_as_json', action='store_true', help = "If this parameter is used then the results will be stores as JSON.")
-# parser.add_argument('-s', '--separate-files', dest='store_separate_files', action='store_true', help = "If this parameter is used then the results will in separate files, one for each id.")
-# parser.add_argument('-o', '--one-file', dest='store_one_file', action='store_true', help = "If this parameter is used then the results will be stored in one big file.")
 
 parser.add_argument('--manual', dest='manual', action='store_true', help = "If this parameter is used then only manual annotations will be downloaded.")
 
@@ -41,8 +39,6 @@ required_args.add_argument('-p', '--path', dest='path', help =
 parser.set_defaults(download_all=False)
 parser.set_defaults(store_as_csv=False)
 parser.set_defaults(store_as_json=False)
-parser.set_defaults(store_separate_files=False)
-parser.set_defaults(store_one_file=False)
 args = parser.parse_args()
 
 # if not args.store_one_file and not args.store_separate_files:
@@ -55,8 +51,8 @@ if not os.path.isdir(args.path):
 if args.ids is not None and args.download_all:
     raise ValueError("Cannot specify ids and download all annotation results. Call this script with the '-h' parameter to get information on how to run it")
 
-if args.ids is not None and args.starting_with is not None:
-    raise ValueError("Cannot use -i and -s together")
+# if args.ids is not None and args.starting_with is not None:
+#     raise ValueError("Cannot use -i and -s together")
 #
 # MAIN PART OF SCRIPT
 #
@@ -92,9 +88,20 @@ print("Found {0} videos that fulfill the requirements".format(len(videos_id_list
 annotation_results = []
 
 # Get annotation results
-for vid in videos_id_list:
-    if not args.manual:
-        json = RestAPI.getAutomaticResults(vid)
-    else:
-        json = RestAPI.getManualResults(vid)
-    Utils.store_json(os.path.join(args.path, str(vid) + ".json"), json)
+
+if args.store_as_csv:
+    assert not args.manual
+    for id in videos_id_list:
+        data = RestAPI.getSTCResult(id)
+        file_name_without_extension = os.path.join(args.path,  str(id))
+        file_path = Utils.make_filepath_unique(file_name_without_extension, '.csv')
+        Utils.store_csv(file_path, data)
+        
+  
+if args.store_as_json:
+    for vid in videos_id_list:
+        if not args.manual:
+            json = RestAPI.getAutomaticResults(vid)
+        else:
+            json = RestAPI.getManualResults(vid)
+        Utils.store_json(os.path.join(args.path, str(vid) + ".json"), json)

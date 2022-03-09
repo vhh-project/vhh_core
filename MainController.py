@@ -75,6 +75,7 @@ class MainController(object):
 
         # cleanup coplete results and video folder
         if (self.__configuration_instance.cleanup_flag == 1):
+            print("Cleaning up")
             for video_instance in video_instance_list:
                 video_instance.cleanup()
 
@@ -85,9 +86,7 @@ class MainController(object):
         videos_to_process = []
         for i, video_instance in enumerate(video_instance_list):
             # For now we only care for shot and object detection
-            # if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["objects"]):
-
-            if (not video_instance.processed_flags["shots"]):
+            if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["objects"]):
                 videos_to_process.append(video_instance)
             
         if(len(videos_to_process) == 0):
@@ -112,6 +111,7 @@ class MainController(object):
 
             # cleanup video and results folder
             if (self.__configuration_instance.cleanup_flag == 1):
+                print("Cleaning up")
                 for video_instance in video_instance_list:
                     video_instance.cleanup()
 

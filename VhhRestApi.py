@@ -178,13 +178,30 @@ class VhhRestApi(object):
     
         return
 
+    def getSTCResult(self, vid):
+        """
+        This method is used to download shot results (STC) from the VhhMMSI system.
+
+        :return: A list of dictionaries that represent the STC file (in a format that can be directly stored as a csv)
+        """
+        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
+        vid_name = f"{vid}.m4v"
+        response = self.getRequest(url)
+        res_json = response.json()
+
+        results = []
+        shot_id_stc = 1
+        for shot in res_json:
+            if not 'cameraMovement' in shot.keys():
+                results.append({'vid_name': vid_name, "shot_id": shot_id_stc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "stc": shot["shotType"]})
+                shot_id_stc += 1
+        return results
 
     def getShotResults(self, vid):
         """
         This method is used to download shot results (SBD, STC, CMC) from the VhhMMSI system.
 
         :param vid: This parameter must hold a valid video identifier.
-        :return: THis method returns the results (payload) as json format.
         """
 
         print("get sbd results from maxrecall ... ")
@@ -302,3 +319,20 @@ class VhhRestApi(object):
                 data = json.load(file)
                 response = self.postRequest(url, data)
                 print(url, ": ", response)
+
+    def postOSDresults(self, osd_list):
+        """
+        Posts overscan detections to VhhMMSI
+
+        :osd_list: a list contatining a dictionary for each film
+                    The dictionary contains the VID, and the overscan coordinates (left, right, top, bottom) normalized to to the intervall [0, 1]
+        """
+        for dict in osd_list:
+            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/overscan/auto".format(dict["vid"]))
+            response = self.postRequest(url, {
+                "left": dict["left"],
+                "right": dict["right"],
+                "top": dict["top"],
+                "bottom": dict["bottom"]
+            })
+            print(url, ": ", response)
