@@ -276,13 +276,11 @@ class VhhRestApi(object):
             inpoint = int(data_block[i][2]) + 1
             outpoint = int(data_block[i][3]) + 1
             shot_type = data_block[i][4]
-            camera_movement = data_block[i][5]
 
             data_dict = {
                 "inPoint": inpoint,
                 "outPoint": outpoint,
                 "shotType": shot_type,
-                "cameraMovement": camera_movement
             }
 
             data_dict_l.append(data_dict)
@@ -294,7 +292,7 @@ class VhhRestApi(object):
 
     def postSBAResults(self, sba_paths):
         """
-        Posts the automatically generated SBA results (SBD, STC, CMC) to the VhhMMSI system.
+        Posts the automatically generated SBA results (SBD, STC) to the VhhMMSI system.
 
         :data: list of paths to json files that contain the shot information
         """
@@ -336,3 +334,33 @@ class VhhRestApi(object):
                 "bottom": dict["bottom"]
             })
             print(url, ": ", response)
+
+    def postCMCResults(self, cmc_paths):
+        """
+        Posts the automatically generated CMC results (CMC) to the VhhMMSI system.
+
+        :data: list of paths to json files that contain the shot information
+        """
+        for path in cmc_paths:
+            vid = os.path.split(path)[-1].split('.')[0]
+            #vid = os.path.split(path)[-1].split('_')[0]
+            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/camera-movements/auto".format(vid))
+  
+            with open(path) as file:
+                data = json.load(file)
+
+                results = []
+                for data_entry in data:
+                    inpoint = int(data_entry['start']) + 1
+                    outpoint = int(data_entry['stop']) + 1
+                    camera_movement = data_entry['cmcType']
+    
+                    result_entry = {
+                        "inPoint": inpoint,
+                        "outPoint": outpoint,
+                        "cameraMovement": camera_movement
+                    }
+                    results.append(result_entry)
+
+                response = self.postRequest(url, results)
+                print(url, ": ", response)
