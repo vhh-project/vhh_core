@@ -49,6 +49,7 @@ class MainController(object):
 
         path_core_results = os.path.join(self.__configuration_instance.results_root_dir, "core")
         self.__path_sba, self.__path_oba = os.path.join(path_core_results, "SBA"), os.path.join(path_core_results, "OBA")
+        self.__path_tba = os.path.join(path_core_results, "TBA")
 
         self.make_video_folder()
         self.make_result_folders()
@@ -85,8 +86,9 @@ class MainController(object):
 
         videos_to_process = []
         for i, video_instance in enumerate(video_instance_list):
-            # For now we only care for shot and object detection
-            if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["objects"]):
+            # For now we only care for shot, camera_movements and object detection
+            if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["camera_movements"]) or (not video_instance.processed_flags["objects"]):
+            #if (not video_instance.processed_flags["camera_movements"]):
                 videos_to_process.append(video_instance)
             
         if(len(videos_to_process) == 0):
@@ -95,6 +97,9 @@ class MainController(object):
         else:
             print("Found {0} videos to process".format(len(videos_to_process)))
 
+        #videos_to_process = videos_to_process[:20]
+        #for i, video_instance in enumerate(videos_to_process):
+        #    video_instance.printInfo()
         #exit()
 
         print("-------------------------------------------------------------------")
@@ -129,36 +134,39 @@ class MainController(object):
                     if(ret == False):
                         print("Not able to download this video! e.g. access restrictions or missing video file! --> skip")
                         continue
-
-
-            videos_to_process_shots = list(filter(lambda x: not x.processed_flags["shots"], batch_video_instance_list))
-            videos_to_download_shots = list(filter(lambda x: x.processed_flags["shots"], batch_video_instance_list))
-
+            
             #
             # RUN THE PIPELINE
             #
             print("Run pipeline on a batch")
 
-            # run sbd
+            # run sbd & stc
+            videos_to_process_shots = list(filter(lambda x: not x.processed_flags["shots"], batch_video_instance_list))
+            videos_to_download_shots = list(filter(lambda x: x.processed_flags["shots"], batch_video_instance_list))
+
             if self.__configuration_instance.use_sbd:
                 self.__sbd_instance.run(video_instance_list=videos_to_process_shots)
 
-            # run stc
             if self.__configuration_instance.use_stc:
                 self.__stc_instance.run(video_instance_list=videos_to_process_shots)
 
-            # Download shot info (SBD, STC & CMC) for already processed videos
+            # Download shot info (SBD, STC) for already processed videos
             for video_instance in videos_to_download_shots:
                 self.__rest_api_instance.getShotResults(vid=video_instance.id)
 
-            # run cmc (only on videos with non processed shots)
-            if self.__configuration_instance.use_cmc:
-                self.__cmc_instance.run(video_instance_list=videos_to_process_shots)
+            # run cmc
+            videos_to_process_cmc = list(filter(lambda x: not x.processed_flags["camera_movements"], batch_video_instance_list))
+            videos_to_download_cmc = list(filter(lambda x: x.processed_flags["camera_movements"], batch_video_instance_list))
 
+            if self.__configuration_instance.use_cmc:
+                self.__cmc_instance.run(video_instance_list=videos_to_process_cmc)
+
+            # TODO: Download camera movements data for videos that are already processed
+
+            # run odt
             videos_to_process_objects = list(filter(lambda x: not x.processed_flags["objects"], batch_video_instance_list))
             videos_to_download_objects = list(filter(lambda x: x.processed_flags["objects"], batch_video_instance_list))
 
-            # run odt
             if self.__configuration_instance.use_odt:
                 self.__odt_instance.run(video_instance_list = videos_to_process_objects)
 
@@ -170,6 +178,9 @@ class MainController(object):
 
             results_sba = self.merge_results_SBA(batch_video_instance_list)
             sba_paths = self.store_SBA_results(results_sba)
+
+            results_tba = self.format_results_TBA(batch_video_instance_list)
+            tba_paths = self.store_TBA_results(results_tba)
                       
             results_oba = self.format_results_OBA(batch_video_instance_list)
             oba_paths = self.store_OBA_results(results_oba)
@@ -183,6 +194,7 @@ class MainController(object):
             if self.__configuration_instance.do_send_to_server:
                 self.__rest_api_instance.postSBAResults(sba_paths)
                 self.__rest_api_instance.postOBAResults(oba_paths)
+                self.__rest_api_instance.postTBAResults(tba_paths)
                             
         print("Successfully finished!")
 
@@ -219,8 +231,9 @@ class MainController(object):
                 shot = {
                     "inPoint": int(vid_results_sba[row_idx, 2])+1, 
                     "outPoint": int(vid_results_sba[row_idx, 3])+1,
-                    "shotType": vid_results_sba[row_idx, 4],
-                    "cameraMovement": vid_results_sba[row_idx, 5]}
+                    "shotType": vid_results_sba[row_idx, 4]
+                    #"cameraMovement": vid_results_sba[row_idx, 5]
+                    }
                 shots.append(shot)
 
             # Write shots to JSON file
@@ -228,6 +241,21 @@ class MainController(object):
             paths.append(json_path)
             with open(json_path, 'w', newline='') as json_file:
                 json.dump(shots, json_file)
+        return paths
+
+    def store_TBA_results(self, results_tba):
+        """
+        Stores the TBA results in JSON files so they are ready to be sent to VHH-MMSI
+
+        :param results_tba: Output of merge_results_TBA
+        """
+        paths = []
+        for dict in results_tba:
+            print(dict)
+            json_path = os.path.join(self.__path_tba, str(dict["videoId"]) + ".json")
+            paths.append(json_path)
+            with open(json_path, 'w', newline='') as json_file:
+                json.dump(dict['camera_movements'], json_file)
         return paths
 
     def merge_results_SBA(self, relevant_videos):
@@ -241,19 +269,18 @@ class MainController(object):
         # merge and prepare results
         sbd_results_path = os.path.join(self.__configuration_instance.results_root_dir, "sbd")
         sbd_results_path = os.path.join(sbd_results_path, "final_results")
-
         stc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "stc")
         stc_results_path = os.path.join(stc_results_path, "final_results")
 
-        cmc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "cmc")
-        cmc_results_path = os.path.join(cmc_results_path, "final_results")
+        #cmc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "cmc")
+        #cmc_results_path = os.path.join(cmc_results_path, "final_results")
 
         sbd_result_file_list = os.listdir(sbd_results_path)
         sbd_result_file_list = [os.path.join(sbd_results_path, x) for x in sbd_result_file_list if x in relevant_files]
         stc_result_file_list = os.listdir(stc_results_path)
         stc_result_file_list = [os.path.join(stc_results_path, x) for x in stc_result_file_list if x in relevant_files]
-        cmc_result_file_list = os.listdir(cmc_results_path)
-        cmc_result_file_list = [os.path.join(cmc_results_path, x) for x in cmc_result_file_list if x in relevant_files]
+        #cmc_result_file_list = os.listdir(cmc_results_path)
+        #cmc_result_file_list = [os.path.join(cmc_results_path, x) for x in cmc_result_file_list if x in relevant_files]
 
         entries = []
         for results_file in sbd_result_file_list:
@@ -292,6 +319,7 @@ class MainController(object):
         stc_entries_np = np.array(entries)
         print(stc_entries_np)
 
+        '''
         entries = []
         for results_file in cmc_result_file_list:
             fp = open(results_file)
@@ -308,18 +336,54 @@ class MainController(object):
                                 line_split[4]])
         cmc_entries_np = np.array(entries)
         print(cmc_entries_np)
-        
+        '''
 
-        if(len(stc_entries_np) > 0 and len(cmc_entries_np) > 0):
+        if(len(stc_entries_np) > 0):
             entries_np = np.concatenate((sbd_entries_np, stc_entries_np[:, 4:]), axis=1)
-            entries_np = np.concatenate((entries_np, cmc_entries_np[:, 4:]), axis=1)
         else:
             dummy_entries_np = np.empty([len(sbd_entries_np), 1]).astype('str')
             dummy_entries_np[:] = "NA"
             entries_np = np.concatenate((sbd_entries_np, dummy_entries_np), axis=1)
-            entries_np = np.concatenate((entries_np, dummy_entries_np), axis=1)
         print(entries_np)
         return entries_np
+
+    def format_results_TBA(self, relevant_videos):
+        """
+        This method is used to merge and prepare the results of time-based annotation data (cmc) to send it to the the Vhh-MMSI database.
+
+        :return: This method returns a list of dictionaries, each containing the CMC result of one single video.
+        """
+        relevant_files = [str(video.id) + ".json" for video in relevant_videos]
+
+        cmc_results_path = os.path.join(self.__configuration_instance.results_root_dir, "cmc")
+        cmc_results_path = os.path.join(cmc_results_path, "final_results")
+
+        cmc_result_file_list = [os.path.join(cmc_results_path, x) for x in os.listdir(cmc_results_path) if x in relevant_files]
+        video_dicts = []
+        for file_path  in cmc_result_file_list:    
+            videoId = file_path.split('/')[-1]
+            videoId = videoId.split('.')[0]  
+            with open(file_path, mode='r') as json_file:
+                data = json.load(json_file)
+
+                results = []
+                for data_entry in data:
+                    inpoint = int(data_entry['start']) + 1
+                    outpoint = int(data_entry['stop']) + 1
+                    camera_movement = data_entry['cmcType']
+    
+                    result_entry = {
+                        "inPoint": inpoint,
+                        "outPoint": outpoint,
+                        "cameraMovement": camera_movement
+                    }
+                    results.append(result_entry)
+
+                # Objects need to be stored in a list and not a dict
+                video_dict = {"videoId": videoId, "camera_movements": results}
+            video_dicts.append(video_dict)
+
+        return video_dicts
 
     def format_results_OBA(self, relevant_videos):
         """

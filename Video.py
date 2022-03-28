@@ -28,7 +28,7 @@ class Video(object):
         self.download_path = "None"
         self.processed_flags = {}
 
-    def create_video(self, vid, originalFileName, url, download_path, processed_flag_shots, processed_flag_objects, processed_flag_relations, processed_flag_overscan):
+    def create_video(self, vid, originalFileName, url, download_path, processed_flag_shots, processed_flag_camera_movements, processed_flag_objects, processed_flag_relations, processed_flag_overscan):
         """
         This method is used to fill all properties of a video.
 
@@ -46,6 +46,7 @@ class Video(object):
         self.download_path = download_path
         self.processed_flags = {
             "shots": processed_flag_shots,
+            "camera_movements": processed_flag_camera_movements,
             "objects": processed_flag_objects,
             "relations": processed_flag_relations,
             "overscan": processed_flag_overscan}
@@ -138,6 +139,6 @@ class Video(object):
         print("video_format: " + str(self.video_format))
         print("url: " + str(self.url))
         print("download_path: " + str(self.download_path))
-        print("processed flags:\n\tSHOTS: {0}\n\tObjects: {1}\n\tRelations: {2}\n\tOverscan: {3}".format(
-            self.processed_flags["shots"], self.processed_flags["objects"], self.processed_flags["relations"], self.processed_flags["overscan"]))
+        print("processed flags:\n\tShot-Annotations: {0}\n\tCamera-Movement-Annotations: {1}\n\tObjects: {2}\n\tRelations: {3}\n\tOverscan: {4}".format(
+            self.processed_flags["shots"], self.processed_flags["camera_movements"], self.processed_flags["objects"], self.processed_flags["relations"], self.processed_flags["overscan"]))
         print("####################################################")
