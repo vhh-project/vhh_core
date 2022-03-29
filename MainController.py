@@ -173,29 +173,30 @@ class MainController(object):
             # TODO: Download object detection data for videos that are already processed
 
             #
-            # GET RESULTS IN CORRECT FORMAT TO POST
+            # CORRECT FORMAT + POST TO VHH MMSI
             #  
 
-            results_sba = self.merge_results_SBA(batch_video_instance_list)
-            sba_paths = self.store_SBA_results(results_sba)
+            if len(videos_to_process_shots) > 0:
+                results_sba = self.merge_results_SBA(videos_to_process_shots)
+                sba_paths = self.store_SBA_results(results_sba)
 
-            results_tba = self.format_results_TBA(batch_video_instance_list)
-            tba_paths = self.store_TBA_results(results_tba)
-                      
-            results_oba = self.format_results_OBA(batch_video_instance_list)
-            oba_paths = self.store_OBA_results(results_oba)
+                if self.__configuration_instance.do_send_to_server:
+                    self.__rest_api_instance.postSBAResults(sba_paths)
 
-            
-            #
-            # SEND TO VHH MMSI
-            #
-            
-            print("SENDING TO SERVER:", self.__configuration_instance.do_send_to_server)
-            if self.__configuration_instance.do_send_to_server:
-                self.__rest_api_instance.postSBAResults(sba_paths)
-                self.__rest_api_instance.postOBAResults(oba_paths)
-                self.__rest_api_instance.postTBAResults(tba_paths)
-                            
+            if len(videos_to_process_cmc) > 0:
+                results_tba = self.format_results_TBA(videos_to_process_cmc)
+                tba_paths = self.store_TBA_results(results_tba)
+
+                if self.__configuration_instance.do_send_to_server:
+                    self.__rest_api_instance.postTBAResults(tba_paths)    
+                
+                     
+            if len(videos_to_process_objects) > 0:
+                results_oba = self.format_results_OBA(videos_to_process_objects)
+                oba_paths = self.store_OBA_results(results_oba)
+
+                if self.__configuration_instance.do_send_to_server:
+                    self.__rest_api_instance.postOBAResults(oba_paths)                            
         print("Successfully finished!")
 
     def store_OBA_results(self, results_oba):
@@ -251,7 +252,6 @@ class MainController(object):
         """
         paths = []
         for dict in results_tba:
-            print(dict)
             json_path = os.path.join(self.__path_tba, str(dict["videoId"]) + ".json")
             paths.append(json_path)
             with open(json_path, 'w', newline='') as json_file:
@@ -383,7 +383,7 @@ class MainController(object):
                 video_dict = {"videoId": videoId, "camera_movements": results}
             video_dicts.append(video_dict)
 
-        return video_dicts
+        return video_dicts  
 
     def format_results_OBA(self, relevant_videos):
         """
