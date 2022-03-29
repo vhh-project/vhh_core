@@ -31,15 +31,6 @@ class MainController(object):
         if self.make_model_folders():
             print("Models have been downloaded.")
 
-        self.__root_url = self.__configuration_instance.root_url
-        self.__pem_path = self.__configuration_instance.pem_path
-        self.__video_download_path = self.__configuration_instance.video_download_path
-
-        self.__sbd_config_file = self.__configuration_instance.sbd_config_file
-        self.__stc_config_file = self.__configuration_instance.stc_config_file
-        self.__cmc_config_file = self.__configuration_instance.cmc_config_file
-        self.__odt_config_file = self.__configuration_instance.odt_config_file
-
         # initialize class members
         self.__sbd_instance = Sbd(config=self.__configuration_instance)
         self.__stc_instance = Stc(config=self.__configuration_instance)
@@ -74,9 +65,8 @@ class MainController(object):
 
         print("Start automatic annotation process ... ")
 
-        # get list of videos in mmsi
+        # Get list of videos in mmsi
         video_instance_list = self.__rest_api_instance.getListofVideos()
-        # video_instance_list = video_instance_list[0:2]
 
         # cleanup coplete results and video folder
         if (self.__configuration_instance.cleanup_flag == 1):
@@ -99,7 +89,6 @@ class MainController(object):
             exit()
         else:
             print("Found {0} videos to process".format(len(videos_to_process)))
-
 
         print("-------------------------------------------------------------------")
         print("------------------ BATCH PROCESSING -------------------------------")
@@ -129,7 +118,6 @@ class MainController(object):
                     ret = video_instance.download(self.__rest_api_instance)
 
                     # if for some reason it is not possible to download the video than skip it
-                    print(ret)
                     if(ret == False):
                         print(
                             "Not able to download this video! e.g. access restrictions or missing video file! --> skip")
@@ -138,7 +126,6 @@ class MainController(object):
             #
             # RUN THE PIPELINE
             #
-            print("Run pipeline on a batch")
 
             # run sbd & stc
             videos_to_process_shots = list(
@@ -245,7 +232,6 @@ class MainController(object):
                     "inPoint": int(vid_results_sba[row_idx, 2])+1,
                     "outPoint": int(vid_results_sba[row_idx, 3])+1,
                     "shotType": vid_results_sba[row_idx, 4]
-                    # "cameraMovement": vid_results_sba[row_idx, 5]
                 }
                 shots.append(shot)
 
