@@ -4,6 +4,8 @@ import os
 import csv
 from Video import Video
 import urllib.parse
+import sys
+
 
 class VhhRestApi(object):
     """
@@ -29,8 +31,10 @@ class VhhRestApi(object):
         self.__video_download_path = self.__core_config.video_download_path
 
         # create urls
-        self.API_VIDEO_SEARCH_ENDPOINT = urllib.parse.urljoin(self.__root_url, "videos/search")
-        self.API_VIDEO_SHOTS_AUTO_ENDPOINT = urllib.parse.urljoin(self.__root_url, "videos/")  # 8/shots/auto
+        self.API_VIDEO_SEARCH_ENDPOINT = urllib.parse.urljoin(
+            self.__root_url, "videos/search")
+        self.API_VIDEO_SHOTS_AUTO_ENDPOINT = urllib.parse.urljoin(
+            self.__root_url, "videos/")  # 8/shots/auto
 
         self.main_controller = main_controller
 
@@ -42,7 +46,8 @@ class VhhRestApi(object):
         :return: This method returns the original response including header as well as payload.
         """
         print("send get request: " + str(url))
-        response = requests.get(url) #,verify=self.__pem_path)  # params=params,
+        # ,verify=self.__pem_path)  # params=params,
+        response = requests.get(url)
         print("receive get response:", response)
         return response
 
@@ -53,16 +58,24 @@ class VhhRestApi(object):
         :param url: this parameter must hold a valid restApi endpoint.
         :param data_dict: this parameter must hold a valid list of dictionaries with the specified fields (see RestApi documentation).
         :return: This method returns the original response including header as well as payload
-        """		
+        """
         headers = {
-                    'accept': '*/*',
-                    'Content-Type': 'application/json',
-                  }
+            'accept': '*/*',
+            'Content-Type': 'application/json',
+        }
 
         payload = json.dumps(data_dict)
         print("send post request: " + str(url))
-        response = requests.post(url=url, headers=headers, data=payload)#, verify=self.__pem_path)  # , header=headers
-        print("receive post response")
+        try:
+            response = requests.post(url=url, headers=headers, data=payload)
+        except Exception as e:
+            print(f"POST threw an exception:\n{str(e)}\nExiting.")
+            sys.exit()
+
+        if response.status_code != 200:
+            print(
+                f"POST not successful:\n{response.status_code} {response.reason}\nExiting.")
+            sys.exit()
         return response
 
     def getListofVideos(self):
@@ -76,7 +89,8 @@ class VhhRestApi(object):
         print("send request: " + str(self.API_VIDEO_SEARCH_ENDPOINT))
 
         # payload = {"tuwcvProcessedObjects": False, "tuwcvProcessedOverscan": False, "tuwcvProcessedRelations": False, "tuwcvProcessedShots": False}
-        res = requests.get(self.API_VIDEO_SEARCH_ENDPOINT, params={}) #, verify=self.__pem_path)  # params=params,
+        # , verify=self.__pem_path)  # params=params,
+        res = requests.get(self.API_VIDEO_SEARCH_ENDPOINT, params={})
         print("receive response: ", res)
         res_json = res.json()
 
@@ -94,11 +108,11 @@ class VhhRestApi(object):
                                             originalFileName=originalFileName,
                                             url=url,
                                             download_path=self.__video_download_path,
-                                            processed_flag_shots = entry['tuwcvProcessedShots'],
-                                            processed_flag_camera_movements = entry['tuwcvProcessedCameraMovements'],
-                                            processed_flag_objects = entry['tuwcvProcessedObjects'],
-                                            processed_flag_relations = entry['tuwcvProcessedRelations'],
-                                            processed_flag_overscan = entry['tuwcvProcessedOverscan']
+                                            processed_flag_shots=entry['tuwcvProcessedShots'],
+                                            processed_flag_camera_movements=entry['tuwcvProcessedCameraMovements'],
+                                            processed_flag_objects=entry['tuwcvProcessedObjects'],
+                                            processed_flag_relations=entry['tuwcvProcessedRelations'],
+                                            processed_flag_overscan=entry['tuwcvProcessedOverscan']
                                             )
                 video_instance_list.append(video_instance)
 
@@ -121,7 +135,8 @@ class VhhRestApi(object):
         :param vid: This parameter must hold a valid video identifier.
         :return: This method returns the results (payload) as json format.
         """
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/tbas/shots/manual"
+        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + \
+            str(vid) + "/tbas/shots/manual"
         response = self.getRequest(url)
         res_json = response.json()
         return res_json
@@ -138,8 +153,9 @@ class VhhRestApi(object):
         ret = False
 
         try:
-            video_file = requests.get(url) #, verify=self.__pem_path)
-            open(self.__video_download_path + "/" + file_name + "." + str(video_format), 'wb').write(video_file.content)
+            video_file = requests.get(url) 
+            open(self.__video_download_path + "/" + file_name + "." +
+                 str(video_format), 'wb').write(video_file.content)
             ret = True
         except:
             print("Download process failed!")
@@ -148,7 +164,8 @@ class VhhRestApi(object):
         return ret
 
     def downloadSTCData(self, vid, download_dir):
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/tbas/shots/manual"
+        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + \
+            str(vid) + "/tbas/shots/manual"
         response = self.getRequest(url)
         res_json = response.json()
 
@@ -157,7 +174,8 @@ class VhhRestApi(object):
 
         with open(path, 'w') as file:
             fieldnames_stc = ["vid_name", "shot_id", "start", "end", "stc"]
-            writer_stc = csv.DictWriter(file, fieldnames=fieldnames_stc, delimiter=";")
+            writer_stc = csv.DictWriter(
+                file, fieldnames=fieldnames_stc, delimiter=";")
             writer_stc.writeheader()
 
             vid_name = str(vid) + ".m4v"
@@ -167,17 +185,19 @@ class VhhRestApi(object):
             # The JSON does not contain information about shots with NA camera movement, need to add it by finding shots for which no camera movement is given
             for shot in filter(lambda x: 'shotType' in x.keys(), res_json):
                 if len(list(filter(lambda x: "cameraMovement" in x.keys() and x["inPoint"] == shot["inPoint"] and x["outPoint"] == shot["outPoint"], res_json))) == 0:
-                    new_shots.append({"inPoint": shot["inPoint"], "outPoint": shot["outPoint"], "cameraMovement": "NA"})
+                    new_shots.append(
+                        {"inPoint": shot["inPoint"], "outPoint": shot["outPoint"], "cameraMovement": "NA"})
 
-            res_json += new_shots  
+            res_json += new_shots
             # Sort numbers, so the shot ids are correct
             res_json.sort(key=lambda shot: shot["inPoint"])
 
             for shot in res_json:
                 if not 'cameraMovement' in shot.keys():
-                    writer_stc.writerow({'vid_name': vid_name, "shot_id": shot_id_stc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "stc": shot["shotType"]})
+                    writer_stc.writerow({'vid_name': vid_name, "shot_id": shot_id_stc,
+                                        "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "stc": shot["shotType"]})
                     shot_id_stc += 1
-    
+
         return
 
     def getSTCResult(self, vid):
@@ -195,7 +215,8 @@ class VhhRestApi(object):
         shot_id_stc = 1
         for shot in res_json:
             if not 'cameraMovement' in shot.keys():
-                results.append({'vid_name': vid_name, "shot_id": shot_id_stc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "stc": shot["shotType"]})
+                results.append({'vid_name': vid_name, "shot_id": shot_id_stc,
+                               "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "stc": shot["shotType"]})
                 shot_id_stc += 1
         return results
 
@@ -212,45 +233,52 @@ class VhhRestApi(object):
         res_json = response.json()
 
         file_name = str(vid) + ".csv"
-        sbd_path = os.path.join(self.main_controller.get_result_directory("SBD"), file_name)
-        stc_path = os.path.join(self.main_controller.get_result_directory("STC"), file_name)
+        sbd_path = os.path.join(
+            self.main_controller.get_result_directory("SBD"), file_name)
+        stc_path = os.path.join(
+            self.main_controller.get_result_directory("STC"), file_name)
         print("stc_path:", stc_path)
-       
+
         with open(sbd_path, 'w') as sbd_file:
             with open(stc_path, 'w') as stc_file:
-                #with open(cmc_path, 'w') as cmc_file:
+                # with open(cmc_path, 'w') as cmc_file:
 
-                    fieldnames_sbd = ["vid_name", "shot_id", "start", "end"]
-                    fieldnames_stc = ["vid_name", "shot_id", "start", "end", "stc"]
-                    
-                    writer_sbd = csv.DictWriter(sbd_file, fieldnames=fieldnames_sbd, delimiter=";")
-                    writer_stc = csv.DictWriter(stc_file, fieldnames=fieldnames_stc, delimiter=";")
-                   
-                    writer_sbd.writeheader()
-                    writer_stc.writeheader()
-                   
-                    vid_name = str(vid) + ".m4v"
-                    shot_id_stc = 1
-                   
-                    new_shots = []
-                    # The JSON does not contain information about shots with NA camera movement, need to add it by finding shots for which no camera movement is given
-                    for shot in filter(lambda x: 'shotType' in x.keys(), res_json):
-                        if len(list(filter(lambda x: x["inPoint"] == shot["inPoint"] and x["outPoint"] == shot["outPoint"], res_json))) == 0:
-                            new_shots.append({"inPoint": shot["inPoint"], "outPoint": shot["outPoint"]})
+                fieldnames_sbd = ["vid_name", "shot_id", "start", "end"]
+                fieldnames_stc = ["vid_name", "shot_id", "start", "end", "stc"]
 
-                    res_json += new_shots  
-                    # Sort numbers, so the shot ids are correct
-                    res_json.sort(key=lambda shot: shot["inPoint"])
+                writer_sbd = csv.DictWriter(
+                    sbd_file, fieldnames=fieldnames_sbd, delimiter=";")
+                writer_stc = csv.DictWriter(
+                    stc_file, fieldnames=fieldnames_stc, delimiter=";")
 
-                    for shot in res_json:
-                        #if 'cameraMovement' in shot.keys():
-                        #    writer_cmc.writerow({'vid_name': vid_name, "shot_id": shot_id_cmc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "cmc": shot["cameraMovement"]})
-                        #    shot_id_cmc += 1
-                        #else:
-                        writer_sbd.writerow({'vid_name': vid_name, "shot_id": shot_id_stc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1})
-                        writer_stc.writerow({'vid_name': vid_name, "shot_id": shot_id_stc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "stc": shot["shotType"]})
-                        shot_id_stc += 1
-    
+                writer_sbd.writeheader()
+                writer_stc.writeheader()
+
+                vid_name = str(vid) + ".m4v"
+                shot_id_stc = 1
+
+                new_shots = []
+                # The JSON does not contain information about shots with NA camera movement, need to add it by finding shots for which no camera movement is given
+                for shot in filter(lambda x: 'shotType' in x.keys(), res_json):
+                    if len(list(filter(lambda x: x["inPoint"] == shot["inPoint"] and x["outPoint"] == shot["outPoint"], res_json))) == 0:
+                        new_shots.append(
+                            {"inPoint": shot["inPoint"], "outPoint": shot["outPoint"]})
+
+                res_json += new_shots
+                # Sort numbers, so the shot ids are correct
+                res_json.sort(key=lambda shot: shot["inPoint"])
+
+                for shot in res_json:
+                    # if 'cameraMovement' in shot.keys():
+                    #    writer_cmc.writerow({'vid_name': vid_name, "shot_id": shot_id_cmc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "cmc": shot["cameraMovement"]})
+                    #    shot_id_cmc += 1
+                    # else:
+                    writer_sbd.writerow({'vid_name': vid_name, "shot_id": shot_id_stc,
+                                        "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1})
+                    writer_stc.writerow({'vid_name': vid_name, "shot_id": shot_id_stc,
+                                        "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "stc": shot["shotType"]})
+                    shot_id_stc += 1
+
         return
 
     def postAutomaticResults(self, vid, results_np):
@@ -262,7 +290,8 @@ class VhhRestApi(object):
         """
 
         print("save all automatic generated results to maxrecall ... ")
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + "/" + str(vid) + "/shots/auto"
+        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + \
+            "/" + str(vid) + "/shots/auto"
         data_block = results_np[1:, :]
 
         data_dict_l = []
@@ -293,7 +322,8 @@ class VhhRestApi(object):
         """
         for path in sba_paths:
             vid = os.path.split(path)[-1].split('.')[0]
-            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/shots/auto".format(vid))
+            url = urllib.parse.urljoin(
+                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/shots/auto".format(vid))
             with open(path) as file:
                 data = json.load(file)
                 response = self.postRequest(url, data)
@@ -307,7 +337,8 @@ class VhhRestApi(object):
         """
         for path in oba_paths:
             vid = os.path.split(path)[-1].split('.')[0]
-            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/objects/auto".format(vid))
+            url = urllib.parse.urljoin(
+                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/objects/auto".format(vid))
             with open(path) as file:
                 data = json.load(file)
                 response = self.postRequest(url, data)
@@ -321,7 +352,8 @@ class VhhRestApi(object):
         """
         for path in tba_paths:
             vid = os.path.split(path)[-1].split('.')[0]
-            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/camera-movements/auto".format(vid))
+            url = urllib.parse.urljoin(
+                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/camera-movements/auto".format(vid))
             with open(path) as file:
                 data = json.load(file)
                 response = self.postRequest(url, data)
@@ -335,7 +367,8 @@ class VhhRestApi(object):
                     The dictionary contains the VID, and the overscan coordinates (left, right, top, bottom) normalized to to the intervall [0, 1]
         """
         for dict in osd_list:
-            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/overscan/auto".format(dict["vid"]))
+            url = urllib.parse.urljoin(
+                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/overscan/auto".format(dict["vid"]))
             response = self.postRequest(url, {
                 "left": dict["left"],
                 "right": dict["right"],
@@ -353,8 +386,9 @@ class VhhRestApi(object):
         for path in cmc_paths:
             vid = os.path.split(path)[-1].split('.')[0]
             #vid = os.path.split(path)[-1].split('_')[0]
-            url = urllib.parse.urljoin(self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/camera-movements/auto".format(vid))
-  
+            url = urllib.parse.urljoin(
+                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/camera-movements/auto".format(vid))
+
             with open(path) as file:
                 data = json.load(file)
 
@@ -363,7 +397,7 @@ class VhhRestApi(object):
                     inpoint = int(data_entry['start']) + 1
                     outpoint = int(data_entry['stop']) + 1
                     camera_movement = data_entry['cmcType']
-    
+
                     result_entry = {
                         "inPoint": inpoint,
                         "outPoint": outpoint,
