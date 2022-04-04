@@ -6,37 +6,24 @@ from Video import Video
 import urllib.parse
 import sys
 
+from RestURLProvider import RestURLProvider
 
 class VhhRestApi(object):
     """
     This class includes the interfaces and methods to use the vhh restAPI interfaces provided by MaxRecall.
     """
 
-    def __init__(self, config=None, main_controller=None):
+    def __init__(self, config, main_controller=None):
         """
         Constructor
 
         :param config: parameter must hold the core configuration object (Class-type Configuration)
         """
-
-        print("create instance of VhhRestApi ...")
-
-        if (config == None):
-            print("You have to specify a valid configuration instance!")
-
-        # load configurations specified in core config file
         self.__core_config = config
-        self.__pem_path = self.__core_config.pem_path
-        self.__root_url = self.__core_config.root_url
         self.__video_download_path = self.__core_config.video_download_path
 
-        # create urls
-        self.API_VIDEO_SEARCH_ENDPOINT = urllib.parse.urljoin(
-            self.__root_url, "videos/search")
-        self.API_VIDEO_SHOTS_AUTO_ENDPOINT = urllib.parse.urljoin(
-            self.__root_url, "videos/")  # 8/shots/auto
-
         self.main_controller = main_controller
+        self.restURLProvider = RestURLProvider(config)
 
     def getRequest(self, url):
         """
@@ -45,10 +32,17 @@ class VhhRestApi(object):
         :param url: this parameter must hold a valid restApi endpoint.
         :return: This method returns the original response including header as well as payload.
         """
-        print("send get request: " + str(url))
-        # ,verify=self.__pem_path)  # params=params,
-        response = requests.get(url)
-        print("receive get response:", response)
+        print("Send get request: " + str(url))
+        try:
+            response = requests.get(url)
+        except Exception as e:
+            print(f"GET threw an exception:\n{str(e)}\nExiting.")
+            sys.exit()
+
+        if response.status_code != 200:
+            print(
+                f"GET not successful:\n{response.status_code} {response.reason}\nExiting.")
+            sys.exit()
         return response
 
     def postRequest(self, url, data_dict):
@@ -65,7 +59,7 @@ class VhhRestApi(object):
         }
 
         payload = json.dumps(data_dict)
-        print("send post request: " + str(url))
+        print("Send post request: " + str(url))
         try:
             response = requests.post(url=url, headers=headers, data=payload)
         except Exception as e:
@@ -84,19 +78,12 @@ class VhhRestApi(object):
 
         :return: This method returns a list of video objects (Class-type: Video) which holds all video specific meta-data.
         """
-        print("load list of videos ... ")
-
-        print("send request: " + str(self.API_VIDEO_SEARCH_ENDPOINT))
-
-        # payload = {"tuwcvProcessedObjects": False, "tuwcvProcessedOverscan": False, "tuwcvProcessedRelations": False, "tuwcvProcessedShots": False}
-        # , verify=self.__pem_path)  # params=params,
-        res = requests.get(self.API_VIDEO_SEARCH_ENDPOINT, params={})
-        print("receive response: ", res)
+        url = self.restURLProvider.getUrlVideosList()
+        res = requests.get(url, params={})
         res_json = res.json()
 
         video_instance_list = []
-
-        for i, entry in enumerate(res_json['results']):
+        for _, entry in enumerate(res_json['results']):
             vid = int(entry['id'])
             originalFileName = entry['originalFileName']
             url = entry['url']
@@ -118,28 +105,25 @@ class VhhRestApi(object):
 
         return video_instance_list
 
-    def getAutomaticResults(self, vid):
+    def getRawAutomaticSTCResults(self, vid):
         """
-        This method is used to get all automatic generated results from the VhhMMSI system.
+        This method is used to get an automatic generated STC results from the VhhMMSI system.
         :param vid: This parameter must hold a valid video identifier.
         :return: This method returns the results (payload) as json format.
         """
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
+        url = self.restURLProvider.getUrlShots(vid, auto = True)
         response = self.getRequest(url)
-        res_json = response.json()
-        return res_json
+        return response.json()
 
-    def getManualResults(self, vid):
+    def getRawManualSTCResults(self, vid):
         """
-        This method is used to get all manually generated results from the VhhMMSI system.
+        This method is used to get all manually generated STC results from the VhhMMSI system.
         :param vid: This parameter must hold a valid video identifier.
         :return: This method returns the results (payload) as json format.
         """
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + \
-            str(vid) + "/tbas/shots/manual"
+        url = self.restURLProvider.getUrlShots(vid, auto = False)
         response = self.getRequest(url)
-        res_json = response.json()
-        return res_json
+        return response.json()
 
     def downloadVideo(self, url, file_name, video_format):
         """
@@ -150,22 +134,21 @@ class VhhRestApi(object):
         :param video_format: This parameter must hold a valid video format extension (e.g. m4v)
         :return: This method returns a boolean flag which includes the state of the download process (true ... sucessfully finished OR false ... downlaod failed)
         """
-        ret = False
-
         try:
             video_file = requests.get(url) 
             open(self.__video_download_path + "/" + file_name + "." +
                  str(video_format), 'wb').write(video_file.content)
-            ret = True
+            return True
         except:
             print("Download process failed!")
-            ret = False
-
-        return ret
+            return False
 
     def downloadSTCData(self, vid, download_dir):
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + \
-            str(vid) + "/tbas/shots/manual"
+        """
+        Downloads STC data and stores it at the desired directory.
+
+        """
+        url = self.restURLProvider.getUrlShots(vid, auto = True)
         response = self.getRequest(url)
         res_json = response.json()
 
@@ -200,16 +183,15 @@ class VhhRestApi(object):
 
         return
 
-    def getSTCResult(self, vid):
+    def getAutoSTCResult(self, vid):
         """
-        This method is used to download shot results (STC) from the VhhMMSI system.
+        This method is used to download automatically generated shot results (STC) from the VhhMMSI system
+        and transform them into a format that can be used by VHH packages.
 
         :return: A list of dictionaries that represent the STC file (in a format that can be directly stored as a csv)
         """
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
+        res_json = self.getRawAutomaticSTCResults(vid)
         vid_name = f"{vid}.m4v"
-        response = self.getRequest(url)
-        res_json = response.json()
 
         results = []
         shot_id_stc = 1
@@ -220,17 +202,13 @@ class VhhRestApi(object):
                 shot_id_stc += 1
         return results
 
-    def getShotResults(self, vid):
+    def downloadShotResults(self, vid):
         """
         This method is used to download shot results (SBD, STC, CMC) from the VhhMMSI system.
 
         :param vid: This parameter must hold a valid video identifier.
         """
-
-        print("get sbd results from maxrecall ... ")
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + str(vid) + "/shots/auto"
-        response = self.getRequest(url)
-        res_json = response.json()
+        res_json = self.getRawAutomaticSTCResults(vid)
 
         file_name = str(vid) + ".csv"
         sbd_path = os.path.join(
@@ -281,39 +259,6 @@ class VhhRestApi(object):
 
         return
 
-    def postAutomaticResults(self, vid, results_np):
-        """
-        This method is used to post the automatic generated results to the VhhMMSI system.
-
-        :param vid: This parameter must hold a valid video identifier.
-        :param results_np: This parameter must hold a numpy array including the automatic generated results.
-        """
-
-        print("save all automatic generated results to maxrecall ... ")
-        url = self.API_VIDEO_SHOTS_AUTO_ENDPOINT + \
-            "/" + str(vid) + "/shots/auto"
-        data_block = results_np[1:, :]
-
-        data_dict_l = []
-        for i in range(0, len(data_block)):
-            print(data_block[i])
-            inpoint = int(data_block[i][2]) + 1
-            outpoint = int(data_block[i][3]) + 1
-            shot_type = data_block[i][4]
-
-            data_dict = {
-                "inPoint": inpoint,
-                "outPoint": outpoint,
-                "shotType": shot_type,
-            }
-
-            data_dict_l.append(data_dict)
-
-        response = self.postRequest(url, data_dict_l)
-        print(response)
-
-        print("sbd results successfully sent to maxrecall ... ")
-
     def postSBAResults(self, sba_paths):
         """
         Posts the automatically generated SBA results (SBD, STC) to the VhhMMSI system.
@@ -322,12 +267,11 @@ class VhhRestApi(object):
         """
         for path in sba_paths:
             vid = os.path.split(path)[-1].split('.')[0]
-            url = urllib.parse.urljoin(
-                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/shots/auto".format(vid))
+            url = self.restURLProvider.getUrlShots(vid, auto = True)
             with open(path) as file:
                 data = json.load(file)
-                response = self.postRequest(url, data)
-                print(url, ": ", response)
+                print(path, "\n", data)
+                self.postRequest(url, data)
 
     def postOBAResults(self, oba_paths):
         """
@@ -337,12 +281,10 @@ class VhhRestApi(object):
         """
         for path in oba_paths:
             vid = os.path.split(path)[-1].split('.')[0]
-            url = urllib.parse.urljoin(
-                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/objects/auto".format(vid))
+            url = self.restURLProvider.getUrlObjects(vid, auto = True) 
             with open(path) as file:
                 data = json.load(file)
-                response = self.postRequest(url, data)
-                print(url, ": ", response)
+                self.postRequest(url, data)
 
     def postTBAResults(self, tba_paths):
         """
@@ -352,12 +294,10 @@ class VhhRestApi(object):
         """
         for path in tba_paths:
             vid = os.path.split(path)[-1].split('.')[0]
-            url = urllib.parse.urljoin(
-                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/camera-movements/auto".format(vid))
+            url = self.restURLProvider.getUrlCameraMovements(vid, auto = True)
             with open(path) as file:
                 data = json.load(file)
-                response = self.postRequest(url, data)
-                print(url, ": ", response)
+                self.postRequest(url, data)
 
     def postOSDresults(self, osd_list):
         """
@@ -367,15 +307,13 @@ class VhhRestApi(object):
                     The dictionary contains the VID, and the overscan coordinates (left, right, top, bottom) normalized to to the intervall [0, 1]
         """
         for dict in osd_list:
-            url = urllib.parse.urljoin(
-                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/overscan/auto".format(dict["vid"]))
-            response = self.postRequest(url, {
+            url = self.restURLProvider.getUrlOSD(dict["vid"], auto=True)
+            self.postRequest(url, {
                 "left": dict["left"],
                 "right": dict["right"],
                 "top": dict["top"],
                 "bottom": dict["bottom"]
             })
-            print(url, ": ", response)
 
     def postCMCResults(self, cmc_paths):
         """
@@ -385,9 +323,7 @@ class VhhRestApi(object):
         """
         for path in cmc_paths:
             vid = os.path.split(path)[-1].split('.')[0]
-            #vid = os.path.split(path)[-1].split('_')[0]
-            url = urllib.parse.urljoin(
-                self.API_VIDEO_SHOTS_AUTO_ENDPOINT, "{0}/camera-movements/auto".format(vid))
+            url = self.restURLProvider.getUrlCameraMovements(vid, auto = True)
 
             with open(path) as file:
                 data = json.load(file)
@@ -405,5 +341,4 @@ class VhhRestApi(object):
                     }
                     results.append(result_entry)
 
-                response = self.postRequest(url, results)
-                print(url, ": ", response)
+                self.postRequest(url, results)

@@ -143,7 +143,7 @@ class MainController(object):
 
             # Download shot info (SBD, STC) for already processed videos
             for video_instance in videos_to_download_shots:
-                self.__rest_api_instance.getShotResults(vid=video_instance.id)
+                self.__rest_api_instance.downloadShotResults(vid=video_instance.id)
 
             # run cmc
             videos_to_process_cmc = list(filter(
