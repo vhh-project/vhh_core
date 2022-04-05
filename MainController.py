@@ -58,11 +58,10 @@ class MainController(object):
     def get_config(self):
         return self.__configuration_instance
 
-    def run(self):
+    def run(self, run_on_all_videos=False, packages_to_run=["SBD", "STC", "CMC", "OD"]):
         """
         This method is used to start the automatic annotation process.
         """
-
         print("Start automatic annotation process ... ")
 
         # Get list of videos in mmsi
@@ -79,10 +78,14 @@ class MainController(object):
         #
 
         videos_to_process = []
-        for i, video_instance in enumerate(video_instance_list):
-            # For now we only care for shot, camera_movements and object detection
-            if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["camera_movements"]) or (not video_instance.processed_flags["objects"]):
-                videos_to_process.append(video_instance)
+
+        if run_on_all_videos:
+            videos_to_process = video_instance_list
+        else:
+            for i, video_instance in enumerate(video_instance_list):
+                # For now we only care for shot, camera_movements and object detection
+                if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["camera_movements"]) or (not video_instance.processed_flags["objects"]):
+                    videos_to_process.append(video_instance)
 
         if(len(videos_to_process) == 0):
             print("All videos are already processed!")
@@ -101,6 +104,9 @@ class MainController(object):
 
             for video_instance in batch_video_instance_list:
                 video_instance.printInfo()
+
+            #if "VG" in batch_video_instance_list[0].originalFileName or batch_video_instance_list[0].id == 9121:
+            #    continue
 
             # cleanup video and results folder
             if (self.__configuration_instance.cleanup_flag == 1):
@@ -127,69 +133,77 @@ class MainController(object):
             # RUN THE PIPELINE
             #
 
-            # run sbd & stc
-            videos_to_process_shots = list(
-                filter(lambda x: not x.processed_flags["shots"], batch_video_instance_list))
-            videos_to_download_shots = list(
-                filter(lambda x: x.processed_flags["shots"], batch_video_instance_list))
+            # Collect which package to run on which video
+            if run_on_all_videos:
+                videos_to_process_shots = batch_video_instance_list
+                if "SBD" in packages_to_run and "STC" in packages_to_run:
+                    videos_to_download_shots = []
+                else:
+                    videos_to_download_shots = batch_video_instance_list
 
-            if self.__configuration_instance.use_sbd:
+                videos_to_process_cmc = batch_video_instance_list
+                videos_to_process_objects = batch_video_instance_list
+            else:
+                def list_videos_with_flag(flag): return list(
+                    filter(lambda x: not x.processed_flags[flag], batch_video_instance_list))
+
+                videos_to_process_shots = list_videos_with_flag("shots")
+                videos_to_process_cmc = list_videos_with_flag("camera_movements")
+                videos_to_process_objects = list_videos_with_flag("objects")
+
+                # If we do not process a shot then download it
+                videos_to_download_shots = list(set(batch_video_instance_list).difference(videos_to_process_shots))
+
+
+            print(f"videos_to_process_shots: {len(videos_to_process_shots)}")
+            print(f"videos_to_download_shots: {len(videos_to_download_shots)}")
+
+            print(f"videos_to_process_cmc: {len(videos_to_process_cmc)}")
+            print(f"videos_to_process_objects: {len(videos_to_process_objects)}")
+            print(f"packages_to_run: {packages_to_run}")
+            
+            # Download shot info (SBD, STC) for already processed videos
+            for video_instance in videos_to_download_shots:
+                self.__rest_api_instance.downloadShotResults(
+                    vid=video_instance.id)
+
+            # SBD
+            if self.__configuration_instance.use_sbd and "SBD" in packages_to_run:
                 self.__sbd_instance.run(
                     video_instance_list=videos_to_process_shots)
 
-            if self.__configuration_instance.use_stc:
+            # STC
+            if self.__configuration_instance.use_stc and "STC" in packages_to_run:
                 self.__stc_instance.run(
                     video_instance_list=videos_to_process_shots)
 
-            # Download shot info (SBD, STC) for already processed videos
-            for video_instance in videos_to_download_shots:
-                self.__rest_api_instance.downloadShotResults(vid=video_instance.id)
-
-            # run cmc
-            videos_to_process_cmc = list(filter(
-                lambda x: not x.processed_flags["camera_movements"], batch_video_instance_list))
-            videos_to_download_cmc = list(filter(
-                lambda x: x.processed_flags["camera_movements"], batch_video_instance_list))
-
-            if self.__configuration_instance.use_cmc:
-                self.__cmc_instance.run(
-                    video_instance_list=videos_to_process_cmc)
-
-            # TODO: Download camera movements data for videos that are already processed
-
-            # run odt
-            videos_to_process_objects = list(
-                filter(lambda x: not x.processed_flags["objects"], batch_video_instance_list))
-            videos_to_download_objects = list(
-                filter(lambda x: x.processed_flags["objects"], batch_video_instance_list))
-
-            if self.__configuration_instance.use_odt:
-                self.__odt_instance.run(
-                    video_instance_list=videos_to_process_objects)
-
-            # TODO: Download object detection data for videos that are already processed
-
-            #
-            # CORRECT FORMAT + POST TO VHH MMSI
-            #
-
-            if len(videos_to_process_shots) > 0:
+            # Store results and upload them
+            if len(videos_to_process_shots) > 0 and ("SBD" in packages_to_run or "STC" in packages_to_run):
+                print("merge sba results")
                 results_sba = self.merge_results_SBA(videos_to_process_shots)
+                print("store sba results")
                 sba_paths = self.store_SBA_results(results_sba)
 
                 if self.__configuration_instance.do_send_to_server:
+                    print("post sba results")
                     self.__rest_api_instance.postSBAResults(sba_paths)
 
-            if len(videos_to_process_cmc) > 0:
+            # CMC
+            if len(videos_to_process_cmc) and self.__configuration_instance.use_cmc and "CMC" in packages_to_run:
+                self.__cmc_instance.run(
+                    video_instance_list=videos_to_process_cmc)
                 results_tba = self.format_results_TBA(videos_to_process_cmc)
                 tba_paths = self.store_TBA_results(results_tba)
 
                 if self.__configuration_instance.do_send_to_server:
                     self.__rest_api_instance.postTBAResults(tba_paths)
 
-            if len(videos_to_process_objects) > 0:
+            # OD
+            if self.__configuration_instance.use_odt and "OD" in packages_to_run:
+                self.__odt_instance.run(
+                    video_instance_list=videos_to_process_objects)
                 results_oba = self.format_results_OBA(
-                    videos_to_process_objects)
+                videos_to_process_objects)
                 oba_paths = self.store_OBA_results(results_oba)
 
                 if self.__configuration_instance.do_send_to_server:
@@ -420,8 +434,8 @@ class MainController(object):
                         videoId = int(row["movie_name"].split(".")[0])
 
                     bb = {"fid": int(row["fid"]) + 1,
-                          "cbb": -1,
-                          "coc": -1,
+                          "cbb": float(row["object_conf"]),
+                          "coc": float(row["class_score"]),
                           "x1": float(row["bb_x1"]),
                           "x2": float(row["bb_x2"]),
                           "y1": float(row["bb_y1"]),

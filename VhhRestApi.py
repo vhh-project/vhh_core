@@ -66,6 +66,7 @@ class VhhRestApi(object):
             print(f"POST threw an exception:\n{str(e)}\nExiting.")
             sys.exit()
 
+        print(f"Response: {response.status_code}")
         if response.status_code != 200:
             print(
                 f"POST not successful:\n{response.status_code} {response.reason}\nExiting.")
@@ -143,46 +144,6 @@ class VhhRestApi(object):
             print("Download process failed!")
             return False
 
-    def downloadSTCData(self, vid, download_dir):
-        """
-        Downloads STC data and stores it at the desired directory.
-
-        """
-        url = self.restURLProvider.getUrlShots(vid, auto = True)
-        response = self.getRequest(url)
-        res_json = response.json()
-
-        file_name = str(vid) + ".csv"
-        path = os.path.join(download_dir, file_name)
-
-        with open(path, 'w') as file:
-            fieldnames_stc = ["vid_name", "shot_id", "start", "end", "stc"]
-            writer_stc = csv.DictWriter(
-                file, fieldnames=fieldnames_stc, delimiter=";")
-            writer_stc.writeheader()
-
-            vid_name = str(vid) + ".m4v"
-            shot_id_stc = 1
-
-            new_shots = []
-            # The JSON does not contain information about shots with NA camera movement, need to add it by finding shots for which no camera movement is given
-            for shot in filter(lambda x: 'shotType' in x.keys(), res_json):
-                if len(list(filter(lambda x: "cameraMovement" in x.keys() and x["inPoint"] == shot["inPoint"] and x["outPoint"] == shot["outPoint"], res_json))) == 0:
-                    new_shots.append(
-                        {"inPoint": shot["inPoint"], "outPoint": shot["outPoint"], "cameraMovement": "NA"})
-
-            res_json += new_shots
-            # Sort numbers, so the shot ids are correct
-            res_json.sort(key=lambda shot: shot["inPoint"])
-
-            for shot in res_json:
-                if not 'cameraMovement' in shot.keys():
-                    writer_stc.writerow({'vid_name': vid_name, "shot_id": shot_id_stc,
-                                        "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "stc": shot["shotType"]})
-                    shot_id_stc += 1
-
-        return
-
     def getAutoSTCResult(self, vid):
         """
         This method is used to download automatically generated shot results (STC) from the VhhMMSI system
@@ -204,7 +165,7 @@ class VhhRestApi(object):
 
     def downloadShotResults(self, vid):
         """
-        This method is used to download shot results (SBD, STC, CMC) from the VhhMMSI system.
+        This method is used to download shot results (SBD, STC) from the VhhMMSI system.
 
         :param vid: This parameter must hold a valid video identifier.
         """
@@ -247,10 +208,6 @@ class VhhRestApi(object):
                 res_json.sort(key=lambda shot: shot["inPoint"])
 
                 for shot in res_json:
-                    # if 'cameraMovement' in shot.keys():
-                    #    writer_cmc.writerow({'vid_name': vid_name, "shot_id": shot_id_cmc, "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1, "cmc": shot["cameraMovement"]})
-                    #    shot_id_cmc += 1
-                    # else:
                     writer_sbd.writerow({'vid_name': vid_name, "shot_id": shot_id_stc,
                                         "start": shot["inPoint"] - 1, "end": shot["outPoint"] - 1})
                     writer_stc.writerow({'vid_name': vid_name, "shot_id": shot_id_stc,

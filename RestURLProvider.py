@@ -21,12 +21,10 @@ class RestURLProvider(object):
             "https://api.vhh-mmsi.eu/api/tbaservice/videos/1234/shots/auto"
         """
         entire_url_list = [self.ENDPT_VIDEOS] + url_list
-        print(f"entire_url_list2: {entire_url_list}")
         return reduce(urljoin, entire_url_list)
 
     def join_video_endpt_with_vid(self, vid: int, auto: bool, url_list: List[str]):
         entire_url_list = [f"{vid}/"] + url_list + ["auto/" if auto else "manual/"]
-        print(f"entire_url_list: {entire_url_list}")
         return self.join_video_endpt(entire_url_list)
 
     def getUrlVideosList(self):
@@ -41,9 +39,8 @@ class RestURLProvider(object):
     def getUrlObjects(self, vid: int, auto: bool = True):
         return self.join_video_endpt_with_vid(vid, auto, ["objects/"])
 
-    def getUrlCameraMovements(self, vid: int, auto: bool = True, is_public: bool = True):
-        return self.join_video_endpt_with_vid(vid, auto,
-                                              ["public/" if is_public else "private/", "camera-movements/"])
+    def getUrlCameraMovements(self, vid: int, auto: bool = True):
+        return self.join_video_endpt_with_vid(vid, auto, ["camera-movements/"])
 
     def getUrlOSD(self, vid: int, auto: bool = True):
         return self.join_video_endpt_with_vid(vid, auto, ["overscan/"])
