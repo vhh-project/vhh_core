@@ -28,7 +28,7 @@ SbdCore:
 
   ###
   # This parameter is used to save raw results (e.g. debug visualizations).
-  SAVE_RAW_RESULTS: 1       # 1 ... yes 0 ... no
+  SAVE_RAW_RESULTS: 0       # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the raw results.
   PATH_RAW_RESULTS: "results/sbd/raw_results/"
@@ -44,17 +44,17 @@ SbdCore:
   SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the final results.
-  PATH_FINAL_RESULTS: "results/sbd/final_results/"
+  PATH_FINAL_RESULTS: "/data/share/fjogl/vhh_core_workspace/results/sbd/final_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
-  PREFIX_FINAL_RESULTS: "results_"
+  PREFIX_FINAL_RESULTS: ""
   ###
   # This parameter is used to specify the postfix for the results file.
   POSTFIX_FINAL_RESULTS: "csv"
 
   ###
   # This parameter is used to specify the path to the videos.
-  PATH_VIDEOS: "videos/"
+  PATH_VIDEOS: "/data/share/fjogl/vhh_core_workspace/videos/"
   ###
   # This parameter is used to specify the threshold mode (adaptive OR fixed).
   THRESHOLD_MODE: 'adaptive'    # adaptive OR fixed

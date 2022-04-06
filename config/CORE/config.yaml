@@ -24,7 +24,7 @@ VhhCore:
 
   ###
   # This parameter is used to activate/deactivate the clean-up mode. The clean-up mode deletes all downloaded videos and the corresponding generated results.
-  CLEANUP_FLAG: 1   # 0 ... deactivate cleanup function OR 1 ... activate cleanup method -> delete all downloaded videos + annotation results locally
+  CLEANUP_FLAG: 1  # 0 ... deactivate cleanup function OR 1 ... activate cleanup method -> delete all downloaded videos + annotation results locally
 
   ###
   # This parameter specifies the results path for each individual plugin.
@@ -34,7 +34,7 @@ VhhCore:
   ###
   # This parameter specifies the size of the processed videos within one cycle (e.g. size 2 means that 2 videos will be downloaded and processed. 
   # if the results are generated, the next 2 videos will be downloaded and processed.).
-  BATCH_PROCESSING_SIZE: 2
+  BATCH_PROCESSING_SIZE: 1
   
   ###
   # This parameter specifies whether the results will be sent to the VHH MMSI server

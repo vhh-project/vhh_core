@@ -7,6 +7,10 @@ import Utils
 Download all annotation results.
 For more details on the parameters please call this script with the parameter '-h'
 Needs to be run from INSIDE the Develop directory
+
+IMPORTANT: 
+    Storing it as a .json will store the raw result from VhhMMSI meaning that inPoints and outPoints have a 1 added to them.
+    Storing it as a .csv will fix this, i.e. inPoints actually start at 0 
 """
 
 config_file = "../config/CORE/config.yaml"
@@ -92,7 +96,7 @@ annotation_results = []
 if args.store_as_csv:
     assert not args.manual
     for id in videos_id_list:
-        data = RestAPI.getSTCResult(id)
+        data = RestAPI.getAutoSTCResult(id)
         file_name_without_extension = os.path.join(args.path,  str(id))
         file_path = Utils.make_filepath_unique(file_name_without_extension, '.csv')
         Utils.store_csv(file_path, data)
@@ -101,7 +105,7 @@ if args.store_as_csv:
 if args.store_as_json:
     for vid in videos_id_list:
         if not args.manual:
-            json = RestAPI.getAutomaticResults(vid)
+            json = RestAPI.getRawAutomaticSTCResults(vid)
         else:
-            json = RestAPI.getManualResults(vid)
+            json = RestAPI.getRawManualSTCResults(vid)
         Utils.store_json(os.path.join(args.path, str(vid) + ".json"), json)
