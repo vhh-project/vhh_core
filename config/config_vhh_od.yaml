@@ -122,7 +122,7 @@ OdCore:
   CLASSES_FOR_CLASSIFIER: ["others", "soldier", "corpse", "person_with_kz_uniform"]
   ###
   # Set to 1 if the output coordinates should be normalized 
-  DO_NORMALIZE_COORDINATES: 0
+  DO_NORMALIZE_COORDINATES: 1
   ###
   # Factor for persons classified with others. 
   # A factor of 0.25 means that during majority voting between person classes a vote for "person (others)" is only wort 0.25 whereas a vote for any other persons class
@@ -131,7 +131,7 @@ OdCore:
   ###
   # List of shot types on which the detection will NOT be used
   SHOT_TYPES_TO_NOT_RUN_OD:
-    - I
+    - T
 
 Evaluation:
   ###

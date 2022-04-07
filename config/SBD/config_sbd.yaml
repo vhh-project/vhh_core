@@ -44,7 +44,7 @@ SbdCore:
   SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the final results.
-  PATH_FINAL_RESULTS: "/data/share/fjogl/vhh_core_workspace/results/sbd/final_results/"
+  PATH_FINAL_RESULTS: "results/sbd/final_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_FINAL_RESULTS: ""
@@ -54,7 +54,7 @@ SbdCore:
 
   ###
   # This parameter is used to specify the path to the videos.
-  PATH_VIDEOS: "/data/share/fjogl/vhh_core_workspace/videos/"
+  PATH_VIDEOS: "videos/"
   ###
   # This parameter is used to specify the threshold mode (adaptive OR fixed).
   THRESHOLD_MODE: 'adaptive'    # adaptive OR fixed

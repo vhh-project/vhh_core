@@ -24,7 +24,7 @@ PreProcessing:
 StcCore:
   ###
   # This parameter is used to specify the class names. ["ELS","LS","MS","CU"]
-  CLASS_NAMES: ["CU","ELS", "I", "LS", "MS", "NA"]
+  CLASS_NAMES: ["CU","ELS", "T", "LS", "MS", "NA"]
   ###
   # This parameter is used to specify the batch size.
   BATCH_SIZE: 64
@@ -46,7 +46,7 @@ StcCore:
   SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the final results.
-  PATH_FINAL_RESULTS: "/data/share/fjogl/vhh_core_workspace/results/stc/final_results"
+  PATH_FINAL_RESULTS: "results/stc/final_results"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_FINAL_RESULTS: "results_"
@@ -55,7 +55,7 @@ StcCore:
   POSTFIX_FINAL_RESULTS: "csv"
   ###
   # This parameter is used to specify the path to the videos.
-  PATH_VIDEOS: "/data/share/fjogl/vhh_core_workspace/videos/"
+  PATH_VIDEOS: "videos/"
   ###
   # This parameter is used to specify a decision threshold.
   THRESHOLD: 0.8                 # value [0-1]

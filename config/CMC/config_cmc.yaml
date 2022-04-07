@@ -70,7 +70,7 @@ CmcCore:
   SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the final results.
-  PATH_FINAL_RESULTS: "/data/share/fjogl/vhh_core_workspace/results/cmc/final_results"
+  PATH_FINAL_RESULTS: "results/cmc/final_results"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_FINAL_RESULTS: "results_"
@@ -80,7 +80,7 @@ CmcCore:
 
   ###
   # This parameter is used to specify the path to the videos.
-  PATH_VIDEOS: "/data/share/fjogl/vhh_core_workspace/videos/"
+  PATH_VIDEOS: "videos/"
 
 Evaluation:
   ###

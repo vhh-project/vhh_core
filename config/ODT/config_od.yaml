@@ -22,14 +22,14 @@ OdCore:
 
   ###
   # This parameter is used to specify the path for saving the raw results.
-  PATH_STC_RESULTS: "/data/share/fjogl/vhh_core_workspace/results/stc/final_results/"
+  PATH_STC_RESULTS: "results/stc/final_results/"
 
   ###
   # This parameter is used to save raw results (e.g. debug visualizations).
   SAVE_RAW_RESULTS: 0       # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the raw results.
-  PATH_RAW_RESULTS: "/data/share/fjogl/vhh_od_dev_results/raw_results/"
+  PATH_RAW_RESULTS: "results/od/raw_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_RAW_RESULTS: "results_raw_"
@@ -42,7 +42,7 @@ OdCore:
   SAVE_FINAL_RESULTS: 1     # 1 ... yes 0 ... no
   ###
   # This parameter is used to specify the path for saving the final results.
-  PATH_FINAL_RESULTS: "/data/share/fjogl/vhh_core_workspace/results/od/final_results/"
+  PATH_FINAL_RESULTS: "results/od/final_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
   PREFIX_FINAL_RESULTS: "results_"
@@ -52,7 +52,7 @@ OdCore:
 
   ###
   # This parameter is used to specify the path to the videos.
-  PATH_VIDEOS: "/data/share/fjogl/vhh_core_workspace/videos/"
+  PATH_VIDEOS: "videos/"
 
   ###
   # This parameter is used to specify the path to the pre-trained model.
@@ -131,7 +131,7 @@ OdCore:
   ###
   # List of shot types on which the detection will NOT be used
   SHOT_TYPES_TO_NOT_RUN_OD:
-    - I
+    - T
 
 Evaluation:
   ###

@@ -85,6 +85,7 @@ class MainController(object):
             for i, video_instance in enumerate(video_instance_list):
                 # For now we only care for shot, camera_movements and object detection
                 if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["camera_movements"]) or (not video_instance.processed_flags["objects"]):
+                #if ( (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["camera_movements"]) or (video_instance.processed_flags["objects"])) and not ( ("VG" in video_instance.originalFileName) or ("A145-001_YATZIV-Amir_Another" in video_instance.originalFileName) ):
                     videos_to_process.append(video_instance)
 
         if(len(videos_to_process) == 0):
@@ -92,6 +93,10 @@ class MainController(object):
             exit()
         else:
             print("Found {0} videos to process".format(len(videos_to_process)))
+
+        #for i, video_instance in enumerate(videos_to_process):
+        #    video_instance.printInfo()
+        #exit()
 
         print("-------------------------------------------------------------------")
         print("------------------ BATCH PROCESSING -------------------------------")
