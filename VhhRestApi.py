@@ -126,6 +126,15 @@ class VhhRestApi(object):
         response = self.getRequest(url)
         return response.json()
 
+    def getRelations(self, vid):
+        """
+        Downloads manual public relations for a given VID.
+        :return: This method returns the results (payload) as json format.
+        """
+        url = self.restURLProvider.getUrlRelations(vid)
+        response = self.getRequest(url)
+        return response.json()
+
     def downloadVideo(self, url, file_name, video_format):
         """
         This method is used to download a video from the Vhh-MMSI system.
