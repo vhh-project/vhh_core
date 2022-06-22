@@ -1,0 +1,4 @@
+#!/bin/bash
+export PYTHONPATH=/data/vhh_release/release_v1_5_0/vhh_core/:/data/vhh_release/release_v1_5_0/vhh_core/Develop/:/data/vhh_release/release_v1_5_0/vhh_core/Demo/
+cd /data/vhh_release/release_v1_5_0/vhh_core/
+run-one /home/dhelm/virtual_env/vhh_core_31102021/bin/python Demo/run_automatic_annotation_process.py

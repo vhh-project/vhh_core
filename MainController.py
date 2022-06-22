@@ -80,12 +80,15 @@ class MainController(object):
         videos_to_process = []
 
         if run_on_all_videos:
-            videos_to_process = video_instance_list
+            #videos_to_process = video_instance_list
+            for i, video_instance in enumerate(video_instance_list):
+                if ( (video_instance.id == 8220) ): #9447) ):
+                    videos_to_process.append(video_instance)
         else:
             for i, video_instance in enumerate(video_instance_list):
-                # For now we only care for shot, camera_movements and object detection
-                if (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["camera_movements"]) or (not video_instance.processed_flags["objects"]):
-                #if ( (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["camera_movements"]) or (video_instance.processed_flags["objects"])) and not ( ("VG" in video_instance.originalFileName) or ("A145-001_YATZIV-Amir_Another" in video_instance.originalFileName) ):
+                # For now we only care for shot, camera_movements and object detection  "RGAKFD"
+                #if (video_instance.processed_flags["shots"]) and ( video_instance.processed_flags["camera_movements"]) and (not video_instance.processed_flags["objects"]):# and ("IWM" in video_instance.originalFileName):
+                if ( (not video_instance.processed_flags["shots"]) or (not video_instance.processed_flags["camera_movements"]) or (not video_instance.processed_flags["objects"])):
                     videos_to_process.append(video_instance)
 
         if(len(videos_to_process) == 0):
@@ -94,9 +97,28 @@ class MainController(object):
         else:
             print("Found {0} videos to process".format(len(videos_to_process)))
 
-        #for i, video_instance in enumerate(videos_to_process):
-        #    video_instance.printInfo()
+        #videos_to_process = videos_to_process[2:]
+        for i, video_instance in enumerate(videos_to_process):
+            video_instance.printInfo()
+        print("Found {0} videos to process".format(len(videos_to_process)))
         #exit()
+
+        '''
+        # custom filter
+        filtered_video_list = []
+        videos_to_process = videos_to_process[50:100]
+        #videos_to_process = videos_to_process[225:240]  
+        for i, video_instance in enumerate(videos_to_process):
+            if not ("VG" in video_instance.originalFileName) or not ("A145-001_YATZIV-Amir_Another" in video_instance.originalFileName):
+                filtered_video_list.append(video_instance)
+                video_instance.printInfo()
+        videos_to_process = filtered_video_list
+        print("Found {0} videos to process".format(len(videos_to_process)))
+        exit()
+        '''
+
+        
+
 
         print("-------------------------------------------------------------------")
         print("------------------ BATCH PROCESSING -------------------------------")
