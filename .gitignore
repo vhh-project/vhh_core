@@ -107,4 +107,4 @@ venv.bak/
 
 # Results Folder
 results/
-results_backup/
+results_*/
