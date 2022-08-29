@@ -33,7 +33,7 @@ def main():
             width = frame_annotation["meta_info"]["size"]["width"]
             height = frame_annotation["meta_info"]["size"]["height"]
 
-            frame_windows = list(filter(lambda region: "frame-window" in region["tags"], frame_annotation["regions"]))
+            frame_windows = list(filter(lambda region: "frame_window" in region["tags"], frame_annotation["regions"]))
             if len(frame_windows) == 1:
                 break
 
