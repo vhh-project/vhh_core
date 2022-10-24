@@ -126,6 +126,30 @@ class VhhRestApi(object):
         response = self.getRequest(url)
         return response.json()
 
+    def getRawPublicTBAResults(self, vid):
+        """
+        This method is used to get all automatically generated TBA results from the VhhMMSI system.
+        :param vid: This parameter must hold a valid video identifier.
+        :return: This method returns the results (payload) as json format.
+        """
+        url = self.restURLProvider.getUrlTba(vid)
+        response = self.getRequest(url)
+        return response.json()
+
+    def getRawManualTBAResults(self, vid):
+        """
+        This method is used to get all manual generated TBA results from the VhhMMSI system.
+        :param vid: This parameter must hold a valid video identifier.
+        :return: This method returns the results (payload) as json format.
+        """
+
+        print("WARNING: Not implemented yet!")
+        exit()
+
+        url = self.restURLProvider.getUrlObjects(vid, auto = False)
+        response = self.getRequest(url)
+        return response.json()
+
     def getRelations(self, vid):
         """
         Downloads manual public relations for a given VID.
@@ -152,6 +176,23 @@ class VhhRestApi(object):
         except:
             print("Download process failed!")
             return False
+
+    def getPublicObjectsResult(self, vid):
+        """
+        This method is used to download automatically generated object annotation results from the VhhMMSI system
+        and transform them into a format that can be used by VHH packages.
+
+        :return: A list of dictionaries that represent the Object file (in a format that can be directly stored as a csv)
+        """
+        res_json = self.getRawPublicTBAResults(vid)
+        vid_name = f"{vid}.m4v"
+
+        results = []
+        for tba in res_json:
+            #print(tba.keys())
+            if (tba["createdByUserName"] == "tuw_cv_object_annotator"):
+                results.append({'vid_name': vid_name, "object_id": tba["objectId"], "label": tba["label"]})
+        return results
 
     def getAutoSTCResult(self, vid):
         """

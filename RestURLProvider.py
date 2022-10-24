@@ -38,6 +38,9 @@ class RestURLProvider(object):
 
     def getUrlObjects(self, vid: int, auto: bool = True):
         return self.join_video_endpt_with_vid(vid, auto, ["objects/"])
+    
+    def getUrlTba(self, vid: int, ):
+        return self.join_video_endpt([f"{vid}/tbas/public/"])
 
     def getUrlCameraMovements(self, vid: int, auto: bool = True):
         return self.join_video_endpt_with_vid(vid, auto, ["camera-movements/"])
