@@ -177,6 +177,23 @@ class VhhRestApi(object):
             print("Download process failed!")
             return False
 
+    def getOverscans(self, vid):
+        """
+        This method is used to download bounding box annotation results from the VhhMMSI system
+        and transform them into a format that can be used by VHH packages.
+
+        :return: A list of dictionaries that represent the Object file (in a format that can be directly stored as a csv)
+        """
+        url = self.restURLProvider.getUrlOSD(vid, auto=False)
+        response = self.getRequest(url)
+
+        if("content-type" in response.headers.keys()):
+            return response.json()
+        elif("Content-Length" in response.headers.keys()):
+            return None
+        else:
+            return response.json()
+
     def getPublicObjectsResult(self, vid):
         """
         This method is used to download automatically generated object annotation results from the VhhMMSI system

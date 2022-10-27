@@ -46,7 +46,11 @@ class RestURLProvider(object):
         return self.join_video_endpt_with_vid(vid, auto, ["camera-movements/"])
 
     def getUrlOSD(self, vid: int, auto: bool = True):
-        return self.join_video_endpt_with_vid(vid, auto, ["overscan/"])
+        if auto:
+            return self.join_video_endpt_with_vid(vid, auto, ["overscan/"])
+        else:
+            return self.join_video_endpt([f"{vid}/overscan"])
+        
 
     def getUrlRelations(self, vid: int):
         return self.join_video_endpt([f"{vid}/", "relations/public"])
