@@ -50,7 +50,31 @@ class RestURLProvider(object):
             return self.join_video_endpt_with_vid(vid, auto, ["overscan/"])
         else:
             return self.join_video_endpt([f"{vid}/overscan"])
-        
+
 
     def getUrlRelations(self, vid: int):
         return self.join_video_endpt([f"{vid}/", "relations/public"])
+
+    def addListOfParametersToUrl(self, url, parameter_dict={}):
+        entire_parameter_l = [f'{parameter}={value}' for parameter, value in zip(parameter_dict.keys(), parameter_dict.values())]
+        seperator = "&"
+        entire_parameter_url = seperator.join(entire_parameter_l)
+        entire_url_list = f"{url}?" + entire_parameter_url
+        return entire_url_list
+
+
+    def getUrlPublicTbaShots(self, vid: int, annotation_mode="auto", isPublished=False, isConfirmed=False):
+        # annotation_mode: auto | manual | all
+        if annotation_mode == "all":
+            entire_url = self.join_video_endpt([f"{vid}/tbas/public/shots"])
+        else:
+            entire_url = self.join_video_endpt([f"{vid}/tbas/public/shots/{annotation_mode}"])
+            parameter_dict = {
+                "isPublished": isPublished,
+                "isConfirmed": isConfirmed
+            }
+            entire_url = self.addListOfParametersToUrl(entire_url, parameter_dict)
+
+        return entire_url
+
+

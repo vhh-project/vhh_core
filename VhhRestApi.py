@@ -159,6 +159,11 @@ class VhhRestApi(object):
         response = self.getRequest(url)
         return response.json()
 
+    def getPublicShotTba(self, vid, annotation_mode, isPublished, isConfirmed):
+        url = self.restURLProvider.getUrlPublicTbaShots(vid, annotation_mode, isPublished, isConfirmed)
+        response = self.getRequest(url)
+        return response.json()
+
     def downloadVideo(self, url, file_name, video_format):
         """
         This method is used to download a video from the Vhh-MMSI system.
