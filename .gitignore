@@ -108,3 +108,6 @@ venv.bak/
 # Results Folder
 results/
 results_*/
+
+# videos Folder
+videos/*
