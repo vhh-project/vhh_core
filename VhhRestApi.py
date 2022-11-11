@@ -13,7 +13,7 @@ class VhhRestApi(object):
     This class includes the interfaces and methods to use the vhh restAPI interfaces provided by MaxRecall.
     """
 
-    def __init__(self, config, main_controller=None):
+    def __init__(self, config, main_controller=None, activate_dev_flag=False):
         """
         Constructor
 
@@ -21,9 +21,10 @@ class VhhRestApi(object):
         """
         self.__core_config = config
         self.__video_download_path = self.__core_config.video_download_path
+        self.activate_dev_flag = activate_dev_flag
 
         self.main_controller = main_controller
-        self.restURLProvider = RestURLProvider(config)
+        self.restURLProvider = RestURLProvider(config, activate_dev_flag=self.activate_dev_flag)
 
     def getRequest(self, url):
         """
@@ -61,15 +62,19 @@ class VhhRestApi(object):
         payload = json.dumps(data_dict)
         print("Send post request: " + str(url))
         try:
-            response = requests.post(url=url, headers=headers, data=payload)
+            if self.__core_config.dev_flag == True:
+                response = requests.post(url=url, headers=headers, data=payload, verify=self.__core_config.pem_path)
+            else:
+                response = requests.post(url=url, headers=headers, data=payload)
         except Exception as e:
-            print(f"POST threw an exception:\n{str(e)}\nExiting.")
+            print(f'POST threw an exception:\n{str(e)}\nExiting.')
             sys.exit()
 
         print(f"Response: {response.status_code}")
         if response.status_code != 200:
             print(
-                f"POST not successful:\n{response.status_code} {response.reason}\nExiting.")
+                f'POST not successful:\n{response.status_code} {response.reason}\nExiting.')
+            print(response.content)
             sys.exit()
         return response
 
@@ -327,6 +332,18 @@ class VhhRestApi(object):
             with open(path) as file:
                 data = json.load(file)
                 self.postRequest(url, data)
+
+    def postRdResults(self, vid, data):
+        """
+        Posts the automatically generated Relation Detection results (RD) to the VhhMMSI system.
+
+        :data_dict: Dictionary including information of the relation detection module.
+        """
+        url = self.restURLProvider.getUrlPostRelations(vid)
+        #print(data_dict)
+        #print(url)
+        self.postRequest(url, data)
+        #exit()
 
     def postOSDresults(self, osd_list):
         """

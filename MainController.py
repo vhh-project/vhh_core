@@ -37,8 +37,9 @@ class MainController(object):
         self.__cmc_instance = Cmc(config=self.__configuration_instance)
         self.__odt_instance = Odt(config=self.__configuration_instance)
 
+        self.activate_dev_flag = self.__configuration_instance.dev_flag
         self.__rest_api_instance = VhhRestApi(
-            config=self.__configuration_instance, main_controller=self)
+            config=self.__configuration_instance, main_controller=self, activate_dev_flag=self.activate_dev_flag)
 
         path_core_results = os.path.join(
             self.__configuration_instance.results_root_dir, "core")

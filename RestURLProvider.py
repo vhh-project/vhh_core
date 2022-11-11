@@ -7,11 +7,17 @@ class RestURLProvider(object):
     This class provides all URLs to access VhhMMSI. 
     """
 
-    def __init__(self, config):
+    def __init__(self, config, activate_dev_flag=False):
         """
         :param config: parameter must hold the core configuration object (Class-type Configuration)
         """
-        self.__root_url = config.root_url
+        self.activate_dev_flag = activate_dev_flag
+
+        if (self.activate_dev_flag == True):
+            self.__root_url = config.dev_root_url
+        else:
+            self.__root_url = config.root_url
+            
         self.ENDPT_VIDEOS = urljoin(self.__root_url, "videos/")
 
     def join_video_endpt(self, url_list: List[str]):
@@ -51,9 +57,13 @@ class RestURLProvider(object):
         else:
             return self.join_video_endpt([f"{vid}/overscan"])
 
-
     def getUrlRelations(self, vid: int):
         return self.join_video_endpt([f"{vid}/", "relations/public"])
+
+    def getUrlPostRelations(self, vid: int):
+        # example: https://api.vhh-dev.max-recall.com/api/tbaservice/videos/8365/feature-vectors/auto
+        return self.join_video_endpt([f"{vid}/", "feature-vectors/auto"])
+        
 
     def addListOfParametersToUrl(self, url, parameter_dict={}):
         entire_parameter_l = [f'{parameter}={value}' for parameter, value in zip(parameter_dict.keys(), parameter_dict.values())]
@@ -61,7 +71,6 @@ class RestURLProvider(object):
         entire_parameter_url = seperator.join(entire_parameter_l)
         entire_url_list = f"{url}?" + entire_parameter_url
         return entire_url_list
-
 
     def getUrlPublicTbaShots(self, vid: int, annotation_mode="auto", isPublished=False, isConfirmed=False):
         # annotation_mode: auto | manual | all
@@ -74,7 +83,6 @@ class RestURLProvider(object):
                 "isConfirmed": isConfirmed
             }
             entire_url = self.addListOfParametersToUrl(entire_url, parameter_dict)
-
         return entire_url
 
 
