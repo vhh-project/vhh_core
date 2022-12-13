@@ -34,8 +34,10 @@ class Configuration:
         self.config_file = config_file
 
         self.debug_flag = -1
+        self.dev_flag = -1
         self.pem_path = "None"
         self.root_url = "None"
+        self.dev_root_url = "None"
         self.video_download_path = "None"
         self.model_path = "None"
         self.sbd_config_file = "None"
@@ -66,7 +68,8 @@ class Configuration:
         plugin_config = config['PluginConfigs']
 
         # developer_config section
-        self.debug_flag = int(developer_config['DEBUG_FLAG'])
+        self.debug_flag = int(developer_config['DEBUG_FLAG'])  
+        self.dev_flag = int(developer_config['DEV_FLAG']) 
 
         # security section
         self.pem_path = str(security_config['PEM_PATH'])
@@ -75,7 +78,7 @@ class Configuration:
         self.video_download_path = vhh_core_config['VIDEO_DOWNLOAD_PATH']
         self.cleanup_flag = int(vhh_core_config['CLEANUP_FLAG'])
         self.results_root_dir = vhh_core_config['RESULTS_ROOT_DIR']
-        self.results_format = vhh_core_config['RESULTS_FORMAT']
+        self.do_send_to_server = int(vhh_core_config['SEND_TO_SERVER']) == 1
         self.model_path = vhh_core_config['PRETRAINED_MODEL_PATH']
         self.batch_size = int(vhh_core_config['BATCH_PROCESSING_SIZE'])
 
@@ -91,4 +94,5 @@ class Configuration:
 
         # api_config section
         self.root_url = api_config['ROOT_URL']
+        self.dev_root_url = api_config['DEV_ROOT_URL']
 

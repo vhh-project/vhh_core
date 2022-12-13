@@ -5,7 +5,7 @@ Development:
   DEBUG_FLAG: 0             # 1 ... activate 0 ... deactivate
   ###
   # This parameter is used to specify a SBD results file for debugging mode.
-  STC_RESULTS_PATH: "/data/share/fjogl/vhh_od_dev_results/stc_results/"
+  STC_RESULTS_PATH: "/data/share/datasets/vhh_mmsi_test_db_v3/annotations/sbd/57.csv"
   ###
   # This parameter is used to save a debug package (e.g. including some visualizations, ... - not available yet).
   SAVE_DEBUG_PKG: 0
@@ -56,11 +56,11 @@ OdCore:
 
   ###
   # This parameter is used to specify the path to the pre-trained model.
-  PATH_PRETRAINED_MODEL: "models/odt/yolov3.weights"
+  PATH_PRETRAINED_MODEL: "./models/odt/yolov3.weights"
 
   ###
   # yolov3 detector
-  MODEL_CONFIG_PATH: "config/ODT/yolov3/yolov3.cfg"
+  MODEL_CONFIG_PATH: "./config/ODT/yolov3/yolov3.cfg"
 
   ###
   # yolov3 detector - confidence threshold
@@ -72,17 +72,17 @@ OdCore:
 
   ###
   # yolov3 detector - holding list of trained class categories
-  MODEL_CLASS_NAMES_PATH: "config/ODT/yolov3/coco.names"
+  MODEL_CLASS_NAMES_PATH: "./config/ODT/yolov3/coco.names"
   ###
   # yolov3 detector - holding list of trained class categories
-  MODEL_CLASS_SELECTION_PATH: "config/ODT/yolov3/class.selection"
+  MODEL_CLASS_SELECTION_PATH: "./config/ODT/yolov3/class.selection"
 
   ###
   # Parameters for DeepSort Tracker
   USE_DEEPSORT: 1
   ###
   # Path to DeepSort Model Checkpoint
-  DEEPSORT_MODEL_PATH: "models/odt/deepsort_ckpt.t7"
+  DEEPSORT_MODEL_PATH: "./models/odt/deepsort_ckpt.t7"
   ###
   # Maximum Distance for Nearest Neighbour Cosine Metric. Must be a float >= 0
   DS_MAX_DIST: 0.2
@@ -113,7 +113,7 @@ OdCore:
   USE_CLASSIFIER_MAJORITY_VOTING: 1
   ###
   # Path to the model the classifier is supposed to use
-  PATH_TO_CLASSIFIER_MODEL: "models/odt/wd_0.05_best_wide_resnet50_2.weights"
+  PATH_TO_CLASSIFIER_MODEL: "./models/odt/wd_0.05_best_wide_resnet50_2.weights"
   ###
   # Architecture of the model the classifier is using
   CLASSIFIER_MODEL_ARCHITECTURE: "wide_resnet50_2"

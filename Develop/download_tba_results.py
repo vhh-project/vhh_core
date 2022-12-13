@@ -14,7 +14,7 @@ IMPORTANT:
 """
 
 config_file = "../config/CORE/config.yaml"
-output_filename = "annotation_results"
+output_filename = "tba_results"
 
 #
 # ARGUMENT PARSING
@@ -91,12 +91,12 @@ print("Found {0} videos that fulfill the requirements".format(len(videos_id_list
 
 annotation_results = []
 
-# Get annotation results
+# Get tba results
 
 if args.store_as_csv:
     assert not args.manual
     for id in videos_id_list:
-        data = RestAPI.getAutoSTCResult(id)
+        data = RestAPI.getPublicObjectsResult(id)
         file_name_without_extension = os.path.join(args.path,  str(id))
         file_path = Utils.make_filepath_unique(file_name_without_extension, '.csv')
         Utils.store_csv(file_path, data)
@@ -105,7 +105,7 @@ if args.store_as_csv:
 if args.store_as_json:
     for vid in videos_id_list:
         if not args.manual:
-            json = RestAPI.getRawAutomaticSTCResults(vid)
+            json = RestAPI.getRawManualTBAResults(vid)
         else:
-            json = RestAPI.getRawManualSTCResults(vid)
+            json = RestAPI.getRawPublicTBAResults(vid)
         Utils.store_json(os.path.join(args.path, str(vid) + ".json"), json)

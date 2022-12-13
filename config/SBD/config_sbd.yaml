@@ -47,7 +47,7 @@ SbdCore:
   PATH_FINAL_RESULTS: "results/sbd/final_results/"
   ###
   # This parameter is used to specify the prefix for the results file.
-  PREFIX_FINAL_RESULTS: "results_"
+  PREFIX_FINAL_RESULTS: ""
   ###
   # This parameter is used to specify the postfix for the results file.
   POSTFIX_FINAL_RESULTS: "csv"

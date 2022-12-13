@@ -26,9 +26,9 @@ class Video(object):
         self.video_format = "None"
         self.file_name = "None"
         self.download_path = "None"
-        self.processed_flag = "None"
+        self.processed_flags = {}
 
-    def create_video(self, vid, originalFileName, url, download_path, processed_flag):
+    def create_video(self, vid, originalFileName, url, download_path, processed_flag_shots, processed_flag_camera_movements, processed_flag_objects, processed_flag_relations, processed_flag_overscan):
         """
         This method is used to fill all properties of a video.
 
@@ -44,9 +44,14 @@ class Video(object):
         self.video_format = url.split('.')[-1]
         self.file_name = url.split('/')[-1]
         self.download_path = download_path
-        self.processed_flag = processed_flag
+        self.processed_flags = {
+            "shots": processed_flag_shots,
+            "camera_movements": processed_flag_camera_movements,
+            "objects": processed_flag_objects,
+            "relations": processed_flag_relations,
+            "overscan": processed_flag_overscan}
 
-    def download(self, rest_api_instance=None):
+    def download(self, rest_api_instance=None, filename = None):
         """
         This method is used to download the video into the local storage path.
 
@@ -57,8 +62,10 @@ class Video(object):
             print("You have to specify a valid object of class type VhhRestApi to execute the download process!")
             exit()
 
+        if filename is None:
+            filename = str(self.id)
         ret = rest_api_instance.downloadVideo(self.url,
-                                              str(self.id),
+                                              filename,
                                               self.video_format)
         return ret
 
@@ -95,59 +102,30 @@ class Video(object):
         This method is used to cleanup all data related to the corresponding video ID. It deletes the generated results
         of the sbd, stc and cmc plugin as well as the downloaded video file.
         """
-        print("start cleanup process ... ")
-
-        print("Delete video if available in video_download path ...")
         # get list of videos in download path
         video_list = os.listdir(self.download_path)
         search_str = str(self.id) + "." + self.video_format
 
         # find video name in list
         if (search_str in video_list):
-            print("delete video ... ")
             file_path = os.path.join(self.download_path, search_str)
             os.remove(file_path)
 
-        print("Delete sbd results if available ...")
-        fp = open(self.__core_config.sbd_config_file, 'r')
-        sbd_config = yaml.load(fp, Loader=yaml.BaseLoader)
-        sbd_results_dir = sbd_config['SbdCore']['PATH_FINAL_RESULTS']
-        fp.close()
-
+        # Delete results from SBD, STC, CMC and ODT
         search_str = str(self.id) + ".csv"
-        result_file_list = os.listdir(sbd_results_dir)
-        if (search_str in result_file_list):
-            print("delete sbd results ... ")
-            file_path = os.path.join(sbd_results_dir, search_str)
-            os.remove(file_path)
 
-        print("Delete stc results if available  ...")
-        fp = open(self.__core_config.stc_config_file, 'r')
-        stc_config = yaml.load(fp, Loader=yaml.BaseLoader)
-        stc_results_dir = stc_config['StcCore']['PATH_FINAL_RESULTS']
-        fp.close()
+        for config_file_path, config_section in zip(
+            [self.__core_config.sbd_config_file, self.__core_config.stc_config_file, self.__core_config.cmc_config_file, self.__core_config.odt_config_file], 
+            ['SbdCore', 'StcCore', 'CmcCore', 'OdCore']):
 
-        search_str = str(self.id) + ".csv"
-        result_file_list = os.listdir(stc_results_dir)
-        if (search_str in result_file_list):
-            print("delete stc results ... ")
-            file_path = os.path.join(stc_results_dir, search_str)
-            os.remove(file_path)
+            with open(config_file_path, 'r') as fp:
+                config = yaml.load(fp, Loader=yaml.BaseLoader)
+                results_dir = config[config_section]['PATH_FINAL_RESULTS']
 
-        print("Delete cmc results if available  ...")
-        fp = open(self.__core_config.cmc_config_file, 'r')
-        cmc_config = yaml.load(fp, Loader=yaml.BaseLoader)
-        cmc_results_dir = cmc_config['CmcCore']['PATH_FINAL_RESULTS']
-        fp.close()
-
-        search_str = str(self.id) + ".csv"
-        result_file_list = os.listdir(cmc_results_dir)
-        if (search_str in result_file_list):
-            print("delete cmc results ... ")
-            file_path = os.path.join(cmc_results_dir, search_str)
-            os.remove(file_path)
-
-        print("cleanup process successfully finished!")
+                result_file_list = os.listdir(results_dir)
+                if (search_str in result_file_list):
+                    file_path = os.path.join(results_dir, search_str)
+                    os.remove(file_path)    
 
     def printInfo(self):
         """
@@ -161,5 +139,6 @@ class Video(object):
         print("video_format: " + str(self.video_format))
         print("url: " + str(self.url))
         print("download_path: " + str(self.download_path))
-        print("processed flag: " + str(self.processed_flag))
+        print("processed flags:\n\tShot-Annotations: {0}\n\tCamera-Movement-Annotations: {1}\n\tObjects: {2}\n\tRelations: {3}\n\tOverscan: {4}".format(
+            self.processed_flags["shots"], self.processed_flags["camera_movements"], self.processed_flags["objects"], self.processed_flags["relations"], self.processed_flags["overscan"]))
         print("####################################################")

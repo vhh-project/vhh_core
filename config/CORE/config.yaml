@@ -2,16 +2,22 @@ Development:
   ###
   # This parameter is used to activate or deactivate the debug mode.
   DEBUG_FLAG: 0             # 1 ... activate 0 ... deactivate
+  ###
+  # This parameter is used to activate or deactivate the dev-system/prod-system mode.
+  DEV_FLAG: 1             # 1 ... activate 0 ... deactivate
 
 Security:
   ###
   # This parameter specifies the path tp the certificate file needed to provide vhh-mmsi api access.
-  PEM_PATH: "/home/dhelm/VHH_Releases/certificates/cacert.pem"  # certificate file for vhh-mmsi api access
+  PEM_PATH: "/data/vhh_release/release_v1_5_0/cacert.pem"  # certificate file for vhh-mmsi api access
 
 ApiEndpoints:
   ###
   # This parameter specifies the root url for the RestApi endpoints.
-  ROOT_URL: "https://api.vhh-mmsi.eu/api/shotservice/"   # root url for API endpoints
+  ROOT_URL: "https://api.vhh-mmsi.eu/api/tbaservice/"   # root url for API endpoints
+  ###
+  # This parameter specifies the dev root url for the RestApi endpoints.
+  DEV_ROOT_URL: "https://api.vhh-dev.max-recall.com/api/tbaservice/"   # dev root url for API endpoints  138.201.135.134   api.vhh-dev.max-recall.com
 
 VhhCore:
   ###
@@ -24,7 +30,7 @@ VhhCore:
 
   ###
   # This parameter is used to activate/deactivate the clean-up mode. The clean-up mode deletes all downloaded videos and the corresponding generated results.
-  CLEANUP_FLAG: 0   # 0 ... deactivate cleanup function OR 1 ... activate cleanup method -> delete all downloaded videos + annotation results locally
+  CLEANUP_FLAG: 1  # 0 ... deactivate cleanup function OR 1 ... activate cleanup method -> delete all downloaded videos + annotation results locally
 
   ###
   # This parameter specifies the results path for each individual plugin.
@@ -37,29 +43,27 @@ VhhCore:
   BATCH_PROCESSING_SIZE: 2
   
   ###
-  # This parameter specifies the format in which the results are written.
-  # CSV_LOCAL ... writes results to RESULTS_ROOT_DIR/core/results.csv
-  # JSON_LOCAL ... writes results to RESULTS_ROOT_DIR/core/results.json
-  # JSON_REST ... uses the Rest API to publish results as JSON files
-  # other ... do not write any results
-  RESULTS_FORMAT: "CSV_LOCAL"
+  # This parameter specifies whether the results will be sent to the VHH MMSI server
+  #   0 ... do NOT send to server
+  #   1 ... send to server
+  SEND_TO_SERVER: 1
 
 PluginConfigs:
   ###
   # This parameter is used to activate or deactivate the SBD Plugin
-  USE_SBD: 0             # 1 ... activate 0 ... deactivate
+  USE_SBD: 1             # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the shot boundary detection plugin module
   SBD_CONFIG_FILE: "config/SBD/config_sbd.yaml"
 
   ###
   # This parameter is used to activate or deactivate the STC Plugin
-  USE_STC: 0             # 1 ... activate 0 ... deactivate
+  USE_STC: 1            # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the shot type classification plugin module
   STC_CONFIG_FILE: "config/STC/config_stc.yaml"
 
   ###
   # This parameter is used to activate or deactivate the CMC Plugin
-  USE_CMC: 0             # 1 ... activate 0 ... deactivate
+  USE_CMC: 1              # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the camera movement classification module
   CMC_CONFIG_FILE: "config/CMC/config_cmc.yaml"
 
@@ -67,7 +71,7 @@ PluginConfigs:
   # This parameter is used to activate or deactivate the ODT Plugin
   USE_ODT: 1             # 1 ... activate 0 ... deactivate
   # This parameter specifies the configuration path (.yaml) for the object detection and tracking module
-  ODT_CONFIG_FILE: "config/ODT/config_od.yaml"
+  ODT_CONFIG_FILE: "config/config_vhh_od.yaml"
 
 
 

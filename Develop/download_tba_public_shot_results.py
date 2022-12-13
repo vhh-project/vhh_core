@@ -4,7 +4,7 @@ import argparse, os
 import Utils
 
 """
-Download all annotation results.
+Download all tba shot annotation results.
 For more details on the parameters please call this script with the parameter '-h'
 Needs to be run from INSIDE the Develop directory
 
@@ -14,7 +14,7 @@ IMPORTANT:
 """
 
 config_file = "../config/CORE/config.yaml"
-output_filename = "annotation_results"
+output_filename = "tba_results"
 
 #
 # ARGUMENT PARSING
@@ -28,8 +28,10 @@ parser.add_argument('-a', '--all', dest='download_all', action='store_true', hel
 parser.add_argument('-c', '--csv', dest='store_as_csv', action='store_true', help = "If this parameter is used then the results will be stores as CSV.")
 parser.add_argument('-j', '--json', dest='store_as_json', action='store_true', help = "If this parameter is used then the results will be stores as JSON.")
 
-parser.add_argument('--manual', dest='manual', action='store_true', help = "If this parameter is used then only manual annotations will be downloaded.")
+parser.add_argument('-isPublished', '--isPublished', dest='isPublished', action='store_true', help = "If this parameter is used then download only all annotated videos which are indicated with the \"isPublished\" flag.")
+parser.add_argument('-isConfirmed', '--isConfirmed', dest='isConfirmed', action='store_true', help = "If this parameter is used then download only all annotated videos which are indicated with the \"isConfirmed\" flag.")
 
+parser.add_argument('-m', '--manual', dest='manual', action='store_true', help = "If this parameter is used then only manual annotations will be downloaded.")
 
 parser.add_argument('-s', '--starting_with', dest='starting_with', nargs='+', type=str, help = 
     """Download all annotations whose video starts with this i.e. "-s NARA EFA LOC" will only download annotations of videos who's name starts with NARA, EFA or LOC""")
@@ -86,26 +88,18 @@ if args.download_all:
             videos_id_list.append(video.id)
 else:
     videos_id_list = args.ids
-
 print("Found {0} videos that fulfill the requirements".format(len(videos_id_list)))
 
 annotation_results = []
-
-# Get annotation results
-
-if args.store_as_csv:
-    assert not args.manual
-    for id in videos_id_list:
-        data = RestAPI.getAutoSTCResult(id)
-        file_name_without_extension = os.path.join(args.path,  str(id))
-        file_path = Utils.make_filepath_unique(file_name_without_extension, '.csv')
-        Utils.store_csv(file_path, data)
-        
-  
+# Get public tba shot results  
 if args.store_as_json:
     for vid in videos_id_list:
         if not args.manual:
-            json = RestAPI.getRawAutomaticSTCResults(vid)
+            annotation_mode = "auto"
         else:
-            json = RestAPI.getRawManualSTCResults(vid)
+            annotation_mode = "manual"
+
+        isPublished = args.isPublished
+        isConfirmed = args.isConfirmed
+        json = RestAPI.getPublicShotTba(vid, annotation_mode, isPublished, isConfirmed)
         Utils.store_json(os.path.join(args.path, str(vid) + ".json"), json)

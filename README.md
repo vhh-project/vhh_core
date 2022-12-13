@@ -41,13 +41,9 @@ Install a Version of PyTorch depending on your setup. Consult the [PyTorch websi
 
 **Setup environment variables:**
 
-   * ```source /data/dhelm/python_virtenv/vhh_core_env/bin/activate```
-   * ```export CUDA_VISIBLE_DEVICES=0```
-   * ```export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.1/lib64/```
-   * ```export CUDA_HOME=/usr/local/cuda-10.1```
-   * ```export PATH=$PATH:/usr/local/cuda-10.1/bin```
-   * ```export PYTHONPATH=$PYTHONPATH:/XXX/vhh_core/:/XXX/vhh_core/Develop/:/XXX/vhh_core/Demo/```
-   * ```export PYTHONPATH=$PYTHONPATH:/home/dhelm/VHH_Releases/vhh_core/vhh_core/:/home/dhelm/VHH_Releases/vhh_core/vhh_core/Develop/:/home/dhelm/VHH_Releases/vhh_core/vhh_core/Demo/```
+   * Activate environment: ```source /xxx/vhh_core/bin/activate```
+   * Let PATH_TO_DIR be the path to the directory containing this repository. Change pythonpath:
+    ```export PYTHONPATH=$PYTHONPATH:/PATH_TO_DIR/vhh_core/:/PATH_TO_DIR/vhh_core/Develop/:/PATH_TO_DIR/vhh_core/Demo/```
    
 **Import Models**
 
@@ -60,7 +56,3 @@ Folders for the downloaded videos and the results will be automatically created 
    * ```python Demo/run_automatic_annotation_process.py```
    * Import models for SBD and STC.
    * ```python Demo/run_automatic_annotation_process.py```
-
-## Docker Setup instructions
-
-NOT AVAILABLE YET
